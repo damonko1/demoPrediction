@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "start": "python3 -m http.server 3000 -d out",
+    "typecheck": "tsc --noEmit",
+    "build:historical-data": "node scripts/build-historical-data.mjs",
+    "build:legislative-data": "node scripts/build-legislative-data.mjs",
+    "validate:legislative-data": "node scripts/validate-legislative-data.mjs"
   },
   "dependencies": {
     "lucide-react": "1.22.0",
