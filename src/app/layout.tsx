@@ -8,6 +8,18 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  openGraph: {
+    title: "Election Forecast Playground",
+    description:
+      "Explore Electoral College scenarios with historical baselines, swing controls, and compact share previews.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Election Forecast Playground",
+    description:
+      "Explore Electoral College scenarios with historical baselines, swing controls, and compact share previews.",
+  },
 };
 
 export default function RootLayout({
