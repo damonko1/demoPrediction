@@ -1,4 +1,8 @@
-import { formatMargin, formatSwing } from "@/lib/format";
+import {
+  formatMargin,
+  formatPartyShort,
+  formatSwing,
+} from "@/lib/format";
 import type { ScenarioResult } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
@@ -6,12 +10,22 @@ type ScenarioSummaryProps = {
   scenario: ScenarioResult;
 };
 
+function formatEvDelta(value: number) {
+  if (value === 0) {
+    return "0";
+  }
+
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
 export function ScenarioSummary({ scenario }: ScenarioSummaryProps) {
   const demEvShift =
     scenario.totals.democratic - scenario.baselineTotals.democratic;
+  const repEvShift =
+    scenario.totals.republican - scenario.baselineTotals.republican;
 
   return (
-    <section className={styles.panel} aria-label="Scenario summary">
+    <section className={styles.panel} aria-label="Scenario summary" aria-live="polite">
       <div className={styles.panelHeader}>
         <div>
           <p className={styles.sectionKicker}>Summary</p>
@@ -24,11 +38,14 @@ export function ScenarioSummary({ scenario }: ScenarioSummaryProps) {
 
       <div className={styles.summaryMetrics}>
         <div className={styles.evShift}>
-          <span>Democratic EV shift</span>
-          <strong>{demEvShift > 0 ? `+${demEvShift}` : demEvShift}</strong>
+          <span>EV change from baseline</span>
+          <div className={styles.evDeltaStack}>
+            <strong>D {formatEvDelta(demEvShift)}</strong>
+            <small>R {formatEvDelta(repEvShift)}</small>
+          </div>
         </div>
         <div className={styles.evShift}>
-          <span>Flipped state count</span>
+          <span>Flipped states</span>
           <strong>{scenario.flippedStates.length}</strong>
         </div>
       </div>
@@ -39,8 +56,15 @@ export function ScenarioSummary({ scenario }: ScenarioSummaryProps) {
         <ul className={styles.flipList}>
           {scenario.flippedStates.map((result) => (
             <li key={result.state.code}>
-              <span>{result.state.code}</span>
-              <strong>{formatMargin(result.simulatedMargin)}</strong>
+              <span className={styles.flipStateName}>
+                <b>{result.state.code}</b>
+                <small>{result.state.name}</small>
+              </span>
+              <strong className={styles.flipOutcome}>
+                {formatPartyShort(result.baselineWinner)} to{" "}
+                {formatPartyShort(result.simulatedWinner)}
+                <small>{formatMargin(result.simulatedMargin)}</small>
+              </strong>
             </li>
           ))}
         </ul>

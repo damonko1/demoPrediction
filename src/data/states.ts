@@ -1,57 +1,185 @@
-import type { StateBaseline } from "@/types/election";
+import { currentDatasetAccuracyProfiles } from "@/data/dataAccuracy";
+import {
+  defaultHistoricalElectionYear,
+  historicalStateResultsByYear,
+  splitElectoralVoteUnitsByYear,
+} from "@/data/historicalElectionData.generated";
+import type {
+  ElectoralVoteUnit,
+  HistoricalElectionYear,
+  HistoricalStateResult,
+  Party,
+  StateBaseline,
+} from "@/types/election";
 
-// Positive margins are Democratic; negative margins are Republican.
-// Starter margins are rounded, illustrative 2024-style state baselines for MVP simulation.
-export const stateBaselines: StateBaseline[] = [
-  { code: "AK", name: "Alaska", electoralVotes: 3, baselineMargin: -13.1, tile: { row: 1, col: 1 } },
-  { code: "ME", name: "Maine", electoralVotes: 4, baselineMargin: 6.9, tile: { row: 1, col: 12 } },
-  { code: "WA", name: "Washington", electoralVotes: 12, baselineMargin: 18.2, tile: { row: 2, col: 2 } },
-  { code: "MT", name: "Montana", electoralVotes: 4, baselineMargin: -20.4, tile: { row: 2, col: 3 } },
-  { code: "ND", name: "North Dakota", electoralVotes: 3, baselineMargin: -36.4, tile: { row: 2, col: 4 } },
-  { code: "MN", name: "Minnesota", electoralVotes: 10, baselineMargin: 4.2, tile: { row: 2, col: 5 } },
-  { code: "WI", name: "Wisconsin", electoralVotes: 10, baselineMargin: -0.9, tile: { row: 2, col: 6 } },
-  { code: "MI", name: "Michigan", electoralVotes: 15, baselineMargin: -1.4, tile: { row: 2, col: 7 } },
-  { code: "VT", name: "Vermont", electoralVotes: 3, baselineMargin: 32.8, tile: { row: 2, col: 10 } },
-  { code: "NH", name: "New Hampshire", electoralVotes: 4, baselineMargin: 2.8, tile: { row: 2, col: 11 } },
-  { code: "MA", name: "Massachusetts", electoralVotes: 11, baselineMargin: 24.2, tile: { row: 2, col: 12 } },
-  { code: "OR", name: "Oregon", electoralVotes: 8, baselineMargin: 14.6, tile: { row: 3, col: 2 } },
-  { code: "ID", name: "Idaho", electoralVotes: 4, baselineMargin: -36.5, tile: { row: 3, col: 3 } },
-  { code: "SD", name: "South Dakota", electoralVotes: 3, baselineMargin: -29.4, tile: { row: 3, col: 4 } },
-  { code: "IA", name: "Iowa", electoralVotes: 6, baselineMargin: -13.2, tile: { row: 3, col: 5 } },
-  { code: "IL", name: "Illinois", electoralVotes: 19, baselineMargin: 11.0, tile: { row: 3, col: 6 } },
-  { code: "IN", name: "Indiana", electoralVotes: 11, baselineMargin: -19.0, tile: { row: 3, col: 7 } },
-  { code: "OH", name: "Ohio", electoralVotes: 17, baselineMargin: -11.2, tile: { row: 3, col: 8 } },
-  { code: "PA", name: "Pennsylvania", electoralVotes: 19, baselineMargin: -1.7, tile: { row: 3, col: 9 } },
-  { code: "NY", name: "New York", electoralVotes: 28, baselineMargin: 12.6, tile: { row: 3, col: 10 } },
-  { code: "CT", name: "Connecticut", electoralVotes: 7, baselineMargin: 14.5, tile: { row: 3, col: 11 } },
-  { code: "RI", name: "Rhode Island", electoralVotes: 4, baselineMargin: 13.9, tile: { row: 3, col: 12 } },
-  { code: "CA", name: "California", electoralVotes: 54, baselineMargin: 20.1, tile: { row: 4, col: 2 } },
-  { code: "NV", name: "Nevada", electoralVotes: 6, baselineMargin: -3.1, tile: { row: 4, col: 3 } },
-  { code: "WY", name: "Wyoming", electoralVotes: 3, baselineMargin: -46.2, tile: { row: 4, col: 4 } },
-  { code: "NE", name: "Nebraska", electoralVotes: 5, baselineMargin: -21.8, tile: { row: 4, col: 5 } },
-  { code: "MO", name: "Missouri", electoralVotes: 10, baselineMargin: -18.4, tile: { row: 4, col: 6 } },
-  { code: "KY", name: "Kentucky", electoralVotes: 8, baselineMargin: -30.6, tile: { row: 4, col: 7 } },
-  { code: "WV", name: "West Virginia", electoralVotes: 4, baselineMargin: -41.9, tile: { row: 4, col: 8 } },
-  { code: "VA", name: "Virginia", electoralVotes: 13, baselineMargin: 5.8, tile: { row: 4, col: 9 } },
-  { code: "NJ", name: "New Jersey", electoralVotes: 14, baselineMargin: 5.9, tile: { row: 4, col: 10 } },
-  { code: "DE", name: "Delaware", electoralVotes: 3, baselineMargin: 14.7, tile: { row: 4, col: 11 } },
-  { code: "DC", name: "District of Columbia", electoralVotes: 3, baselineMargin: 84.2, tile: { row: 4, col: 12 } },
-  { code: "AZ", name: "Arizona", electoralVotes: 11, baselineMargin: -5.5, tile: { row: 5, col: 3 } },
-  { code: "UT", name: "Utah", electoralVotes: 6, baselineMargin: -21.6, tile: { row: 5, col: 4 } },
-  { code: "CO", name: "Colorado", electoralVotes: 10, baselineMargin: 11.0, tile: { row: 5, col: 5 } },
-  { code: "KS", name: "Kansas", electoralVotes: 6, baselineMargin: -16.2, tile: { row: 5, col: 6 } },
-  { code: "AR", name: "Arkansas", electoralVotes: 6, baselineMargin: -30.6, tile: { row: 5, col: 7 } },
-  { code: "TN", name: "Tennessee", electoralVotes: 11, baselineMargin: -29.7, tile: { row: 5, col: 8 } },
-  { code: "NC", name: "North Carolina", electoralVotes: 16, baselineMargin: -3.2, tile: { row: 5, col: 9 } },
-  { code: "SC", name: "South Carolina", electoralVotes: 9, baselineMargin: -17.8, tile: { row: 5, col: 10 } },
-  { code: "MD", name: "Maryland", electoralVotes: 10, baselineMargin: 25.0, tile: { row: 5, col: 11 } },
-  { code: "NM", name: "New Mexico", electoralVotes: 5, baselineMargin: 6.0, tile: { row: 6, col: 4 } },
-  { code: "OK", name: "Oklahoma", electoralVotes: 7, baselineMargin: -33.5, tile: { row: 6, col: 5 } },
-  { code: "LA", name: "Louisiana", electoralVotes: 8, baselineMargin: -22.0, tile: { row: 6, col: 6 } },
-  { code: "MS", name: "Mississippi", electoralVotes: 6, baselineMargin: -24.1, tile: { row: 6, col: 7 } },
-  { code: "AL", name: "Alabama", electoralVotes: 9, baselineMargin: -30.5, tile: { row: 6, col: 8 } },
-  { code: "GA", name: "Georgia", electoralVotes: 16, baselineMargin: -2.2, tile: { row: 6, col: 9 } },
-  { code: "HI", name: "Hawaii", electoralVotes: 4, baselineMargin: 23.1, tile: { row: 7, col: 1 } },
-  { code: "TX", name: "Texas", electoralVotes: 40, baselineMargin: -13.7, tile: { row: 7, col: 5 } },
-  { code: "FL", name: "Florida", electoralVotes: 30, baselineMargin: -13.1, tile: { row: 7, col: 10 } },
+export const stateMapShapeAssetPath = "/us-states-albers-10m.json";
+export const stateBaselineAccuracyProfile = currentDatasetAccuracyProfiles.find(
+  (profile) => profile.id === "historical-state-baselines",
+);
+
+const stateMapShapeIds = {
+  AL: "01",
+  AK: "02",
+  AZ: "04",
+  AR: "05",
+  CA: "06",
+  CO: "08",
+  CT: "09",
+  DE: "10",
+  DC: "11",
+  FL: "12",
+  GA: "13",
+  HI: "15",
+  ID: "16",
+  IL: "17",
+  IN: "18",
+  IA: "19",
+  KS: "20",
+  KY: "21",
+  LA: "22",
+  ME: "23",
+  MD: "24",
+  MA: "25",
+  MI: "26",
+  MN: "27",
+  MS: "28",
+  MO: "29",
+  MT: "30",
+  NE: "31",
+  NV: "32",
+  NH: "33",
+  NJ: "34",
+  NM: "35",
+  NY: "36",
+  NC: "37",
+  ND: "38",
+  OH: "39",
+  OK: "40",
+  OR: "41",
+  PA: "42",
+  RI: "44",
+  SC: "45",
+  SD: "46",
+  TN: "47",
+  TX: "48",
+  UT: "49",
+  VT: "50",
+  VA: "51",
+  WA: "53",
+  WV: "54",
+  WI: "55",
+  WY: "56",
+} as const;
+
+type MappedStateCode = keyof typeof stateMapShapeIds;
+type StateMetadata = Pick<
+  StateBaseline,
+  "name" | "tile"
+> & {
+  code: MappedStateCode;
+};
+
+export const stateCodeByMapShapeId = Object.fromEntries(
+  Object.entries(stateMapShapeIds).map(([code, mapShapeId]) => [mapShapeId, code]),
+) as Record<string, MappedStateCode>;
+
+function getBaselineWinner(baselineMargin: number): Party {
+  return baselineMargin >= 0 ? "democratic" : "republican";
+}
+
+function getHistoricalStateResult(
+  year: HistoricalElectionYear,
+  code: MappedStateCode,
+): HistoricalStateResult {
+  return historicalStateResultsByYear[year][code] as HistoricalStateResult;
+}
+
+function buildStateBaseline(
+  state: StateMetadata,
+  year: HistoricalElectionYear,
+): StateBaseline {
+  const historicalResult = getHistoricalStateResult(year, state.code);
+  const splitElectoralVoteUnits = splitElectoralVoteUnitsByYear[year] as Partial<
+    Record<MappedStateCode, readonly ElectoralVoteUnit[]>
+  >;
+
+  return {
+    ...state,
+    electoralVotes: historicalResult.electoralVotes,
+    electoralVoteUnits: splitElectoralVoteUnits[state.code],
+    baselineYear: year,
+    baselineMargin: historicalResult.baselineMargin,
+    baselineMargins: {
+      democratic: historicalResult.baselineMargin,
+      republican: -historicalResult.baselineMargin,
+    },
+    baselineWinner: getBaselineWinner(historicalResult.baselineMargin),
+    democraticVotes: historicalResult.democraticVotes,
+    republicanVotes: historicalResult.republicanVotes,
+    otherVotes: historicalResult.otherVotes,
+    totalVotes: historicalResult.totalVotes,
+    mapShapeId: stateMapShapeIds[state.code],
+  };
+}
+
+const stateMetadata: StateMetadata[] = [
+  { code: "AK", name: "Alaska", tile: { row: 1, col: 1 } },
+  { code: "ME", name: "Maine", tile: { row: 1, col: 12 } },
+  { code: "WA", name: "Washington", tile: { row: 2, col: 2 } },
+  { code: "MT", name: "Montana", tile: { row: 2, col: 3 } },
+  { code: "ND", name: "North Dakota", tile: { row: 2, col: 4 } },
+  { code: "MN", name: "Minnesota", tile: { row: 2, col: 5 } },
+  { code: "WI", name: "Wisconsin", tile: { row: 2, col: 6 } },
+  { code: "MI", name: "Michigan", tile: { row: 2, col: 7 } },
+  { code: "VT", name: "Vermont", tile: { row: 2, col: 10 } },
+  { code: "NH", name: "New Hampshire", tile: { row: 2, col: 11 } },
+  { code: "MA", name: "Massachusetts", tile: { row: 2, col: 12 } },
+  { code: "OR", name: "Oregon", tile: { row: 3, col: 2 } },
+  { code: "ID", name: "Idaho", tile: { row: 3, col: 3 } },
+  { code: "SD", name: "South Dakota", tile: { row: 3, col: 4 } },
+  { code: "IA", name: "Iowa", tile: { row: 3, col: 5 } },
+  { code: "IL", name: "Illinois", tile: { row: 3, col: 6 } },
+  { code: "IN", name: "Indiana", tile: { row: 3, col: 7 } },
+  { code: "OH", name: "Ohio", tile: { row: 3, col: 8 } },
+  { code: "PA", name: "Pennsylvania", tile: { row: 3, col: 9 } },
+  { code: "NY", name: "New York", tile: { row: 3, col: 10 } },
+  { code: "CT", name: "Connecticut", tile: { row: 3, col: 11 } },
+  { code: "RI", name: "Rhode Island", tile: { row: 3, col: 12 } },
+  { code: "CA", name: "California", tile: { row: 4, col: 2 } },
+  { code: "NV", name: "Nevada", tile: { row: 4, col: 3 } },
+  { code: "WY", name: "Wyoming", tile: { row: 4, col: 4 } },
+  { code: "NE", name: "Nebraska", tile: { row: 4, col: 5 } },
+  { code: "MO", name: "Missouri", tile: { row: 4, col: 6 } },
+  { code: "KY", name: "Kentucky", tile: { row: 4, col: 7 } },
+  { code: "WV", name: "West Virginia", tile: { row: 4, col: 8 } },
+  { code: "VA", name: "Virginia", tile: { row: 4, col: 9 } },
+  { code: "NJ", name: "New Jersey", tile: { row: 4, col: 10 } },
+  { code: "DE", name: "Delaware", tile: { row: 4, col: 11 } },
+  { code: "DC", name: "District of Columbia", tile: { row: 4, col: 12 } },
+  { code: "AZ", name: "Arizona", tile: { row: 5, col: 3 } },
+  { code: "UT", name: "Utah", tile: { row: 5, col: 4 } },
+  { code: "CO", name: "Colorado", tile: { row: 5, col: 5 } },
+  { code: "KS", name: "Kansas", tile: { row: 5, col: 6 } },
+  { code: "AR", name: "Arkansas", tile: { row: 5, col: 7 } },
+  { code: "TN", name: "Tennessee", tile: { row: 5, col: 8 } },
+  { code: "NC", name: "North Carolina", tile: { row: 5, col: 9 } },
+  { code: "SC", name: "South Carolina", tile: { row: 5, col: 10 } },
+  { code: "MD", name: "Maryland", tile: { row: 5, col: 11 } },
+  { code: "NM", name: "New Mexico", tile: { row: 6, col: 4 } },
+  { code: "OK", name: "Oklahoma", tile: { row: 6, col: 5 } },
+  { code: "LA", name: "Louisiana", tile: { row: 6, col: 6 } },
+  { code: "MS", name: "Mississippi", tile: { row: 6, col: 7 } },
+  { code: "AL", name: "Alabama", tile: { row: 6, col: 8 } },
+  { code: "GA", name: "Georgia", tile: { row: 6, col: 9 } },
+  { code: "HI", name: "Hawaii", tile: { row: 7, col: 1 } },
+  { code: "TX", name: "Texas", tile: { row: 7, col: 5 } },
+  { code: "FL", name: "Florida", tile: { row: 7, col: 10 } },
 ];
+
+export function getStateBaselinesForYear(
+  year: HistoricalElectionYear = defaultHistoricalElectionYear,
+) {
+  return stateMetadata.map((state) => buildStateBaseline(state, year));
+}
+
+export const stateBaselines = getStateBaselinesForYear();

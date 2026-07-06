@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Download } from "lucide-react";
 import {
   useEffect,
   useMemo,
@@ -9,6 +10,10 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
+import {
+  stateCodeByMapShapeId,
+  stateMapShapeAssetPath,
+} from "@/data/states";
 import { getStateColor } from "@/lib/getStateColor";
 import { formatMargin } from "@/lib/format";
 import type { StateScenarioResult } from "@/types/election";
@@ -26,7 +31,7 @@ type TopologyTransform = {
 };
 
 type TopologyGeometry = {
-  id: keyof typeof fipsToStateCode;
+  id: string;
   type: "Polygon" | "MultiPolygon";
   arcs: number[][] | number[][][];
   properties: {
@@ -55,63 +60,10 @@ type StateShape = {
   labelVisible: boolean;
 };
 
-const fipsToStateCode = {
-  "01": "AL",
-  "02": "AK",
-  "04": "AZ",
-  "05": "AR",
-  "06": "CA",
-  "08": "CO",
-  "09": "CT",
-  "10": "DE",
-  "11": "DC",
-  "12": "FL",
-  "13": "GA",
-  "15": "HI",
-  "16": "ID",
-  "17": "IL",
-  "18": "IN",
-  "19": "IA",
-  "20": "KS",
-  "21": "KY",
-  "22": "LA",
-  "23": "ME",
-  "24": "MD",
-  "25": "MA",
-  "26": "MI",
-  "27": "MN",
-  "28": "MS",
-  "29": "MO",
-  "30": "MT",
-  "31": "NE",
-  "32": "NV",
-  "33": "NH",
-  "34": "NJ",
-  "35": "NM",
-  "36": "NY",
-  "37": "NC",
-  "38": "ND",
-  "39": "OH",
-  "40": "OK",
-  "41": "OR",
-  "42": "PA",
-  "44": "RI",
-  "45": "SC",
-  "46": "SD",
-  "47": "TN",
-  "48": "TX",
-  "49": "UT",
-  "50": "VT",
-  "51": "VA",
-  "53": "WA",
-  "54": "WV",
-  "55": "WI",
-  "56": "WY",
-} as const;
+type ExportStatus = "idle" | "exporting" | "saved" | "failed";
 
 const smallStateCodes = ["VT", "NH", "MA", "RI", "CT", "NJ", "DE", "MD", "DC"];
 const labelOmitCodes = new Set([...smallStateCodes, "HI"]);
-const mapAssetPath = "/us-states-albers-10m.json";
 
 function decodeArcs(topology: StatesTopology) {
   const [scaleX, scaleY] = topology.transform.scale;
@@ -182,7 +134,16 @@ function getBounds(points: MapPoint[]) {
   );
 }
 
-function shapeForGeometry(decodedArcs: MapPoint[][], geometry: TopologyGeometry): StateShape {
+function shapeForGeometry(
+  decodedArcs: MapPoint[][],
+  geometry: TopologyGeometry,
+): StateShape | null {
+  const code = stateCodeByMapShapeId[geometry.id];
+
+  if (!code) {
+    return null;
+  }
+
   const polygons = geometry.type === "Polygon"
     ? [geometry.arcs as number[][]]
     : geometry.arcs as number[][][];
@@ -202,7 +163,6 @@ function shapeForGeometry(decodedArcs: MapPoint[][], geometry: TopologyGeometry)
     }, []);
 
   const bounds = getBounds(largestRing);
-  const code = fipsToStateCode[geometry.id];
 
   return {
     code,
@@ -215,8 +175,9 @@ function shapeForGeometry(decodedArcs: MapPoint[][], geometry: TopologyGeometry)
 
 function buildStateShapes(topology: StatesTopology) {
   const decodedArcs = decodeArcs(topology);
-  return topology.objects.states.geometries.map((geometry) => {
-    return shapeForGeometry(decodedArcs, geometry);
+  return topology.objects.states.geometries.flatMap((geometry) => {
+    const shape = shapeForGeometry(decodedArcs, geometry);
+    return shape ? [shape] : [];
   });
 }
 
@@ -239,15 +200,17 @@ export function ElectoralMap({
   onSelectState,
 }: ElectoralMapProps) {
   const mapCanvasRef = useRef<HTMLDivElement>(null);
+  const exportStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [topology, setTopology] = useState<StatesTopology | null>(null);
   const [hasMapError, setHasMapError] = useState(false);
   const [hoveredStateCode, setHoveredStateCode] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("idle");
 
   useEffect(() => {
     let isMounted = true;
 
-    fetch(mapAssetPath)
+    fetch(stateMapShapeAssetPath)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Map asset failed with status ${response.status}`);
@@ -268,6 +231,14 @@ export function ElectoralMap({
 
     return () => {
       isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (exportStatusTimeoutRef.current) {
+        clearTimeout(exportStatusTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -321,6 +292,151 @@ export function ElectoralMap({
     }
   }
 
+  function queueExportStatusReset() {
+    if (exportStatusTimeoutRef.current) {
+      clearTimeout(exportStatusTimeoutRef.current);
+    }
+
+    exportStatusTimeoutRef.current = setTimeout(() => {
+      setExportStatus("idle");
+    }, 2800);
+  }
+
+  async function handleExportMapImage() {
+    const sourceSvg = mapCanvasRef.current?.querySelector("svg");
+
+    if (!sourceSvg) {
+      setExportStatus("failed");
+      queueExportStatusReset();
+      return;
+    }
+
+    setExportStatus("exporting");
+
+    try {
+      const sourceElements = sourceSvg.querySelectorAll<SVGElement>("path,text");
+      const svgClone = sourceSvg.cloneNode(true) as SVGSVGElement;
+      const cloneElements = svgClone.querySelectorAll<SVGElement>("path,text");
+      const viewBox = sourceSvg.viewBox.baseVal;
+      const exportScale = 2;
+      const exportWidth = Math.round(viewBox.width * exportScale);
+      const exportHeight = Math.round(viewBox.height * exportScale);
+      const isDarkTheme =
+        mapCanvasRef.current?.closest("[data-theme='dark']") !== null;
+      const backgroundFill = isDarkTheme ? "#0a0f15" : "#f8ffff";
+
+      sourceElements.forEach((sourceElement, index) => {
+        const cloneElement = cloneElements[index];
+
+        if (!cloneElement) {
+          return;
+        }
+
+        const computedStyle = getComputedStyle(sourceElement);
+
+        cloneElement.removeAttribute("class");
+        cloneElement.removeAttribute("style");
+        cloneElement.setAttribute("fill", computedStyle.fill);
+        cloneElement.setAttribute("stroke", computedStyle.stroke);
+        cloneElement.setAttribute(
+          "stroke-width",
+          computedStyle.getPropertyValue("stroke-width"),
+        );
+        cloneElement.setAttribute(
+          "stroke-linejoin",
+          computedStyle.getPropertyValue("stroke-linejoin"),
+        );
+        cloneElement.setAttribute(
+          "stroke-dasharray",
+          computedStyle.getPropertyValue("stroke-dasharray"),
+        );
+        cloneElement.setAttribute("font-family", computedStyle.fontFamily);
+        cloneElement.setAttribute("font-size", computedStyle.fontSize);
+        cloneElement.setAttribute("font-weight", computedStyle.fontWeight);
+        cloneElement.setAttribute(
+          "paint-order",
+          computedStyle.getPropertyValue("paint-order"),
+        );
+        cloneElement.setAttribute(
+          "text-anchor",
+          computedStyle.getPropertyValue("text-anchor"),
+        );
+      });
+
+      const backgroundRect = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect",
+      );
+
+      backgroundRect.setAttribute("x", String(viewBox.x));
+      backgroundRect.setAttribute("y", String(viewBox.y));
+      backgroundRect.setAttribute("width", String(viewBox.width));
+      backgroundRect.setAttribute("height", String(viewBox.height));
+      backgroundRect.setAttribute("fill", backgroundFill);
+      svgClone.insertBefore(backgroundRect, svgClone.firstChild);
+      svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      svgClone.setAttribute("width", String(exportWidth));
+      svgClone.setAttribute("height", String(exportHeight));
+
+      const svgBlob = new Blob([new XMLSerializer().serializeToString(svgClone)], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const image = new Image();
+
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("Map export image failed to load"));
+        image.src = svgUrl;
+      });
+
+      URL.revokeObjectURL(svgUrl);
+
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        throw new Error("Canvas context unavailable");
+      }
+
+      canvas.width = exportWidth;
+      canvas.height = exportHeight;
+      context.fillStyle = backgroundFill;
+      context.fillRect(0, 0, exportWidth, exportHeight);
+      context.drawImage(image, 0, 0, exportWidth, exportHeight);
+
+      const pngBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("PNG export failed"));
+          }
+        }, "image/png");
+      });
+      const pngUrl = URL.createObjectURL(pngBlob);
+      const link = document.createElement("a");
+
+      link.href = pngUrl;
+      link.download = `election-map-${new Date().toISOString().slice(0, 10)}.png`;
+      link.click();
+      URL.revokeObjectURL(pngUrl);
+      setExportStatus("saved");
+    } catch {
+      setExportStatus("failed");
+    }
+
+    queueExportStatusReset();
+  }
+
+  const exportButtonLabel = exportStatus === "saved"
+    ? "Map image exported"
+    : exportStatus === "failed"
+      ? "Map export failed"
+      : exportStatus === "exporting"
+        ? "Exporting map image"
+        : "Export map as image";
+
   return (
     <section className={styles.mapPanel} aria-label="State-level electoral map">
       <div className={styles.panelHeader}>
@@ -328,11 +444,27 @@ export function ElectoralMap({
           <p className={styles.sectionKicker}>Electoral map</p>
           <h2>State scenario view</h2>
         </div>
-        <div className={styles.legend} aria-label="Margin legend">
-          <span><b className={styles.legendTilt} />TILT</span>
-          <span><b className={styles.legendLean} />LEAN</span>
-          <span><b className={styles.legendLikely} />LIKELY</span>
-          <span><b className={styles.legendSafe} />SAFE</span>
+        <div className={styles.mapHeaderTools}>
+          <div className={styles.legend} aria-label="Margin legend">
+            <span><b className={styles.legendTilt} />TILT</span>
+            <span><b className={styles.legendLean} />LEAN</span>
+            <span><b className={styles.legendLikely} />LIKELY</span>
+            <span><b className={styles.legendSafe} />SAFE</span>
+          </div>
+          <button
+            aria-label={exportButtonLabel}
+            className={styles.iconButton}
+            disabled={!topology || exportStatus === "exporting"}
+            onClick={handleExportMapImage}
+            title={exportButtonLabel}
+            type="button"
+          >
+            {exportStatus === "saved" ? (
+              <Check size={16} strokeWidth={2.3} />
+            ) : (
+              <Download size={16} strokeWidth={2.3} />
+            )}
+          </button>
         </div>
       </div>
 

@@ -1,8 +1,5 @@
-import type { Party } from "@/types/election";
-
-export function getPartyFromMargin(margin: number): Party {
-  return margin >= 0 ? "democratic" : "republican";
-}
+import type { LegislativeParty, Party } from "@/types/election";
+export { formatMargin, getPartyFromMargin } from "@/lib/formatMargin";
 
 export function formatParty(party: Party) {
   return party === "democratic" ? "Democratic" : "Republican";
@@ -12,12 +9,28 @@ export function formatPartyShort(party: Party) {
   return party === "democratic" ? "D" : "R";
 }
 
-export function formatMargin(margin: number) {
-  if (Math.abs(margin) < 0.05) {
-    return "Tie";
+export function formatLegislativeParty(party: LegislativeParty) {
+  if (party === "independent") {
+    return "Independent";
   }
 
-  return `${margin > 0 ? "D" : "R"} +${Math.abs(margin).toFixed(1)}`;
+  if (party === "vacant") {
+    return "Vacant";
+  }
+
+  return formatParty(party);
+}
+
+export function formatLegislativePartyShort(party: LegislativeParty) {
+  if (party === "independent") {
+    return "I";
+  }
+
+  if (party === "vacant") {
+    return "V";
+  }
+
+  return formatPartyShort(party);
 }
 
 export function formatSignedPoints(value: number) {
