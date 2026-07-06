@@ -1,0 +1,418 @@
+{
+  "generatedAt": "2026-07-02",
+  "stateBaselines": {
+    "sourceName": "MIT Election Data and Science Lab, U.S. President 1976-2024",
+    "sourceUrl": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX",
+    "status": "calculation-ready",
+    "checks": {
+      "historicalYears": [
+        2000,
+        2004,
+        2008,
+        2012,
+        2016,
+        2020,
+        2024
+      ],
+      "stateYearRecords": {
+        "2000": 51,
+        "2004": 51,
+        "2008": 51,
+        "2012": 51,
+        "2016": 51,
+        "2020": 51,
+        "2024": 51
+      },
+      "electoralVoteSums": {
+        "2000": 538,
+        "2004": 538,
+        "2008": 538,
+        "2012": 538,
+        "2016": 538,
+        "2020": 538,
+        "2024": 538
+      }
+    }
+  },
+  "splitElectoralVotes": {
+    "status": "calculation-ready-for-ev-allocation",
+    "sourceNotes": [
+      "Maine and Nebraska are modeled as two statewide at-large electoral votes plus one electoral vote per congressional district.",
+      "2024 split outcome cross-checked against FEC official 2024 results and National Archives Electoral College notes.",
+      "District margins are explicit per unit so future official district data can replace or refine any historical margin value without changing calculator shape."
+    ]
+  },
+  "countyResults": {
+    "sourceName": "MIT Election Data and Science Lab, County Presidential Election Returns 2000-2024",
+    "sourceUrl": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/VOQCHQ",
+    "status": "blocked-until-reconciled",
+    "cleaningRules": [
+      "Excluded TOTAL VOTES CAST pseudo-candidate rows.",
+      "Preferred TOTAL/TOTAL VOTES mode rows when present.",
+      "Summed ballot modes only when no total mode was present."
+    ],
+    "cleanedCountyRows": 76996,
+    "countyYearRecords": {
+      "2000": 3157,
+      "2004": 3158,
+      "2008": 3158,
+      "2012": 3158,
+      "2016": 3158,
+      "2020": 3155,
+      "2024": 3154
+    },
+    "mismatchSummaryByYear": {
+      "2000": {
+        "mismatchCount": 74,
+        "maxAbsVoteDelta": 448495
+      },
+      "2004": {
+        "mismatchCount": 71,
+        "maxAbsVoteDelta": 176095
+      },
+      "2008": {
+        "mismatchCount": 65,
+        "maxAbsVoteDelta": 579129
+      },
+      "2012": {
+        "mismatchCount": 45,
+        "maxAbsVoteDelta": 54859
+      },
+      "2016": {
+        "mismatchCount": 62,
+        "maxAbsVoteDelta": 549941
+      },
+      "2020": {
+        "mismatchCount": 64,
+        "maxAbsVoteDelta": 23000
+      },
+      "2024": {
+        "mismatchCount": 45,
+        "maxAbsVoteDelta": 118934
+      }
+    },
+    "sampleMismatches": [
+      {
+        "year": 2000,
+        "state": "AK",
+        "field": "otherVotes",
+        "expected": 39158,
+        "actual": 39128,
+        "delta": -30
+      },
+      {
+        "year": 2000,
+        "state": "AK",
+        "field": "totalVotes",
+        "expected": 285560,
+        "actual": 285530,
+        "delta": -30
+      },
+      {
+        "year": 2000,
+        "state": "AL",
+        "field": "democraticVotes",
+        "expected": 692611,
+        "actual": 695602,
+        "delta": 2991
+      },
+      {
+        "year": 2000,
+        "state": "AL",
+        "field": "republicanVotes",
+        "expected": 941173,
+        "actual": 944409,
+        "delta": 3236
+      },
+      {
+        "year": 2000,
+        "state": "AL",
+        "field": "otherVotes",
+        "expected": 32488,
+        "actual": 32540,
+        "delta": 52
+      },
+      {
+        "year": 2000,
+        "state": "AL",
+        "field": "totalVotes",
+        "expected": 1666272,
+        "actual": 1672551,
+        "delta": 6279
+      },
+      {
+        "year": 2000,
+        "state": "AZ",
+        "field": "otherVotes",
+        "expected": 65023,
+        "actual": 67120,
+        "delta": 2097
+      },
+      {
+        "year": 2000,
+        "state": "AZ",
+        "field": "totalVotes",
+        "expected": 1532016,
+        "actual": 1534113,
+        "delta": 2097
+      },
+      {
+        "year": 2000,
+        "state": "CA",
+        "field": "otherVotes",
+        "expected": 537190,
+        "actual": 537224,
+        "delta": 34
+      },
+      {
+        "year": 2000,
+        "state": "CA",
+        "field": "totalVotes",
+        "expected": 10965822,
+        "actual": 10965856,
+        "delta": 34
+      },
+      {
+        "year": 2000,
+        "state": "CO",
+        "field": "republicanVotes",
+        "expected": 883748,
+        "actual": 883745,
+        "delta": -3
+      },
+      {
+        "year": 2000,
+        "state": "CO",
+        "field": "totalVotes",
+        "expected": 1741368,
+        "actual": 1741365,
+        "delta": -3
+      },
+      {
+        "year": 2000,
+        "state": "FL",
+        "field": "democraticVotes",
+        "expected": 2912253,
+        "actual": 2911417,
+        "delta": -836
+      },
+      {
+        "year": 2000,
+        "state": "FL",
+        "field": "republicanVotes",
+        "expected": 2912790,
+        "actual": 2911215,
+        "delta": -1575
+      },
+      {
+        "year": 2000,
+        "state": "FL",
+        "field": "otherVotes",
+        "expected": 138067,
+        "actual": 138028,
+        "delta": -39
+      },
+      {
+        "year": 2000,
+        "state": "FL",
+        "field": "totalVotes",
+        "expected": 5963110,
+        "actual": 5960660,
+        "delta": -2450
+      },
+      {
+        "year": 2000,
+        "state": "GA",
+        "field": "otherVotes",
+        "expected": 47258,
+        "actual": 60854,
+        "delta": 13596
+      },
+      {
+        "year": 2000,
+        "state": "GA",
+        "field": "totalVotes",
+        "expected": 2583208,
+        "actual": 2596804,
+        "delta": 13596
+      },
+      {
+        "year": 2000,
+        "state": "HI",
+        "field": "democraticVotes",
+        "expected": 205286,
+        "actual": 205242,
+        "delta": -44
+      },
+      {
+        "year": 2000,
+        "state": "HI",
+        "field": "republicanVotes",
+        "expected": 137845,
+        "actual": 137819,
+        "delta": -26
+      },
+      {
+        "year": 2000,
+        "state": "HI",
+        "field": "otherVotes",
+        "expected": 24820,
+        "actual": 24810,
+        "delta": -10
+      },
+      {
+        "year": 2000,
+        "state": "HI",
+        "field": "totalVotes",
+        "expected": 367951,
+        "actual": 367871,
+        "delta": -80
+      },
+      {
+        "year": 2000,
+        "state": "IA",
+        "field": "otherVotes",
+        "expected": 80132,
+        "actual": 42673,
+        "delta": -37459
+      },
+      {
+        "year": 2000,
+        "state": "IA",
+        "field": "totalVotes",
+        "expected": 1353022,
+        "actual": 1315563,
+        "delta": -37459
+      },
+      {
+        "year": 2000,
+        "state": "ID",
+        "field": "otherVotes",
+        "expected": 26041,
+        "actual": 26047,
+        "delta": 6
+      },
+      {
+        "year": 2000,
+        "state": "ID",
+        "field": "totalVotes",
+        "expected": 501615,
+        "actual": 501621,
+        "delta": 6
+      },
+      {
+        "year": 2000,
+        "state": "IL",
+        "field": "otherVotes",
+        "expected": 133661,
+        "actual": 133676,
+        "delta": 15
+      },
+      {
+        "year": 2000,
+        "state": "IL",
+        "field": "totalVotes",
+        "expected": 4742108,
+        "actual": 4742123,
+        "delta": 15
+      },
+      {
+        "year": 2000,
+        "state": "IN",
+        "field": "otherVotes",
+        "expected": 51486,
+        "actual": 51489,
+        "delta": 3
+      },
+      {
+        "year": 2000,
+        "state": "IN",
+        "field": "totalVotes",
+        "expected": 2199302,
+        "actual": 2199305,
+        "delta": 3
+      },
+      {
+        "year": 2000,
+        "state": "KY",
+        "field": "democraticVotes",
+        "expected": 638923,
+        "actual": 638898,
+        "delta": -25
+      },
+      {
+        "year": 2000,
+        "state": "KY",
+        "field": "republicanVotes",
+        "expected": 872520,
+        "actual": 872492,
+        "delta": -28
+      },
+      {
+        "year": 2000,
+        "state": "KY",
+        "field": "otherVotes",
+        "expected": 32663,
+        "actual": 32797,
+        "delta": 134
+      },
+      {
+        "year": 2000,
+        "state": "KY",
+        "field": "totalVotes",
+        "expected": 1544106,
+        "actual": 1544187,
+        "delta": 81
+      },
+      {
+        "year": 2000,
+        "state": "MA",
+        "field": "otherVotes",
+        "expected": 238975,
+        "actual": 207995,
+        "delta": -30980
+      },
+      {
+        "year": 2000,
+        "state": "MA",
+        "field": "totalVotes",
+        "expected": 2733964,
+        "actual": 2702984,
+        "delta": -30980
+      },
+      {
+        "year": 2000,
+        "state": "MD",
+        "field": "democraticVotes",
+        "expected": 1144008,
+        "actual": 1145782,
+        "delta": 1774
+      },
+      {
+        "year": 2000,
+        "state": "MD",
+        "field": "republicanVotes",
+        "expected": 813827,
+        "actual": 813797,
+        "delta": -30
+      },
+      {
+        "year": 2000,
+        "state": "MD",
+        "field": "otherVotes",
+        "expected": 67377,
+        "actual": 65901,
+        "delta": -1476
+      },
+      {
+        "year": 2000,
+        "state": "MD",
+        "field": "totalVotes",
+        "expected": 2025212,
+        "actual": 2025480,
+        "delta": 268
+      }
+    ],
+    "totalMismatches": 426
+  }
+}

@@ -1,0 +1,1099 @@
+{
+  "generatedAt": "2026-07-06",
+  "sourceMetadata": {
+    "houseResults": {
+      "id": "mit-house-1976-2024",
+      "sourceName": "MIT Election Data and Science Lab, U.S. House 1976-2024",
+      "sourcePublisher": "MIT Election Data and Science Lab",
+      "sourceUrl": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2",
+      "dataVintage": "Version 15.0, released 2026-03-09; current baseline year 2024",
+      "retrievedAt": "2026-07-02",
+      "trustLevel": "widely trusted published research dataset",
+      "cleaningNotes": "Filters to US HOUSE, 2024, regular general-election, TOTAL-mode rows outside DC; groups candidate rows by state and congressional district.",
+      "validationSummary": "Race totals use MIT totalvotes when available; candidate-vote differences from totalvotes are listed in the generated validation report."
+    },
+    "senateResults": {
+      "id": "mit-senate-state-1976-2024",
+      "sourceName": "MIT Election Data and Science Lab, U.S. Senate statewide 1976-2024",
+      "sourcePublisher": "MIT Election Data and Science Lab",
+      "sourceUrl": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PEJ5QU",
+      "dataVintage": "Version 8.0, released 2026-05-11; latest matched seat results from 2020, 2021, 2022, and 2024",
+      "retrievedAt": "2026-07-02",
+      "trustLevel": "widely trusted published research dataset",
+      "cleaningNotes": "Filters to US SENATE statewide TOTAL-mode general and runoff rows, then matches current seats by state, Senate class, term year, and winner where possible.",
+      "validationSummary": "Race totals use MIT totalvotes when available; candidate-vote differences from totalvotes are listed in the generated validation report."
+    },
+    "congressionalRoster": {
+      "id": "unitedstates-congress-legislators-current",
+      "sourceName": "unitedstates/congress-legislators legislators-current.yaml",
+      "sourcePublisher": "United States project contributors",
+      "sourceUrl": "https://github.com/unitedstates/congress-legislators/blob/main/legislators-current.yaml",
+      "dataVintage": "GitHub main branch snapshot cached 2026-07-02",
+      "retrievedAt": "2026-07-02",
+      "trustLevel": "widely used public-domain congressional roster dataset",
+      "cleaningNotes": "Parses current rep and senator terms active on the generatedAt date; preserves Bioguide IDs, state, district, Senate class, party, caucus, and term dates.",
+      "validationSummary": "Roster counts are reconciled against generated House voting-seat and Senate seat totals, with non-voting House delegates excluded from chamber-control math."
+    }
+  },
+  "accuracyRequirements": {
+    "sourceMetadataRecorded": {
+      "status": "passed",
+      "note": "Every generated legislative dataset records source name, URL, publisher, retrieval date, data vintage, cleaning notes, and validation summary."
+    },
+    "electionReturnReconciliation": {
+      "status": "passed-with-documented-source-differences",
+      "trustedPublishedSource": "MIT Election Data and Science Lab congressional returns are treated as the trusted published source for current calculation baselines.",
+      "method": "Generated race totals use the MIT totalvotes field when present. Candidate-vote sums are compared against totalvotes and any differences are reported below because fusion lines, blank/void/scattering rows, and source placeholder totals can make candidate sums differ from the published race total.",
+      "officialCompilationStatus": "House Clerk and state-certified official documents remain preferred audit sources for future cross-source reconciliation."
+    },
+    "raceEdgeCaseDocumentation": {
+      "status": "passed",
+      "note": "Uncontested races, write-in rows, missing vote totals, and zero-total cancelled-election candidates are surfaced in checks below."
+    },
+    "redistrictingDocumentation": {
+      "status": "passed",
+      "note": "The generated calculation baseline does not compare House districts across cycles. Historical House comparisons remain blocked until district-plan relationship metadata is added."
+    },
+    "specialElectionTiming": {
+      "status": "passed",
+      "note": "Regular House baselines exclude special elections and mark specialElection=false; Senate seats preserve matched special-election and runoff flags."
+    },
+    "rosterCompleteness": {
+      "status": "passed",
+      "note": "The validation checks distinguish 435 House voting seats from non-voting delegate roster records and represent current vacancies separately."
+    },
+    "senateClassesStored": {
+      "status": "passed",
+      "note": "Every generated Senate seat stores class 1, 2, or 3."
+    },
+    "stableHouseDistrictIds": {
+      "status": "passed",
+      "note": "Every generated House voting seat uses a stable ID such as CA-45 or AK-AL."
+    },
+    "displayNamesSeparatedFromIds": {
+      "status": "passed",
+      "note": "Stable IDs are stored separately from district labels and candidate/member display names."
+    },
+    "validationScripts": {
+      "status": "passed",
+      "command": "npm run validate:legislative-data"
+    }
+  },
+  "checks": {
+    "currentRosterMembers": 537,
+    "currentHouseRosterMembers": 437,
+    "currentSenateRosterMembers": 100,
+    "houseVotingDistricts": 435,
+    "senateSeats": 100,
+    "senateStatesRepresented": 50,
+    "senateStateSeatCounts": {
+      "AL": 2,
+      "AK": 2,
+      "AZ": 2,
+      "AR": 2,
+      "CA": 2,
+      "CO": 2,
+      "CT": 2,
+      "DE": 2,
+      "FL": 2,
+      "GA": 2,
+      "HI": 2,
+      "ID": 2,
+      "IL": 2,
+      "IN": 2,
+      "IA": 2,
+      "KS": 2,
+      "KY": 2,
+      "LA": 2,
+      "ME": 2,
+      "MD": 2,
+      "MA": 2,
+      "MI": 2,
+      "MN": 2,
+      "MS": 2,
+      "MO": 2,
+      "MT": 2,
+      "NE": 2,
+      "NV": 2,
+      "NH": 2,
+      "NJ": 2,
+      "NM": 2,
+      "NY": 2,
+      "NC": 2,
+      "ND": 2,
+      "OH": 2,
+      "OK": 2,
+      "OR": 2,
+      "PA": 2,
+      "RI": 2,
+      "SC": 2,
+      "SD": 2,
+      "TN": 2,
+      "TX": 2,
+      "UT": 2,
+      "VT": 2,
+      "VA": 2,
+      "WA": 2,
+      "WV": 2,
+      "WI": 2,
+      "WY": 2
+    },
+    "houseIncumbentPartyCounts": {
+      "democratic": 212,
+      "republican": 218,
+      "independent": 1,
+      "vacant": 4
+    },
+    "senateIncumbentPartyCounts": {
+      "democratic": 45,
+      "republican": 53,
+      "independent": 2,
+      "vacant": 0
+    },
+    "invalidHouseDistrictIds": [],
+    "invalidSenateClassSeats": [],
+    "missingRequiredFields": [],
+    "houseVoteTotalMismatches": [
+      {
+        "id": "ME-01",
+        "totalVotes": 425530,
+        "candidateVoteTotalDifference": 14037
+      },
+      {
+        "id": "NY-01",
+        "totalVotes": 410100,
+        "candidateVoteTotalDifference": 20360
+      },
+      {
+        "id": "NY-02",
+        "totalVotes": 339157,
+        "candidateVoteTotalDifference": 23959
+      },
+      {
+        "id": "NY-03",
+        "totalVotes": 363124,
+        "candidateVoteTotalDifference": 18758
+      },
+      {
+        "id": "NY-04",
+        "totalVotes": 375518,
+        "candidateVoteTotalDifference": 16812
+      },
+      {
+        "id": "NY-05",
+        "totalVotes": 231736,
+        "candidateVoteTotalDifference": 12060
+      },
+      {
+        "id": "NY-06",
+        "totalVotes": 198690,
+        "candidateVoteTotalDifference": 12467
+      },
+      {
+        "id": "NY-07",
+        "totalVotes": 221779,
+        "candidateVoteTotalDifference": 15556
+      },
+      {
+        "id": "NY-08",
+        "totalVotes": 223804,
+        "candidateVoteTotalDifference": 17346
+      },
+      {
+        "id": "NY-09",
+        "totalVotes": 235772,
+        "candidateVoteTotalDifference": 17562
+      },
+      {
+        "id": "NY-10",
+        "totalVotes": 254556,
+        "candidateVoteTotalDifference": 24718
+      },
+      {
+        "id": "NY-11",
+        "totalVotes": 261728,
+        "candidateVoteTotalDifference": 12861
+      },
+      {
+        "id": "NY-12",
+        "totalVotes": 324020,
+        "candidateVoteTotalDifference": 17949
+      },
+      {
+        "id": "NY-13",
+        "totalVotes": 218973,
+        "candidateVoteTotalDifference": 22917
+      },
+      {
+        "id": "NY-14",
+        "totalVotes": 192551,
+        "candidateVoteTotalDifference": 12366
+      },
+      {
+        "id": "NY-15",
+        "totalVotes": 171095,
+        "candidateVoteTotalDifference": 17450
+      },
+      {
+        "id": "NY-16",
+        "totalVotes": 305079,
+        "candidateVoteTotalDifference": 26008
+      },
+      {
+        "id": "NY-17",
+        "totalVotes": 379508,
+        "candidateVoteTotalDifference": 14452
+      },
+      {
+        "id": "NY-18",
+        "totalVotes": 362509,
+        "candidateVoteTotalDifference": 13779
+      },
+      {
+        "id": "NY-19",
+        "totalVotes": 377343,
+        "candidateVoteTotalDifference": 11983
+      },
+      {
+        "id": "NY-20",
+        "totalVotes": 363445,
+        "candidateVoteTotalDifference": 14303
+      },
+      {
+        "id": "NY-21",
+        "totalVotes": 348640,
+        "candidateVoteTotalDifference": 11818
+      },
+      {
+        "id": "NY-22",
+        "totalVotes": 356792,
+        "candidateVoteTotalDifference": 10471
+      },
+      {
+        "id": "NY-23",
+        "totalVotes": 375594,
+        "candidateVoteTotalDifference": 22027
+      },
+      {
+        "id": "NY-24",
+        "totalVotes": 359407,
+        "candidateVoteTotalDifference": 19504
+      },
+      {
+        "id": "NY-25",
+        "totalVotes": 360633,
+        "candidateVoteTotalDifference": 18983
+      },
+      {
+        "id": "NY-26",
+        "totalVotes": 321304,
+        "candidateVoteTotalDifference": 21100
+      }
+    ],
+    "senateVoteTotalMismatches": [],
+    "houseSeatsWithoutCurrentIncumbent": [
+      "CA-14",
+      "FL-20",
+      "GA-13",
+      "TX-23"
+    ],
+    "houseUncontestedSeats": [
+      "AL-03",
+      "AL-04",
+      "AL-05",
+      "CA-12",
+      "CA-16",
+      "CA-20",
+      "CA-34",
+      "CA-37",
+      "FL-20",
+      "IL-15",
+      "IL-16",
+      "KY-04",
+      "KY-05",
+      "LA-04",
+      "MA-01",
+      "MA-02",
+      "MA-03",
+      "MA-04",
+      "MA-05",
+      "MA-06",
+      "MA-07",
+      "MS-03",
+      "NV-02",
+      "NC-03",
+      "NC-06",
+      "ND-AL",
+      "OK-03",
+      "PA-03",
+      "TX-01",
+      "TX-09",
+      "TX-11",
+      "TX-13",
+      "TX-19",
+      "TX-20",
+      "TX-25",
+      "TX-30",
+      "VT-AL",
+      "WA-04",
+      "WA-09"
+    ],
+    "senateUncontestedSeats": [
+      "AK-S3",
+      "AR-S2",
+      "IL-S3",
+      "MD-S3",
+      "NE-S1",
+      "UT-S3",
+      "VT-S1",
+      "WY-S2"
+    ],
+    "houseWriteInSeats": [
+      {
+        "id": "AL-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 306
+      },
+      {
+        "id": "AL-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 219
+      },
+      {
+        "id": "AL-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 5160
+      },
+      {
+        "id": "AL-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 3374
+      },
+      {
+        "id": "AL-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 12088
+      },
+      {
+        "id": "AL-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 380
+      },
+      {
+        "id": "AL-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 185
+      },
+      {
+        "id": "AK-AL",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 750
+      },
+      {
+        "id": "AZ-02",
+        "writeInCandidateCount": 3,
+        "writeInVotes": 55
+      },
+      {
+        "id": "AZ-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 16
+      },
+      {
+        "id": "AZ-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 91
+      },
+      {
+        "id": "CO-01",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 96
+      },
+      {
+        "id": "CO-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 8
+      },
+      {
+        "id": "CO-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 4
+      },
+      {
+        "id": "CO-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 25
+      },
+      {
+        "id": "CO-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 37
+      },
+      {
+        "id": "CO-08",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 7
+      },
+      {
+        "id": "CT-02",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 7
+      },
+      {
+        "id": "CT-03",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 126
+      },
+      {
+        "id": "CT-05",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 79
+      },
+      {
+        "id": "FL-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 73
+      },
+      {
+        "id": "FL-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 23
+      },
+      {
+        "id": "FL-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 10
+      },
+      {
+        "id": "FL-13",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 27
+      },
+      {
+        "id": "FL-17",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 8
+      },
+      {
+        "id": "FL-21",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 19
+      },
+      {
+        "id": "FL-24",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 22
+      },
+      {
+        "id": "FL-25",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 41
+      },
+      {
+        "id": "ID-01",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 10
+      },
+      {
+        "id": "IL-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 45
+      },
+      {
+        "id": "IL-02",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 62
+      },
+      {
+        "id": "IL-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 96
+      },
+      {
+        "id": "IL-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 26
+      },
+      {
+        "id": "IL-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 9
+      },
+      {
+        "id": "IL-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 86
+      },
+      {
+        "id": "IL-07",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 146
+      },
+      {
+        "id": "IL-10",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 238
+      },
+      {
+        "id": "IL-11",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 229
+      },
+      {
+        "id": "IL-13",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 244
+      },
+      {
+        "id": "IL-14",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 19
+      },
+      {
+        "id": "IL-15",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1409
+      },
+      {
+        "id": "IL-16",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 183
+      },
+      {
+        "id": "IN-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 13
+      },
+      {
+        "id": "IA-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 967
+      },
+      {
+        "id": "IA-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 341
+      },
+      {
+        "id": "IA-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1197
+      },
+      {
+        "id": "IA-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1127
+      },
+      {
+        "id": "KY-03",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 51
+      },
+      {
+        "id": "KY-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1131
+      },
+      {
+        "id": "MD-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 675
+      },
+      {
+        "id": "MD-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 749
+      },
+      {
+        "id": "MD-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 862
+      },
+      {
+        "id": "MD-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 920
+      },
+      {
+        "id": "MD-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 999
+      },
+      {
+        "id": "MD-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 862
+      },
+      {
+        "id": "MD-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 649
+      },
+      {
+        "id": "MD-08",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 786
+      },
+      {
+        "id": "MA-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1099
+      },
+      {
+        "id": "MI-13",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 26
+      },
+      {
+        "id": "MN-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 297
+      },
+      {
+        "id": "MN-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 455
+      },
+      {
+        "id": "MN-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 504
+      },
+      {
+        "id": "MN-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 623
+      },
+      {
+        "id": "MN-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 3768
+      },
+      {
+        "id": "MN-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 565
+      },
+      {
+        "id": "MN-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 433
+      },
+      {
+        "id": "MN-08",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 384
+      },
+      {
+        "id": "MO-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 2
+      },
+      {
+        "id": "NH-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 295
+      },
+      {
+        "id": "NH-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 367
+      },
+      {
+        "id": "ND-AL",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1455
+      },
+      {
+        "id": "OH-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 4
+      },
+      {
+        "id": "OH-11",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 29
+      },
+      {
+        "id": "RI-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 561
+      },
+      {
+        "id": "RI-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 660
+      },
+      {
+        "id": "SC-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 693
+      },
+      {
+        "id": "SC-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 786
+      },
+      {
+        "id": "SC-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 609
+      },
+      {
+        "id": "SC-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 743
+      },
+      {
+        "id": "SC-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 557
+      },
+      {
+        "id": "SC-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 299
+      },
+      {
+        "id": "SC-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 481
+      },
+      {
+        "id": "TX-16",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 156
+      },
+      {
+        "id": "TX-18",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 76
+      },
+      {
+        "id": "TX-25",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1661
+      },
+      {
+        "id": "TX-38",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 94
+      },
+      {
+        "id": "VT-AL",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 929
+      },
+      {
+        "id": "VA-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 804
+      },
+      {
+        "id": "VA-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 471
+      },
+      {
+        "id": "VA-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 670
+      },
+      {
+        "id": "VA-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 809
+      },
+      {
+        "id": "VA-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 2046
+      },
+      {
+        "id": "VA-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 510
+      },
+      {
+        "id": "VA-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1116
+      },
+      {
+        "id": "VA-08",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1034
+      },
+      {
+        "id": "VA-09",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 748
+      },
+      {
+        "id": "VA-10",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1538
+      },
+      {
+        "id": "VA-11",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1855
+      },
+      {
+        "id": "WA-01",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 907
+      },
+      {
+        "id": "WA-02",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1303
+      },
+      {
+        "id": "WA-03",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1673
+      },
+      {
+        "id": "WA-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 5400
+      },
+      {
+        "id": "WA-05",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 593
+      },
+      {
+        "id": "WA-06",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 753
+      },
+      {
+        "id": "WA-07",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1313
+      },
+      {
+        "id": "WA-08",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 995
+      },
+      {
+        "id": "WA-09",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 5917
+      },
+      {
+        "id": "WA-10",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 820
+      },
+      {
+        "id": "WV-01",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 174
+      },
+      {
+        "id": "WI-04",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 13
+      },
+      {
+        "id": "WY-AL",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1505
+      }
+    ],
+    "senateWriteInSeats": [
+      {
+        "id": "AL-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 3891
+      },
+      {
+        "id": "AK-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 601
+      },
+      {
+        "id": "IL-S2",
+        "writeInCandidateCount": 3,
+        "writeInVotes": 18
+      },
+      {
+        "id": "IA-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1211
+      },
+      {
+        "id": "KY-S2",
+        "writeInCandidateCount": 5,
+        "writeInVotes": 99
+      },
+      {
+        "id": "ME-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 228
+      },
+      {
+        "id": "MA-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 7428
+      },
+      {
+        "id": "MI-S2",
+        "writeInCandidateCount": 2,
+        "writeInVotes": 12
+      },
+      {
+        "id": "MN-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 2261
+      },
+      {
+        "id": "NH-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 486
+      },
+      {
+        "id": "ND-S3",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 265
+      },
+      {
+        "id": "OR-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 2402
+      },
+      {
+        "id": "RI-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 833
+      },
+      {
+        "id": "SC-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 2294
+      },
+      {
+        "id": "TN-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 64
+      },
+      {
+        "id": "TX-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 678
+      },
+      {
+        "id": "VA-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 4388
+      },
+      {
+        "id": "WY-S2",
+        "writeInCandidateCount": 1,
+        "writeInVotes": 1071
+      }
+    ],
+    "missingVoteTotalSeats": [
+      "FL-20",
+      "OK-03",
+      "CT-S3"
+    ],
+    "cancelledElectionSeats": [],
+    "houseSpecialElectionSeatsInBaseline": [],
+    "senateSpecialElectionSeats": [
+      "NE-S2"
+    ],
+    "senateRunoffSeats": [
+      "GA-S2",
+      "GA-S3"
+    ],
+    "houseLowDataSeats": [
+      "AL-03",
+      "AL-04",
+      "AL-05",
+      "CA-12",
+      "CA-16",
+      "CA-20",
+      "CA-34",
+      "CA-37",
+      "FL-20",
+      "IL-15",
+      "IL-16",
+      "KY-04",
+      "KY-05",
+      "LA-04",
+      "MA-01",
+      "MA-02",
+      "MA-03",
+      "MA-04",
+      "MA-05",
+      "MA-06",
+      "MA-07",
+      "MS-03",
+      "NV-02",
+      "NC-03",
+      "NC-06",
+      "ND-AL",
+      "OK-03",
+      "PA-03",
+      "TX-01",
+      "TX-09",
+      "TX-11",
+      "TX-13",
+      "TX-19",
+      "TX-20",
+      "TX-25",
+      "TX-30",
+      "VT-AL",
+      "WA-04",
+      "WA-09"
+    ],
+    "senateLowDataSeats": [
+      "CT-S3"
+    ],
+    "senateSeatsUpNextCycle": [
+      "AL-S2",
+      "AK-S2",
+      "AR-S2",
+      "CO-S2",
+      "DE-S2",
+      "GA-S2",
+      "ID-S2",
+      "IL-S2",
+      "IA-S2",
+      "KS-S2",
+      "KY-S2",
+      "LA-S2",
+      "ME-S2",
+      "MA-S2",
+      "MI-S2",
+      "MN-S2",
+      "MS-S2",
+      "MT-S2",
+      "NE-S2",
+      "NH-S2",
+      "NJ-S2",
+      "NM-S2",
+      "NC-S2",
+      "OK-S2",
+      "OR-S2",
+      "RI-S2",
+      "SC-S2",
+      "SD-S2",
+      "TN-S2",
+      "TX-S2",
+      "VA-S2",
+      "WV-S2",
+      "WY-S2"
+    ]
+  },
+  "limitations": [
+    "The trusted-source reconciliation currently checks against MIT totalvotes, not a second official Clerk/state source.",
+    "True House district geometry and cross-cycle redistricting relationship files are not yet ingested.",
+    "Open-seat and incumbent-running status for future races remain blocked until a sourced candidate filing or retirement dataset is added."
+  ]
+}
