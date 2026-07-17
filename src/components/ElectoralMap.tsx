@@ -256,6 +256,11 @@ export function ElectoralMap({
 
   const hoveredResult = hoveredStateCode ? resultByCode.get(hoveredStateCode) : null;
   const tooltipResult = hoveredResult;
+  const selectedShape =
+    stateShapes.find((shape) => shape.code === selectedStateCode) ?? null;
+  const selectedResult = selectedShape
+    ? resultByCode.get(selectedShape.code) ?? null
+    : null;
   const viewBox = topology
     ? `${topology.bbox[0] - 10} ${topology.bbox[1] - 10} ${topology.bbox[2] - topology.bbox[0] + 20} ${topology.bbox[3] - topology.bbox[1] + 20}`
     : "-68 3 1036 614";
@@ -543,6 +548,16 @@ export function ElectoralMap({
                   );
                 })}
               </g>
+              {selectedShape && selectedResult ? (
+                <g className={styles.mapSelectionLayer} aria-hidden="true">
+                  <path
+                    className={styles.stateSelectedOutline}
+                    d={selectedShape.path}
+                    fillRule="evenodd"
+                    style={getStyleForResult(selectedResult)}
+                  />
+                </g>
+              ) : null}
             </svg>
           ) : null}
 

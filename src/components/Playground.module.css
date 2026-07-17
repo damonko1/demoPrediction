@@ -137,6 +137,95 @@
     linear-gradient(#007f70, #007f70) right bottom / 12px 1px no-repeat,
     linear-gradient(#007f70, #007f70) right bottom / 1px 12px no-repeat,
     rgba(255, 255, 255, 0.68);
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 127, 112, 0.88),
+    inset 0 0 0 1px rgba(0, 127, 112, 0.16);
+}
+
+.unifiedSummary {
+  position: relative;
+  max-width: 1640px;
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(37, 126, 145, 0.16);
+  border-bottom: 1px solid rgba(37, 126, 145, 0.14);
+  background:
+    linear-gradient(90deg, rgba(26, 138, 224, 0.07), transparent 30%),
+    linear-gradient(270deg, rgba(226, 69, 78, 0.07), transparent 30%),
+    rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(18px);
+}
+
+.unifiedSummaryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.unifiedSummaryHeader h2 {
+  margin: 0;
+  color: #123442;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.unifiedSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(37, 126, 145, 0.08);
+}
+
+.unifiedSummaryGrid div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 10px 11px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.unifiedSummaryGrid span,
+.unifiedAssumptionStrip span {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.unifiedSummaryGrid strong {
+  overflow-wrap: anywhere;
+  color: #123442;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.unifiedSummaryGrid small {
+  overflow-wrap: anywhere;
+  color: #617d87;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.unifiedAssumptionStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.unifiedAssumptionStrip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 5px 8px;
+  color: #247a6f;
+  background: rgba(255, 255, 255, 0.34);
 }
 
 .headerMeta strong,
@@ -326,6 +415,10 @@
   gap: 1px;
   margin-top: 12px;
   background: rgba(37, 126, 145, 0.08);
+}
+
+.chamberCounterMetaGrid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .counterMetaGrid div {
@@ -559,6 +652,15 @@
   background: #e84d58;
 }
 
+.legendFlagged {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(216, 148, 33, 0.95) 0 3px,
+      rgba(18, 52, 66, 0.2) 3px 5px
+    );
+}
+
 .mapViewport {
   position: relative;
   overflow: auto;
@@ -619,12 +721,16 @@
 }
 
 .stateShape:focus-visible,
+.houseDistrictShape:focus-visible,
 .smallStateButton:focus-visible,
 .districtSeatButton:focus-visible,
+.senateSeatButton:focus-visible,
+.houseFocusButton:focus-visible,
 .iconButton:focus-visible,
 .shareButton:focus-visible,
 .baselineYearGrid button:focus-visible,
 .presetButton:focus-visible,
+.mapSelectControl select:focus-visible,
 .themeSwitch button:focus-visible,
 .modelDisclosure summary:focus-visible,
 .compactDisclosure summary:focus-visible,
@@ -643,6 +749,16 @@
 
 .stateShape[data-flipped="true"] {
   stroke-dasharray: 3 2;
+}
+
+.stateShape[data-no-active-race="true"] {
+  fill-opacity: 0.72;
+  stroke-dasharray: 1.5 2.5;
+}
+
+.stateShape[data-special-election="true"] {
+  stroke: rgba(216, 148, 33, 0.9);
+  stroke-dasharray: 4 2;
 }
 
 .stateLabel {
@@ -795,6 +911,273 @@
   scrollbar-color: rgba(0, 132, 116, 0.42) rgba(255, 255, 255, 0.35);
 }
 
+.houseMapControls {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.65fr) minmax(260px, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mapSelectControl {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.mapSelectControl span {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.mapSelectControl select {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 28px 0 10px;
+  color: #123442;
+  font-size: 12px;
+  font-weight: 800;
+  background:
+    linear-gradient(45deg, transparent 50%, #1a6573 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, #1a6573 50%, transparent 50%) calc(100% - 11px) 50% / 6px 6px no-repeat,
+    linear-gradient(#2b899c, #2b899c) left top / 10px 1px no-repeat,
+    linear-gradient(#2b899c, #2b899c) left top / 1px 10px no-repeat,
+    linear-gradient(#1a9f83, #1a9f83) right bottom / 10px 1px no-repeat,
+    linear-gradient(#1a9f83, #1a9f83) right bottom / 1px 10px no-repeat,
+    rgba(255, 255, 255, 0.5);
+  appearance: none;
+}
+
+.houseMapStatus {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-bottom: 10px;
+  background: rgba(37, 126, 145, 0.08);
+}
+
+.houseMapStatus div,
+.houseMapReadout div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.houseMapStatus span,
+.houseMapReadout span,
+.houseFocusHeader span {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.houseMapStatus strong,
+.houseMapReadout strong,
+.houseFocusHeader strong {
+  overflow-wrap: anywhere;
+  color: #123442;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.houseMapStatus small,
+.houseMapReadout small,
+.houseFocusHeader small {
+  overflow-wrap: anywhere;
+  color: #617d87;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.houseBoundaryViewport {
+  overflow: auto;
+  padding: 2px;
+  scrollbar-color: rgba(0, 132, 116, 0.42) rgba(255, 255, 255, 0.35);
+}
+
+.houseBoundaryCanvas {
+  position: relative;
+  min-width: 760px;
+  min-height: 468px;
+  background:
+    linear-gradient(90deg, rgba(38, 126, 149, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(38, 126, 149, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(217, 247, 255, 0.2));
+  background-size:
+    74px 74px,
+    74px 74px,
+    auto;
+}
+
+.houseDistrictMap {
+  display: block;
+  width: 100%;
+  min-height: 468px;
+  aspect-ratio: 1040 / 640;
+}
+
+.houseDistrictLayer {
+  filter: drop-shadow(0 10px 16px rgba(18, 52, 66, 0.08));
+}
+
+.houseDistrictShape {
+  fill: var(--seat-fill);
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition:
+    fill 180ms ease,
+    filter 120ms ease,
+    stroke 120ms ease,
+    stroke-width 120ms ease;
+}
+
+.houseDistrictShape:hover,
+.houseDistrictShape[data-hovered="true"] {
+  filter: saturate(1.16) brightness(1.05);
+  stroke: var(--seat-stroke);
+  stroke-width: 1.45;
+}
+
+.houseDistrictShape[data-flagged="true"] {
+  stroke: rgba(115, 83, 21, 0.76);
+  stroke-width: 1;
+}
+
+.houseDistrictShape[data-low-data="true"] {
+  stroke-dasharray: 2 2;
+}
+
+.houseDistrictShape[data-uncontested="true"] {
+  filter: saturate(0.86) contrast(0.96);
+}
+
+.houseDistrictShape[data-flipped="true"] {
+  stroke: rgba(216, 148, 33, 0.92);
+  stroke-width: 1.2;
+}
+
+.houseDistrictShape[data-selected="true"] {
+  filter:
+    drop-shadow(0 0 8px rgba(0, 168, 124, 0.34))
+    saturate(1.1);
+  stroke: var(--aero-green);
+  stroke-width: 2.4;
+}
+
+.houseDistrictLabel {
+  fill: rgba(18, 52, 66, 0.76);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: rgba(255, 255, 255, 0.82);
+  stroke-linejoin: round;
+  stroke-width: 2.6px;
+  text-anchor: middle;
+}
+
+.houseMapReadout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 10px;
+  background: rgba(37, 126, 145, 0.08);
+}
+
+.houseStateFocus {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(37, 126, 145, 0.12);
+}
+
+.houseFocusHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.houseFocusHeader div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.houseFocusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 5px;
+}
+
+.houseFocusButton {
+  display: grid;
+  min-width: 0;
+  min-height: 40px;
+  place-items: center;
+  gap: 3px;
+  border: 0;
+  border-radius: 0;
+  color: var(--seat-fg);
+  background:
+    linear-gradient(var(--seat-stroke), var(--seat-stroke)) left top / 8px 1px no-repeat,
+    linear-gradient(var(--seat-stroke), var(--seat-stroke)) left top / 1px 8px no-repeat,
+    linear-gradient(var(--seat-stroke), var(--seat-stroke)) right bottom / 8px 1px no-repeat,
+    linear-gradient(var(--seat-stroke), var(--seat-stroke)) right bottom / 1px 8px no-repeat,
+    var(--seat-fill);
+  transition:
+    filter 120ms ease,
+    transform 120ms ease,
+    outline-color 120ms ease;
+}
+
+.houseFocusButton span {
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.houseFocusButton small {
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.houseFocusButton:hover {
+  filter: saturate(1.14) brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.houseFocusButton[data-selected="true"] {
+  outline: 2px solid var(--aero-green);
+  outline-offset: 1px;
+}
+
+.houseFocusButton[data-flipped="true"] {
+  box-shadow: inset 0 0 0 1px rgba(216, 148, 33, 0.88);
+}
+
+.houseFocusButton[data-low-data="true"] span,
+.houseFocusButton[data-uncontested="true"] span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
 .houseMatrix {
   display: grid;
   grid-template-columns: repeat(10, minmax(86px, 1fr));
@@ -907,6 +1290,107 @@
 
 .tooltipSeatRow {
   display: contents;
+}
+
+.senateSeatSelector {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(37, 126, 145, 0.14);
+}
+
+.senateSeatSelectorHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.senateSeatSelectorHeader span {
+  color: #123442;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.senateSeatSelectorHeader strong {
+  color: #247a6f;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.senateSeatGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.senateSeatButton {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  border: 0;
+  border-radius: 0;
+  padding: 10px;
+  color: #1a6573;
+  text-align: left;
+  background:
+    linear-gradient(#2b899c, #2b899c) left top / 9px 1px no-repeat,
+    linear-gradient(#2b899c, #2b899c) left top / 1px 9px no-repeat,
+    linear-gradient(#1a9f83, #1a9f83) right bottom / 9px 1px no-repeat,
+    linear-gradient(#1a9f83, #1a9f83) right bottom / 1px 9px no-repeat,
+    rgba(255, 255, 255, 0.34);
+  transition:
+    filter 140ms ease,
+    transform 140ms ease;
+}
+
+.senateSeatButton:hover {
+  filter: brightness(1.04) saturate(1.08);
+  transform: translateY(-1px);
+}
+
+.senateSeatButton[data-selected="true"] {
+  outline: 2px solid var(--aero-green);
+  outline-offset: 1px;
+}
+
+.senateSeatButton[data-up-next="true"] {
+  background:
+    linear-gradient(#007f70, #007f70) left top / 10px 1px no-repeat,
+    linear-gradient(#007f70, #007f70) left top / 1px 10px no-repeat,
+    linear-gradient(#2b899c, #2b899c) right bottom / 10px 1px no-repeat,
+    linear-gradient(#2b899c, #2b899c) right bottom / 1px 10px no-repeat,
+    rgba(226, 252, 245, 0.52);
+}
+
+.senateSeatButton[data-special-election="true"] {
+  box-shadow: inset 0 0 0 1px rgba(216, 148, 33, 0.85);
+}
+
+.senateSeatButton span {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.senateSeatButton strong {
+  color: #123442;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.senateSeatButton small {
+  color: #55717b;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 
 .iconButton {
@@ -1358,6 +1842,14 @@
   text-align: right;
 }
 
+.heuristicSliderNote {
+  margin: 0;
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
 .steadyBadge {
   color: #247a6f;
 }
@@ -1388,10 +1880,20 @@
 .flipDistance strong,
 .evShift strong,
 .voteDetail strong {
+  overflow-wrap: anywhere;
   color: #123442;
   font-size: 19px;
   font-weight: 850;
   line-height: 1.05;
+}
+
+.detailGrid small {
+  overflow-wrap: anywhere;
+  color: #68838d;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-transform: uppercase;
 }
 
 .flipDistance,
@@ -1852,12 +2354,13 @@
 }
 
 .sensitivityList strong {
+  min-width: 0;
   color: #123442;
   font-size: 12px;
   font-weight: 900;
   line-height: 1;
   text-align: right;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .modelDisclosure {
@@ -2040,7 +2543,38 @@
     linear-gradient(#89d7be, #89d7be) right bottom / 12px 1px no-repeat,
     linear-gradient(#89d7be, #89d7be) right bottom / 1px 12px no-repeat,
     rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 -3px 0 rgba(137, 215, 190, 0.88),
+    inset 0 0 0 1px rgba(137, 215, 190, 0.18);
   color: #d7fff3;
+}
+
+.shell[data-theme="dark"] .unifiedSummary {
+  border-color: rgba(151, 169, 188, 0.18);
+  background:
+    linear-gradient(90deg, rgba(58, 145, 226, 0.1), transparent 30%),
+    linear-gradient(270deg, rgba(226, 78, 96, 0.09), transparent 30%),
+    rgba(13, 26, 34, 0.72);
+}
+
+.shell[data-theme="dark"] .unifiedSummaryHeader h2,
+.shell[data-theme="dark"] .unifiedSummaryGrid strong {
+  color: #ecf8fb;
+}
+
+.shell[data-theme="dark"] .unifiedSummaryGrid {
+  background: rgba(151, 169, 188, 0.1);
+}
+
+.shell[data-theme="dark"] .unifiedSummaryGrid div,
+.shell[data-theme="dark"] .unifiedAssumptionStrip span {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.shell[data-theme="dark"] .unifiedSummaryGrid span,
+.shell[data-theme="dark"] .unifiedSummaryGrid small,
+.shell[data-theme="dark"] .unifiedAssumptionStrip span {
+  color: #9aa8b4;
 }
 
 .shell[data-theme="dark"] .counter,
@@ -2086,6 +2620,7 @@
 .shell[data-theme="dark"] .counterMetaGrid span,
 .shell[data-theme="dark"] .counterMetaGrid small,
 .shell[data-theme="dark"] .detailGrid span,
+.shell[data-theme="dark"] .detailGrid small,
 .shell[data-theme="dark"] .flipDistance span,
 .shell[data-theme="dark"] .evShift span,
 .shell[data-theme="dark"] .voteDetail span,
@@ -2169,6 +2704,7 @@
 .shell[data-theme="dark"] .sensitivityList small,
 .shell[data-theme="dark"] .presetButton small,
 .shell[data-theme="dark"] .simulationDisclaimer p,
+.shell[data-theme="dark"] .heuristicSliderNote,
 .shell[data-theme="dark"] .flipStateName small,
 .shell[data-theme="dark"] .flipOutcome small,
 .shell[data-theme="dark"] .modelNote p,
@@ -2203,6 +2739,16 @@
   box-shadow: 0 0 12px rgba(255, 76, 89, 0.42);
 }
 
+.shell[data-theme="dark"] .legendFlagged {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(216, 180, 90, 0.95) 0 3px,
+      rgba(238, 244, 248, 0.22) 3px 5px
+    );
+  box-shadow: 0 0 10px rgba(216, 180, 90, 0.28);
+}
+
 .shell[data-theme="dark"] .mapCanvas {
   background:
     radial-gradient(circle, rgba(184, 203, 219, 0.16) 1px, transparent 1px),
@@ -2214,6 +2760,109 @@
     74px 74px,
     74px 74px,
     auto;
+}
+
+.shell[data-theme="dark"] .mapSelectControl span,
+.shell[data-theme="dark"] .houseMapStatus span,
+.shell[data-theme="dark"] .houseMapStatus small,
+.shell[data-theme="dark"] .houseMapReadout span,
+.shell[data-theme="dark"] .houseMapReadout small,
+.shell[data-theme="dark"] .houseFocusHeader span,
+.shell[data-theme="dark"] .houseFocusHeader small {
+  color: #7d8994;
+}
+
+.shell[data-theme="dark"] .mapSelectControl select {
+  color: #f2f7fb;
+  background:
+    linear-gradient(45deg, transparent 50%, #89d7be 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, #89d7be 50%, transparent 50%) calc(100% - 11px) 50% / 6px 6px no-repeat,
+    linear-gradient(#8b9dae, #8b9dae) left top / 10px 1px no-repeat,
+    linear-gradient(#8b9dae, #8b9dae) left top / 1px 10px no-repeat,
+    linear-gradient(#89d7be, #89d7be) right bottom / 10px 1px no-repeat,
+    linear-gradient(#89d7be, #89d7be) right bottom / 1px 10px no-repeat,
+    rgba(255, 255, 255, 0.045);
+}
+
+.shell[data-theme="dark"] .houseMapStatus,
+.shell[data-theme="dark"] .houseMapReadout {
+  background: rgba(139, 157, 174, 0.08);
+}
+
+.shell[data-theme="dark"] .houseMapStatus div,
+.shell[data-theme="dark"] .houseMapReadout div {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.shell[data-theme="dark"] .houseMapStatus strong,
+.shell[data-theme="dark"] .houseMapReadout strong,
+.shell[data-theme="dark"] .houseFocusHeader strong {
+  color: #f2f7fb;
+}
+
+.shell[data-theme="dark"] .houseBoundaryCanvas {
+  background:
+    radial-gradient(circle, rgba(184, 203, 219, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 157, 174, 0.11) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(139, 157, 174, 0.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(16, 23, 31, 0.26), rgba(8, 12, 17, 0.14));
+  background-size:
+    18px 18px,
+    74px 74px,
+    74px 74px,
+    auto;
+}
+
+.shell[data-theme="dark"] .houseDistrictLayer {
+  filter: drop-shadow(0 0 14px rgba(63, 140, 255, 0.08));
+}
+
+.shell[data-theme="dark"] .houseDistrictShape {
+  fill: var(--seat-fill-dark);
+  stroke: rgba(216, 227, 237, 0.2);
+}
+
+.shell[data-theme="dark"] .houseDistrictShape:hover,
+.shell[data-theme="dark"] .houseDistrictShape[data-hovered="true"] {
+  stroke: var(--seat-stroke-dark);
+}
+
+.shell[data-theme="dark"] .houseDistrictShape[data-flagged="true"] {
+  stroke: rgba(216, 180, 90, 0.78);
+}
+
+.shell[data-theme="dark"] .houseDistrictShape[data-flipped="true"] {
+  stroke: rgba(216, 180, 90, 0.94);
+}
+
+.shell[data-theme="dark"] .houseDistrictShape[data-selected="true"] {
+  filter:
+    drop-shadow(0 0 12px rgba(137, 215, 190, 0.44))
+    saturate(1.1);
+  stroke: #89d7be;
+}
+
+.shell[data-theme="dark"] .houseDistrictLabel {
+  fill: rgba(238, 244, 248, 0.86);
+  stroke: rgba(8, 12, 17, 0.86);
+}
+
+.shell[data-theme="dark"] .houseStateFocus {
+  border-top-color: rgba(139, 157, 174, 0.14);
+}
+
+.shell[data-theme="dark"] .houseFocusButton {
+  color: var(--seat-fg-dark);
+  background:
+    linear-gradient(var(--seat-stroke-dark), var(--seat-stroke-dark)) left top / 8px 1px no-repeat,
+    linear-gradient(var(--seat-stroke-dark), var(--seat-stroke-dark)) left top / 1px 8px no-repeat,
+    linear-gradient(var(--seat-stroke-dark), var(--seat-stroke-dark)) right bottom / 8px 1px no-repeat,
+    linear-gradient(var(--seat-stroke-dark), var(--seat-stroke-dark)) right bottom / 1px 8px no-repeat,
+    var(--seat-fill-dark);
+}
+
+.shell[data-theme="dark"] .houseFocusButton[data-selected="true"] {
+  outline-color: #89d7be;
 }
 
 .shell[data-theme="dark"] .houseStateBlock {
@@ -2241,6 +2890,14 @@
   filter:
     drop-shadow(0 0 12px rgba(137, 215, 190, 0.44))
     saturate(1.1);
+}
+
+.shell[data-theme="dark"] .stateShape[data-no-active-race="true"] {
+  fill-opacity: 0.62;
+}
+
+.shell[data-theme="dark"] .stateShape[data-special-election="true"] {
+  stroke: rgba(217, 184, 91, 0.9);
 }
 
 .shell[data-theme="dark"] .stateLabel {
@@ -2273,6 +2930,43 @@
     linear-gradient(var(--seat-stroke-dark), var(--seat-stroke-dark)) left top / 1px 6px no-repeat,
     var(--seat-fill-dark);
   color: var(--seat-fg-dark);
+}
+
+.shell[data-theme="dark"] .senateSeatSelector {
+  border-top-color: rgba(139, 157, 174, 0.14);
+}
+
+.shell[data-theme="dark"] .senateSeatSelectorHeader span,
+.shell[data-theme="dark"] .senateSeatButton strong {
+  color: #f2f7fb;
+}
+
+.shell[data-theme="dark"] .senateSeatSelectorHeader strong {
+  color: #89d7be;
+}
+
+.shell[data-theme="dark"] .senateSeatButton {
+  background:
+    linear-gradient(#8b9dae, #8b9dae) left top / 9px 1px no-repeat,
+    linear-gradient(#8b9dae, #8b9dae) left top / 1px 9px no-repeat,
+    linear-gradient(#89d7be, #89d7be) right bottom / 9px 1px no-repeat,
+    linear-gradient(#89d7be, #89d7be) right bottom / 1px 9px no-repeat,
+    rgba(255, 255, 255, 0.02);
+  color: #becad3;
+}
+
+.shell[data-theme="dark"] .senateSeatButton[data-up-next="true"] {
+  background:
+    linear-gradient(#89d7be, #89d7be) left top / 10px 1px no-repeat,
+    linear-gradient(#89d7be, #89d7be) left top / 1px 10px no-repeat,
+    linear-gradient(#8b9dae, #8b9dae) right bottom / 10px 1px no-repeat,
+    linear-gradient(#8b9dae, #8b9dae) right bottom / 1px 10px no-repeat,
+    rgba(137, 215, 190, 0.08);
+}
+
+.shell[data-theme="dark"] .senateSeatButton span,
+.shell[data-theme="dark"] .senateSeatButton small {
+  color: #8793a0;
 }
 
 .shell[data-theme="dark"] .smallStateButton[data-selected="true"] {
@@ -2500,6 +3194,10 @@
     grid-column: 1 / -1;
   }
 
+  .chamberCounterMetaGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 980px) {
@@ -2529,6 +3227,18 @@
     min-height: 40px;
   }
 
+  .tabBar .activeTab {
+    box-shadow:
+      inset 4px 0 0 rgba(0, 127, 112, 0.88),
+      inset 0 0 0 1px rgba(0, 127, 112, 0.16);
+  }
+
+  .shell[data-theme="dark"] .tabBar .activeTab {
+    box-shadow:
+      inset 4px 0 0 rgba(137, 215, 190, 0.88),
+      inset 0 0 0 1px rgba(137, 215, 190, 0.18);
+  }
+
   .workspace {
     grid-template-areas:
       "center"
@@ -2541,6 +3251,44 @@
 
   .analysisRail {
     grid-template-columns: 1fr;
+  }
+
+  .unifiedSummaryHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .unifiedSummaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .houseMapControls,
+  .houseMapReadout {
+    grid-template-columns: 1fr;
+  }
+
+  .houseMapStatus {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .houseBoundaryCanvas {
+    width: 100%;
+    min-width: 0;
+    min-height: 426px;
+  }
+
+  .houseDistrictMap {
+    min-width: 0;
+    min-height: 426px;
+  }
+
+  .houseFocusHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .houseFocusGrid {
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
   }
 
   .houseMatrix {
@@ -2576,6 +3324,10 @@
   .counterMetaGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-top: 10px;
+  }
+
+  .chamberCounterMetaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .counterMetaGrid div {
@@ -2654,6 +3406,10 @@
     height: 33px;
   }
 
+  .senateSeatGrid {
+    grid-template-columns: 1fr;
+  }
+
   .stateTooltip {
     min-width: 170px;
   }
@@ -2665,5 +3421,1347 @@
   .comparisonGrid,
   .sharePreviewCard dl {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Refined application shell */
+.shell {
+  --app-bg: #f5f7fb;
+  --app-bg-strong: #e9f0f6;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-soft: rgba(255, 255, 255, 0.58);
+  --surface-raised: rgba(255, 255, 255, 0.94);
+  --ink: #132532;
+  --muted: #627386;
+  --muted-strong: #415567;
+  --line: rgba(76, 96, 116, 0.16);
+  --line-strong: rgba(60, 79, 99, 0.24);
+  --accent: #087f68;
+  --accent-soft: rgba(8, 127, 104, 0.11);
+  --blue-soft: rgba(26, 122, 216, 0.12);
+  --red-soft: rgba(220, 65, 76, 0.12);
+  --gold-soft: rgba(202, 142, 40, 0.16);
+  min-height: 100dvh;
+  padding: 16px;
+  color: var(--ink);
+  background:
+    linear-gradient(140deg, rgba(35, 122, 210, 0.08), transparent 34%),
+    linear-gradient(24deg, rgba(8, 127, 104, 0.08), transparent 42%),
+    linear-gradient(180deg, var(--app-bg) 0%, #eef4f5 100%);
+}
+
+.shell::before,
+.shell::after {
+  display: none;
+}
+
+.appFrame {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  width: min(100%, 1800px);
+  margin: 0 auto;
+}
+
+.appSidebar {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+  height: calc(100dvh - 32px);
+  min-width: 0;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
+  box-shadow: 0 20px 60px rgba(20, 34, 48, 0.1);
+  backdrop-filter: blur(22px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(8, 127, 104, 0.34) transparent;
+}
+
+.brandLockup {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  min-width: 0;
+}
+
+.brandMark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(8, 127, 104, 0.2);
+  border-radius: 8px;
+  color: var(--accent);
+  background:
+    linear-gradient(135deg, rgba(8, 127, 104, 0.16), rgba(26, 122, 216, 0.08)),
+    var(--surface-soft);
+}
+
+.brandText {
+  min-width: 0;
+}
+
+.brandText h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.08;
+}
+
+.contentShell {
+  display: grid;
+  min-width: 0;
+  gap: 14px;
+}
+
+.focusShell .contentShell {
+  gap: 12px;
+}
+
+.focusShell .unifiedSummary,
+.focusShell .counter {
+  display: none;
+}
+
+.header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  max-width: none;
+  margin: 0;
+  padding: 3px 2px 1px;
+  border-bottom: 0;
+}
+
+.header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 850;
+  line-height: 1.08;
+}
+
+.headerMeta {
+  gap: 8px;
+  color: var(--muted);
+}
+
+.eyebrow,
+.sectionKicker {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.headerMeta strong,
+.summaryPill,
+.steadyBadge,
+.flipBadge,
+.unifiedAssumptionStrip span,
+.presetControlsHeader span {
+  border: 1px solid rgba(8, 127, 104, 0.14);
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.flipBadge {
+  border-color: rgba(202, 142, 40, 0.2);
+  color: #94600d;
+  background: var(--gold-soft);
+}
+
+.tabBar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-content: start;
+  max-width: none;
+  margin: 0;
+  background: transparent;
+}
+
+.tabBar button {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "icon label"
+    "icon detail";
+  min-height: 58px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted-strong);
+  background: transparent;
+  text-align: left;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.tabBar button > svg {
+  grid-area: icon;
+  align-self: center;
+  justify-self: center;
+}
+
+.tabBar button:hover {
+  color: var(--accent);
+  background: var(--surface-soft);
+  filter: none;
+  transform: translateY(-1px);
+}
+
+.tabBar span {
+  grid-area: label;
+  align-self: end;
+  font-size: 13px;
+  line-height: 1.15;
+  text-transform: none;
+}
+
+.tabBar small {
+  grid-area: detail;
+  align-self: start;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 760;
+  text-transform: none;
+}
+
+.tabBar .activeTab {
+  color: var(--ink);
+  border-color: rgba(8, 127, 104, 0.18);
+  background:
+    linear-gradient(90deg, var(--accent-soft), transparent 68%),
+    var(--surface-raised);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.sidebarFooter {
+  display: grid;
+  gap: 10px;
+}
+
+.themeSwitch {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(236, 241, 246, 0.7);
+}
+
+.themeSwitch button {
+  min-height: 34px;
+  border-radius: 6px;
+  color: var(--muted-strong);
+  background: transparent;
+  text-transform: none;
+}
+
+.themeSwitch button:hover {
+  color: var(--accent);
+  filter: none;
+}
+
+.themeSwitch .activeThemeButton {
+  color: var(--ink);
+  background: var(--surface-raised);
+  box-shadow: 0 1px 6px rgba(20, 34, 48, 0.08);
+}
+
+.focusToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+  font-size: 12px;
+  font-weight: 850;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.focusToggle:hover {
+  border-color: rgba(8, 127, 104, 0.22);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.activeFocusToggle {
+  color: var(--ink);
+  border-color: rgba(8, 127, 104, 0.22);
+  background: var(--accent-soft);
+}
+
+.unifiedSummary,
+.counter,
+.workspace {
+  max-width: none;
+}
+
+.unifiedSummary,
+.counter,
+.mapPanel,
+.panel,
+.modelNote {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 14px 40px rgba(20, 34, 48, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.counter::before,
+.mapPanel::before,
+.panel::before,
+.modelNote::before {
+  display: none;
+}
+
+.unifiedSummary {
+  margin: 0;
+  padding: 14px;
+}
+
+.unifiedSummaryHeader {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.unifiedSummaryHeader h2 {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.unifiedSummaryGrid,
+.counterMetaGrid,
+.detailGrid,
+.summaryMetrics,
+.comparisonGrid,
+.sharePreviewCard dl,
+.houseMapStatus,
+.houseMapReadout,
+.driverList,
+.splitEvList,
+.sensitivityList {
+  gap: 8px;
+  background: transparent;
+}
+
+.unifiedSummaryGrid div,
+.counterMetaGrid div,
+.detailGrid div,
+.comparisonGrid div,
+.sharePreviewCard dl div,
+.houseMapStatus div,
+.houseMapReadout div,
+.driverList li,
+.splitEvList li,
+.sensitivityList li,
+.flipDistance,
+.evShift,
+.voteDetail,
+.assumptionDrivers,
+.splitEvDetail,
+.uncertaintyBand,
+.compactDisclosure,
+.emptyState,
+.sharePreviewCard,
+.embedActions code {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.unifiedSummaryGrid strong,
+.counterMetaGrid strong,
+.detailGrid strong,
+.flipDistance strong,
+.evShift strong,
+.voteDetail strong,
+.comparisonGrid strong,
+.uncertaintyBand strong,
+.sharePreviewCard strong,
+.sharePreviewCard dd,
+.houseMapStatus strong,
+.houseMapReadout strong,
+.houseFocusHeader strong,
+.driverList b,
+.driverList strong,
+.splitEvList b,
+.splitEvList strong,
+.sensitivityList b,
+.sensitivityList strong {
+  color: var(--ink);
+}
+
+.unifiedSummaryGrid span,
+.unifiedSummaryGrid small,
+.counterMetaGrid span,
+.counterMetaGrid small,
+.detailGrid span,
+.detailGrid small,
+.flipDistance span,
+.evShift span,
+.voteDetail span,
+.voteDetail small,
+.comparisonGrid span,
+.comparisonGrid small,
+.uncertaintyBand span,
+.uncertaintyBand small,
+.sharePreviewCard span,
+.sharePreviewCard small,
+.sharePreviewCard dt,
+.houseMapStatus span,
+.houseMapStatus small,
+.houseMapReadout span,
+.houseMapReadout small,
+.houseFocusHeader span,
+.houseFocusHeader small,
+.driverList small,
+.splitEvList small,
+.sensitivityList small,
+.emptyState,
+.driverEmpty,
+.modelNote p,
+.modelDisclosure p,
+.compactDisclosure p,
+.heuristicSliderNote {
+  color: var(--muted);
+}
+
+.workspace {
+  grid-template-areas:
+    "left center detail"
+    "left center analysis";
+  grid-template-columns:
+    minmax(252px, 306px)
+    minmax(430px, 1fr)
+    minmax(260px, 334px);
+  gap: 14px;
+  align-items: start;
+  margin: 0;
+}
+
+.leftRail,
+.detailRail,
+.analysisRail {
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(8, 127, 104, 0.34) transparent;
+}
+
+.leftRail,
+.detailRail {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.analysisRail {
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.focusWorkspace {
+  grid-template-areas:
+    "center center"
+    "left detail"
+    "analysis analysis";
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+
+.focusWorkspace .centerStage {
+  min-width: 0;
+}
+
+.focusWorkspace .leftRail,
+.focusWorkspace .detailRail,
+.focusWorkspace .analysisRail {
+  position: static;
+  max-height: none;
+}
+
+.focusWorkspace .analysisRail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.focusWorkspace .analysisRail .modelNote,
+.focusWorkspace .analysisRail .panel:last-child {
+  grid-column: auto;
+}
+
+.panel,
+.mapPanel,
+.counter {
+  padding: 14px;
+}
+
+.modelNote {
+  overflow: hidden;
+}
+
+.panelHeader {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.panelHeader h2 {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.panelActions,
+.mapHeaderTools {
+  gap: 8px;
+}
+
+.iconButton,
+.shareButton,
+.presetButton,
+.baselineYearGrid button,
+.mapSelectControl select,
+.smallStateButton,
+.houseFocusButton,
+.districtSeatButton {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+  box-shadow: none;
+}
+
+.iconButton,
+.shareButton {
+  min-height: 36px;
+}
+
+.iconButton:hover,
+.shareButton:hover,
+.presetButton:hover,
+.baselineYearGrid button:hover,
+.smallStateButton:hover,
+.houseFocusButton:hover,
+.districtSeatButton:hover {
+  border-color: rgba(8, 127, 104, 0.24);
+  color: var(--accent);
+  filter: none;
+  transform: translateY(-1px);
+}
+
+.iconButton:disabled,
+.shareButton:disabled {
+  opacity: 0.45;
+  transform: none;
+}
+
+.baselineSelector,
+.demographicSlider,
+.simulationDisclaimer {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.baselineYearGrid {
+  gap: 6px;
+  background: transparent;
+}
+
+.baselineYearGrid .activeBaselineYear {
+  border-color: rgba(8, 127, 104, 0.28);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.presetGrid {
+  gap: 8px;
+}
+
+.presetButton {
+  min-height: 76px;
+  padding: 10px;
+}
+
+.presetButton b {
+  color: var(--ink);
+  text-transform: none;
+}
+
+.presetButton small {
+  color: var(--muted);
+}
+
+.sliderFrame {
+  min-height: 32px;
+}
+
+.sliderNeutralMarker {
+  background: rgba(19, 37, 50, 0.46);
+}
+
+.swingSlider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+}
+
+.swingSlider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 4px 12px rgba(8, 127, 104, 0.25);
+}
+
+.swingSlider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+}
+
+.swingSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 4px 12px rgba(8, 127, 104, 0.25);
+}
+
+.sliderReadout {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.mapPanel {
+  overflow: hidden;
+}
+
+.legend {
+  gap: 8px;
+}
+
+.legend span {
+  color: var(--muted);
+}
+
+.legend b {
+  width: 18px;
+  height: 5px;
+  border-radius: 999px;
+}
+
+.mapViewport,
+.houseBoundaryViewport,
+.houseMapViewport {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background:
+    linear-gradient(90deg, rgba(26, 122, 216, 0.06), transparent 52%),
+    rgba(238, 244, 247, 0.68);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(8, 127, 104, 0.34) transparent;
+}
+
+.mapCanvas,
+.houseBoundaryCanvas {
+  min-height: 450px;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(76, 96, 116, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(76, 96, 116, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(227, 236, 241, 0.4));
+  background-size:
+    72px 72px,
+    72px 72px,
+    auto;
+}
+
+.focusWorkspace .mapCanvas,
+.focusWorkspace .houseBoundaryCanvas {
+  min-height: min(68dvh, 680px);
+}
+
+.stateLayer,
+.houseDistrictLayer {
+  filter: drop-shadow(0 8px 16px rgba(20, 34, 48, 0.08));
+}
+
+.smallStateDock {
+  right: 16px;
+  bottom: 16px;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
+  box-shadow: 0 12px 32px rgba(20, 34, 48, 0.14);
+}
+
+.smallStateButton,
+.houseFocusButton {
+  border-color: color-mix(in srgb, var(--state-stroke, var(--seat-stroke)) 36%, var(--line));
+  background: var(--state-fill, var(--seat-fill));
+}
+
+.smallStateButton[data-selected="true"],
+.houseFocusButton[data-selected="true"],
+.districtSeatButton[data-selected="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.houseMapControls,
+.houseMapStatus,
+.houseMapReadout {
+  gap: 8px;
+}
+
+.mapSelectControl select {
+  height: 38px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--muted-strong) 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--muted-strong) 50%, transparent 50%) calc(100% - 11px) 50% / 6px 6px no-repeat,
+    var(--surface-raised);
+}
+
+.houseBoundaryCanvas {
+  min-width: 760px;
+}
+
+.houseFocusGrid {
+  gap: 6px;
+}
+
+.houseFocusButton {
+  min-height: 42px;
+  border-radius: 7px;
+}
+
+.districtSeatButton {
+  border-radius: 5px;
+}
+
+.stateTooltip {
+  border: 1px solid rgba(8, 127, 104, 0.18);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+  box-shadow: 0 18px 42px rgba(20, 34, 48, 0.16);
+}
+
+.modelDisclosure summary,
+.compactDisclosure summary {
+  color: var(--accent);
+}
+
+.modelDisclosure summary::after,
+.compactDisclosure summary::after {
+  color: var(--muted);
+}
+
+.shell[data-theme="dark"] {
+  --app-bg: #10151c;
+  --app-bg-strong: #0c1118;
+  --surface: rgba(20, 27, 36, 0.84);
+  --surface-soft: rgba(255, 255, 255, 0.045);
+  --surface-raised: rgba(25, 34, 45, 0.94);
+  --ink: #edf4f8;
+  --muted: #94a3b2;
+  --muted-strong: #bdc7d2;
+  --line: rgba(187, 201, 215, 0.16);
+  --line-strong: rgba(187, 201, 215, 0.26);
+  --accent: #8ad7bd;
+  --accent-soft: rgba(138, 215, 189, 0.12);
+  --blue-soft: rgba(76, 145, 255, 0.15);
+  --red-soft: rgba(255, 80, 94, 0.14);
+  --gold-soft: rgba(219, 178, 84, 0.15);
+  color: var(--ink);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background:
+    linear-gradient(140deg, rgba(67, 134, 230, 0.1), transparent 36%),
+    linear-gradient(24deg, rgba(138, 215, 189, 0.08), transparent 44%),
+    linear-gradient(180deg, #10151c 0%, #0c1118 100%);
+}
+
+.shell[data-theme="dark"] .appSidebar,
+.shell[data-theme="dark"] .unifiedSummary,
+.shell[data-theme="dark"] .counter,
+.shell[data-theme="dark"] .mapPanel,
+.shell[data-theme="dark"] .panel,
+.shell[data-theme="dark"] .modelNote {
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.24);
+}
+
+.shell[data-theme="dark"] .brandText h1,
+.shell[data-theme="dark"] .header h2,
+.shell[data-theme="dark"] .unifiedSummaryHeader h2,
+.shell[data-theme="dark"] .panelHeader h2,
+.shell[data-theme="dark"] .counterStatus strong,
+.shell[data-theme="dark"] .partyTotal strong,
+.shell[data-theme="dark"] .presetButton b {
+  color: var(--ink);
+}
+
+.shell[data-theme="dark"] .themeSwitch {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.shell[data-theme="dark"] .themeSwitch .activeThemeButton,
+.shell[data-theme="dark"] .tabBar .activeTab {
+  color: var(--ink);
+  background: var(--surface-raised);
+}
+
+.shell[data-theme="dark"] .mapViewport,
+.shell[data-theme="dark"] .houseBoundaryViewport,
+.shell[data-theme="dark"] .houseMapViewport {
+  background:
+    linear-gradient(90deg, rgba(76, 145, 255, 0.08), transparent 52%),
+    rgba(255, 255, 255, 0.035);
+}
+
+.shell[data-theme="dark"] .mapCanvas,
+.shell[data-theme="dark"] .houseBoundaryCanvas {
+  background:
+    linear-gradient(90deg, rgba(187, 201, 215, 0.09) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(187, 201, 215, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  background-size:
+    72px 72px,
+    72px 72px,
+    auto;
+}
+
+.shell[data-theme="dark"] .mapSelectControl select {
+  color: var(--ink);
+  background:
+    linear-gradient(45deg, transparent 50%, var(--muted-strong) 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--muted-strong) 50%, transparent 50%) calc(100% - 11px) 50% / 6px 6px no-repeat,
+    var(--surface-raised);
+}
+
+.shell[data-theme="dark"] .stateTooltip {
+  background: rgba(18, 25, 34, 0.94);
+}
+
+@media (max-width: 1500px) {
+  .appFrame {
+    grid-template-columns: 226px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .workspace {
+    grid-template-areas:
+      "center center"
+      "left detail"
+      "analysis analysis";
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  }
+
+  .leftRail,
+  .detailRail,
+  .analysisRail {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .analysisRail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .shell {
+    padding: 10px;
+  }
+
+  .appFrame {
+    grid-template-columns: 1fr;
+  }
+
+  .appSidebar {
+    position: static;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+
+  .tabBar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tabBar button {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "icon"
+      "label"
+      "detail";
+    justify-items: center;
+    min-height: 78px;
+    text-align: center;
+  }
+
+  .sidebarFooter {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, auto);
+  }
+
+  .header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .headerMeta {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace,
+  .focusWorkspace {
+    grid-template-areas:
+      "center"
+      "detail"
+      "left"
+      "analysis";
+    grid-template-columns: 1fr;
+  }
+
+  .analysisRail,
+  .focusWorkspace .analysisRail {
+    grid-template-columns: 1fr;
+  }
+
+  .unifiedSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .counterTopline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .counterStatus {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .tabBar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tabBar button {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "icon"
+      "label"
+      "detail";
+    justify-items: center;
+    min-height: 72px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+
+  .tabBar span {
+    font-size: 12px;
+  }
+
+  .tabBar small {
+    font-size: 10px;
+  }
+
+  .sidebarFooter {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHeader {
+    align-items: flex-start;
+  }
+
+  .mapHeaderTools {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .mapCanvas {
+    min-width: 0;
+    min-height: 320px;
+  }
+
+  .usMap {
+    min-height: 320px;
+  }
+
+  .houseBoundaryCanvas {
+    min-width: 700px;
+    min-height: 420px;
+  }
+
+  .focusWorkspace .mapCanvas {
+    min-height: 360px;
+  }
+
+  .focusWorkspace .houseBoundaryCanvas {
+    min-height: 420px;
+  }
+}
+
+/* Editorial pass inspired by Star Party's bold, option-shelf feel */
+.shell {
+  --app-bg: #f7f8f2;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-soft: rgba(255, 255, 255, 0.66);
+  --surface-raised: rgba(255, 255, 255, 0.96);
+  --ink: #111827;
+  --muted: #63707f;
+  --muted-strong: #344455;
+  --line: rgba(17, 24, 39, 0.14);
+  --accent: #f05f3b;
+  --accent-soft: rgba(240, 95, 59, 0.12);
+  --aero-green: #00a878;
+  font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+  background:
+    linear-gradient(135deg, rgba(240, 95, 59, 0.08), transparent 36%),
+    linear-gradient(225deg, rgba(0, 168, 120, 0.08), transparent 42%),
+    linear-gradient(180deg, #f7f8f2 0%, #eef5f4 100%);
+}
+
+.brandText h1,
+.header h2,
+.panelHeader h2,
+.unifiedSummaryHeader h2 {
+  font-weight: 800;
+}
+
+.header h2 {
+  font-size: 30px;
+}
+
+.eyebrow,
+.sectionKicker,
+.tabBar small,
+.headerMeta,
+.summaryPill,
+.steadyBadge,
+.flipBadge,
+.partyTotal span,
+.partyTotal small,
+.counterStatus span,
+.counterStatus small,
+.counterMetaGrid span,
+.counterMetaGrid small,
+.detailGrid span,
+.detailGrid small,
+.mapSelectControl span,
+.houseMapStatus span,
+.houseMapStatus small,
+.houseMapReadout span,
+.houseMapReadout small,
+.sliderValue span,
+.sliderTicks,
+.demographicTicks,
+.presetButton small {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.appSidebar,
+.unifiedSummary,
+.counter,
+.mapPanel,
+.panel,
+.modelNote {
+  box-shadow:
+    0 20px 54px rgba(17, 24, 39, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.brandMark {
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(240, 95, 59, 0.18), rgba(0, 168, 120, 0.12)),
+    var(--surface-soft);
+}
+
+.tabBar .activeTab {
+  border-color: rgba(240, 95, 59, 0.32);
+  background:
+    linear-gradient(90deg, rgba(240, 95, 59, 0.16), transparent 72%),
+    var(--surface-raised);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.headerMeta strong,
+.summaryPill,
+.steadyBadge,
+.unifiedAssumptionStrip span,
+.presetControlsHeader span {
+  border-color: rgba(0, 168, 120, 0.22);
+  color: #007a59;
+  background: rgba(0, 168, 120, 0.1);
+}
+
+.optionDisclosure {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(240, 95, 59, 0.06), transparent 45%),
+    var(--surface-soft);
+  overflow: hidden;
+}
+
+.optionDisclosure summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 58px;
+  padding: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.optionDisclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.optionDisclosure summary::after {
+  content: "+";
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(240, 95, 59, 0.24);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.optionDisclosure[open] summary::after {
+  content: "-";
+}
+
+.optionDisclosure h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.optionDisclosure summary > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 5px 8px;
+  border: 1px solid rgba(0, 168, 120, 0.22);
+  border-radius: 999px;
+  color: #007a59;
+  background: rgba(0, 168, 120, 0.1);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.optionDisclosureBody {
+  display: grid;
+  gap: 10px;
+  padding: 0 12px 12px;
+}
+
+.optionDisclosure .presetGrid,
+.optionDisclosure .demographicControls {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.houseZoomToolbar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.houseZoomToolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.houseZoomToolbar button:hover:not(:disabled) {
+  border-color: rgba(240, 95, 59, 0.28);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.houseZoomToolbar button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.houseZoomToolbar .activeZoomButton {
+  border-color: rgba(240, 95, 59, 0.34);
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(240, 95, 59, 0.16), transparent 80%),
+    var(--surface-raised);
+}
+
+.mapSelectionLayer {
+  pointer-events: none;
+}
+
+.stateShape:hover,
+.stateShape:active,
+.stateShape[data-selected="true"],
+.houseDistrictShape:hover,
+.houseDistrictShape[data-hovered="true"],
+.houseDistrictShape[data-selected="true"] {
+  filter: none;
+}
+
+.stateShape[data-selected="true"],
+.houseDistrictShape[data-selected="true"] {
+  stroke: rgba(255, 255, 255, 0.82);
+}
+
+.stateSelectedOutline,
+.houseDistrictSelectedOutline {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--aero-green);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.stateSelectedOutline {
+  stroke-width: 3.2;
+}
+
+.houseDistrictSelectedOutline {
+  stroke-width: 3.8;
+}
+
+.houseDistrictLabel,
+.stateLabel {
+  font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.houseDistrictMap[data-zoom-mode="state"] .houseDistrictLabel {
+  font-size: 5px;
+  stroke-width: 1.6px;
+}
+
+.houseDistrictMap[data-zoom-mode="district"] .houseDistrictLabel {
+  font-size: 2.8px;
+  stroke-width: 0.95px;
+}
+
+.shell[data-theme="dark"] {
+  --accent: #ff7b52;
+  --accent-soft: rgba(255, 123, 82, 0.13);
+  --aero-green: #8ad7bd;
+}
+
+.shell[data-theme="dark"] .stateShape[data-selected="true"],
+.shell[data-theme="dark"] .houseDistrictShape[data-selected="true"] {
+  filter: none;
+}
+
+.shell[data-theme="dark"] .stateSelectedOutline,
+.shell[data-theme="dark"] .houseDistrictSelectedOutline {
+  stroke: #8ad7bd;
+}
+
+.shell[data-theme="dark"] .optionDisclosure,
+.shell[data-theme="dark"] .houseZoomToolbar button {
+  background:
+    linear-gradient(90deg, rgba(255, 123, 82, 0.08), transparent 48%),
+    var(--surface-soft);
+}
+
+@media (max-width: 760px) {
+  .header h2 {
+    font-size: 24px;
+  }
+
+  .optionDisclosure summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .optionDisclosure summary > span {
+    display: none;
+  }
+
+  .houseZoomToolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .houseBoundaryCanvas {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .houseDistrictMap {
+    min-width: 0;
   }
 }

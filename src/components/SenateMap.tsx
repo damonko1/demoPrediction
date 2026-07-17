@@ -193,6 +193,26 @@ function pickSeatForState(results: LegislativeSeatResult[]) {
   })[0];
 }
 
+function hasActiveCycleRace(results: readonly LegislativeSeatResult[]) {
+  return results.some((result) => "upNextCycle" in result.seat && result.seat.upNextCycle);
+}
+
+function hasSpecialElection(results: readonly LegislativeSeatResult[]) {
+  return results.some((result) => result.seat.specialElection);
+}
+
+function hasFlippedSeat(results: readonly LegislativeSeatResult[]) {
+  return results.some((result) => result.flipped);
+}
+
+function getCycleLabel(result: LegislativeSeatResult) {
+  if (!("upNextCycle" in result.seat)) {
+    return "";
+  }
+
+  return result.seat.upNextCycle ? "Up this cycle" : "Not up this cycle";
+}
+
 function getStateStyle(results: LegislativeSeatResult[]) {
   const demSeats = results.filter(
     (result) => result.simulatedControlParty === "democratic",
@@ -290,6 +310,22 @@ export function SenateMap({
   const hoveredResults = hoveredStateCode
     ? resultsByState.get(hoveredStateCode) ?? []
     : [];
+  const selectedShape =
+    stateShapes.find((shape) => shape.code === selectedStateCode) ?? null;
+  const selectedShapeResults = selectedShape
+    ? resultsByState.get(selectedShape.code) ?? []
+    : [];
+  const selectedStateName = selectedShapeResults[0]?.seat.stateName ?? null;
+  const selectedStateSortedSeats = [...selectedShapeResults].sort((left, right) => {
+    const leftUpNext = "upNextCycle" in left.seat && left.seat.upNextCycle;
+    const rightUpNext = "upNextCycle" in right.seat && right.seat.upNextCycle;
+
+    if (leftUpNext !== rightUpNext) {
+      return leftUpNext ? -1 : 1;
+    }
+
+    return left.seat.sortIndex - right.seat.sortIndex;
+  });
   const viewBox = topology
     ? `${topology.bbox[0] - 10} ${topology.bbox[1] - 10} ${topology.bbox[2] - topology.bbox[0] + 20} ${topology.bbox[3] - topology.bbox[1] + 20}`
     : "-68 3 1036 614";
@@ -340,11 +376,19 @@ export function SenateMap({
           </span>
           <span>
             <b className={styles.legendLikely} />
-            D edge
+            D control
           </span>
           <span>
             <b className={styles.legendSafe} />
-            R edge
+            R control
+          </span>
+          <span>
+            <b className={styles.legendLean} />
+            Up this cycle
+          </span>
+          <span>
+            <b className={styles.legendFlagged} />
+            No active race / special flag
           </span>
         </div>
       </div>
@@ -377,7 +421,10 @@ export function SenateMap({
                       aria-label={`${shape.code} Senate seats`}
                       className={styles.stateShape}
                       d={shape.path}
+                      data-flipped={hasFlippedSeat(stateResults)}
+                      data-no-active-race={!hasActiveCycleRace(stateResults)}
                       data-selected={shape.code === selectedStateCode}
+                      data-special-election={hasSpecialElection(stateResults)}
                       key={shape.code}
                       onClick={() => selectState(shape.code)}
                       onKeyDown={(event) => handleStateKeyDown(event, shape.code)}
@@ -407,6 +454,16 @@ export function SenateMap({
                     </text>
                   ))}
               </g>
+              {selectedShape && selectedShapeResults.length ? (
+                <g className={styles.mapSelectionLayer} aria-hidden="true">
+                  <path
+                    className={styles.stateSelectedOutline}
+                    d={selectedShape.path}
+                    fillRule="evenodd"
+                    style={getStateStyle(selectedShapeResults)}
+                  />
+                </g>
+              ) : null}
             </svg>
           ) : null}
 
@@ -428,7 +485,9 @@ export function SenateMap({
                   <span>{stateCode}</span>
                   <small>
                     {pickedSeat
-                      ? formatLegislativePartyShort(pickedSeat.simulatedWinner)
+                      ? `${formatLegislativePartyShort(pickedSeat.simulatedWinner)} ${
+                          getCycleLabel(pickedSeat) === "Up this cycle" ? "up" : ""
+                        }`.trim()
                       : "--"}
                   </small>
                 </button>
@@ -452,11 +511,11 @@ export function SenateMap({
                       {"senateClass" in result.seat
                         ? `Class ${result.seat.senateClass}`
                         : result.seat.id}
+                      {" "}
+                      {getCycleLabel(result)}
+                      {result.seat.specialElection ? " / Special" : ""}
                     </span>
-                    <b>
-                      {formatLegislativePartyShort(result.simulatedWinner)}{" "}
-                      {formatMargin(result.simulatedMargin)}
-                    </b>
+                    <b>{formatMargin(result.simulatedMargin)}</b>
                   </div>
                 ))}
               </div>
@@ -464,6 +523,43 @@ export function SenateMap({
           ) : null}
         </div>
       </div>
+
+      {selectedStateSortedSeats.length > 0 ? (
+        <div
+          className={styles.senateSeatSelector}
+          aria-label={`${selectedStateName ?? "Selected state"} Senate seats`}
+        >
+          <div className={styles.senateSeatSelectorHeader}>
+            <span>{selectedStateName}</span>
+            <strong>{hasActiveCycleRace(selectedStateSortedSeats) ? "Active race" : "No active race"}</strong>
+          </div>
+          <div className={styles.senateSeatGrid}>
+            {selectedStateSortedSeats.map((result) => (
+              <button
+                aria-label={`Select ${result.seat.districtLabel}`}
+                className={styles.senateSeatButton}
+                data-selected={result.seat.id === selectedSeatId}
+                data-special-election={result.seat.specialElection}
+                data-up-next={"upNextCycle" in result.seat && result.seat.upNextCycle}
+                key={result.seat.id}
+                onClick={() => onSelectSeat(result.seat.id)}
+                type="button"
+              >
+                <span>
+                  {"senateClass" in result.seat
+                    ? `Class ${result.seat.senateClass}`
+                    : result.seat.id}
+                </span>
+                <strong>{formatMargin(result.simulatedMargin)}</strong>
+                <small>
+                  {getCycleLabel(result)}
+                  {result.seat.specialElection ? " / special election" : ""}
+                </small>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
