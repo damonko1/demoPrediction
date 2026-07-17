@@ -14,6 +14,7 @@ import {
   historicalElectionYears,
 } from "@/data/historicalElectionData.generated";
 import {
+  getMatchingScenarioPreset,
   resetBaselinePresetId,
   scenarioPresets,
 } from "@/data/scenarioPresets";
@@ -66,6 +67,13 @@ export function ScenarioControls({
   const isAtDefault = baselineYear === defaultHistoricalElectionYear &&
     Math.abs(nationalSwing) < 0.05 &&
     Object.values(demographicAssumptions).every((value) => Math.abs(value) < 0.05);
+  const matchingPreset = getMatchingScenarioPreset({
+    nationalSwing,
+    demographics: demographicAssumptions,
+  });
+  const activePresetId = matchingPreset?.id === resetBaselinePresetId && !isAtDefault
+    ? null
+    : matchingPreset?.id ?? null;
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   const copyStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -183,26 +191,37 @@ export function ScenarioControls({
 
         <div className={styles.optionDisclosureBody}>
           <div className={styles.presetGrid}>
-            {scenarioPresets.map((preset) => {
+            {scenarioPresets
+              .filter((preset) => preset.id !== resetBaselinePresetId)
+              .map((preset) => {
               const isResetPreset = preset.id === resetBaselinePresetId;
               const Icon = isResetPreset ? RotateCcw : Zap;
 
               return (
                 <button
                   aria-label={`Apply ${preset.label} preset`}
-                  className={styles.presetButton}
+                  aria-pressed={activePresetId === preset.id}
+                  className={`${styles.presetButton} ${
+                    activePresetId === preset.id
+                      ? styles.activePresetButton
+                      : ""
+                  }`}
                   key={preset.id}
                   onClick={() => onApplyPreset(preset)}
                   type="button"
                 >
-                  <Icon size={15} strokeWidth={2.2} />
+                  {activePresetId === preset.id ? (
+                    <Check size={15} strokeWidth={2.4} />
+                  ) : (
+                    <Icon size={15} strokeWidth={2.2} />
+                  )}
                   <span>
                     <b>{preset.label}</b>
                     <small>{preset.summary}</small>
                   </span>
                 </button>
               );
-            })}
+              })}
           </div>
 
           <div className={styles.simulationDisclaimer}>
@@ -255,12 +274,6 @@ export function ScenarioControls({
                         onDemographicAssumptionChange(
                           config.id,
                           Number(event.target.value),
-                        )
-                      }
-                      onInput={(event) =>
-                        onDemographicAssumptionChange(
-                          config.id,
-                          Number(event.currentTarget.value),
                         )
                       }
                       step={demographicSliderBounds.step}

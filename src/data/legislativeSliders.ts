@@ -81,7 +81,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "suburbanDistrictShift",
-    chambers: ["house", "senate"],
+    chambers: [],
     label: "Suburban district shift",
     lowLabel: "Suburbs shift R",
     neutralLabel: "No suburban shift",
@@ -92,7 +92,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "ruralDistrictShift",
-    chambers: ["house", "senate"],
+    chambers: [],
     label: "Rural district shift",
     lowLabel: "Rural shift R",
     neutralLabel: "No rural shift",
@@ -103,7 +103,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "collegeEducatedDistrictShift",
-    chambers: ["house"],
+    chambers: [],
     label: "College-educated district shift",
     lowLabel: "College districts shift R",
     neutralLabel: "No college shift",
@@ -114,7 +114,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "nonCollegeDistrictShift",
-    chambers: ["house"],
+    chambers: [],
     label: "Non-college district shift",
     lowLabel: "Non-college shift R",
     neutralLabel: "No non-college shift",
@@ -136,7 +136,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "statePartisanshipElasticity",
-    chambers: ["senate"],
+    chambers: [],
     label: "State partisanship elasticity",
     lowLabel: "State lean R",
     neutralLabel: "No state shift",
@@ -158,7 +158,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "antiIncumbentWave",
-    chambers: ["house", "senate"],
+    chambers: [],
     label: "Anti-incumbent wave",
     lowLabel: "Incumbents protected",
     neutralLabel: "No wave",

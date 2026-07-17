@@ -1,0 +1,209 @@
+.root {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 0.85fr) minmax(260px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(37, 126, 145, 0.14);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.heading > div {
+  display: grid;
+  gap: 1px;
+}
+
+.heading strong {
+  color: #123442;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.heading small,
+.status {
+  color: #647c85;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: #007f70;
+  background: rgba(0, 127, 112, 0.09);
+}
+
+.saveGroup,
+.loadGroup {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  gap: 6px;
+}
+
+.nameField,
+.selectField {
+  min-width: 0;
+  flex: 1;
+}
+
+.nameField input,
+.selectField select {
+  width: 100%;
+  height: 34px;
+  min-width: 0;
+  border: 1px solid rgba(37, 126, 145, 0.2);
+  border-radius: 0;
+  padding: 0 9px;
+  color: #123442;
+  background: rgba(255, 255, 255, 0.64);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  outline: none;
+}
+
+.nameField input:focus,
+.selectField select:focus {
+  border-color: rgba(0, 127, 112, 0.66);
+  box-shadow: 0 0 0 2px rgba(0, 127, 112, 0.11);
+}
+
+.nameField input::placeholder {
+  color: #7a9097;
+}
+
+.primaryButton,
+.secondaryButton,
+.deleteButton {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(0, 127, 112, 0.28);
+  border-radius: 0;
+  padding: 0 10px;
+  color: #006a60;
+  background: rgba(223, 250, 244, 0.72);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.primaryButton:hover:not(:disabled),
+.secondaryButton:hover:not(:disabled) {
+  border-color: rgba(0, 127, 112, 0.54);
+  background: rgba(211, 247, 239, 0.9);
+}
+
+.deleteButton {
+  width: 34px;
+  flex: 0 0 34px;
+  padding: 0;
+  border-color: rgba(192, 59, 71, 0.18);
+  color: #a42e3a;
+  background: rgba(255, 241, 242, 0.6);
+}
+
+.deleteButton:hover:not(:disabled) {
+  border-color: rgba(192, 59, 71, 0.42);
+  background: rgba(255, 231, 234, 0.88);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.deleteButton:disabled,
+.selectField select:disabled {
+  cursor: not-allowed;
+  opacity: 0.44;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.error {
+  color: #a42e3a;
+  white-space: normal;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:global([data-theme="dark"]) .root {
+  border-color: rgba(116, 207, 215, 0.14);
+  background: rgba(13, 35, 45, 0.42);
+}
+
+:global([data-theme="dark"]) .heading strong {
+  color: #d9f3f4;
+}
+
+:global([data-theme="dark"]) .heading small,
+:global([data-theme="dark"]) .status {
+  color: #91aaaf;
+}
+
+:global([data-theme="dark"]) .nameField input,
+:global([data-theme="dark"]) .selectField select {
+  border-color: rgba(116, 207, 215, 0.2);
+  color: #d9f3f4;
+  background: rgba(17, 44, 54, 0.8);
+}
+
+@media (max-width: 1100px) {
+  .root {
+    grid-template-columns: auto minmax(200px, 1fr) minmax(240px, 1fr);
+  }
+
+  .status {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 760px) {
+  .root {
+    grid-template-columns: 1fr;
+  }
+
+  .heading,
+  .status {
+    grid-column: 1;
+  }
+
+  .status {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}

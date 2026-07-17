@@ -10,6 +10,10 @@ import {
   getLegislativeSliderConfigsForChamber,
   legislativeSliderBounds,
 } from "@/data/legislativeSliders";
+import {
+  getLegislativePresets,
+  getMatchingLegislativePreset,
+} from "@/data/legislativePresets";
 import { formatSignedPoints, formatSwing } from "@/lib/format";
 import type {
   LegislativeAssumptions,
@@ -34,12 +38,6 @@ type LegislativeControlsProps = {
 
 type CopyStatus = "idle" | "copied" | "failed";
 
-type LegislativePreset = {
-  label: string;
-  summary: string;
-  assumptions: LegislativeAssumptions;
-};
-
 const chamberPresets = [
   {
     label: "Blue wave",
@@ -63,118 +61,6 @@ const chamberPresets = [
   },
 ] as const;
 
-function createLegislativePreset(
-  label: string,
-  summary: string,
-  nationalSwing: number,
-  sliders: Partial<Record<LegislativeSliderId, number>> = {},
-): LegislativePreset {
-  return {
-    label,
-    summary,
-    assumptions: {
-      nationalSwing,
-      sliders: {
-        ...defaultLegislativeSliderAssumptions,
-        ...sliders,
-      },
-      overrides: {
-        states: {},
-        districts: {},
-        races: {},
-      },
-    },
-  };
-}
-
-const housePresets: LegislativePreset[] = [
-  createLegislativePreset("Generic blue wave", "D +5 national House swing", 5),
-  createLegislativePreset("Generic red wave", "R +5 national House swing", -5),
-  createLegislativePreset(
-    "Suburban backlash",
-    "Suburbs and college districts shift R",
-    0,
-    {
-      suburbanDistrictShift: -6,
-      collegeEducatedDistrictShift: -2,
-      candidateQuality: -1.5,
-    },
-  ),
-  createLegislativePreset("Rural surge", "Rural and non-college districts shift R", 0, {
-    genericTurnout: -2,
-    ruralDistrictShift: -6,
-    nonCollegeDistrictShift: -4,
-  }),
-  createLegislativePreset(
-    "Incumbent protection",
-    "Incumbents and open-seat baselines are protected",
-    0,
-    {
-      incumbencyAdvantage: 5,
-      openSeatPenalty: -2,
-      antiIncumbentWave: -4,
-    },
-  ),
-  createLegislativePreset(
-    "Anti-incumbent environment",
-    "Incumbents are penalized across close districts",
-    0,
-    {
-      incumbencyAdvantage: -4,
-      openSeatPenalty: 2,
-      antiIncumbentWave: 6,
-    },
-  ),
-  createLegislativePreset("Presidential coattails", "D +4 downballot pull", 1, {
-    genericTurnout: 1,
-    presidentialCoattails: 4,
-  }),
-  createLegislativePreset("Split-ticket House", "House moves against coattails", -2, {
-    incumbencyAdvantage: 2,
-    candidateQuality: -2,
-    presidentialCoattails: -4,
-  }),
-  createLegislativePreset("Reset to baseline", "Return to sourced district margins", 0),
-];
-
-const senatePresets: LegislativePreset[] = [
-  createLegislativePreset("Generic blue Senate wave", "D +5 national Senate swing", 5),
-  createLegislativePreset("Generic red Senate wave", "R +5 national Senate swing", -5),
-  createLegislativePreset("Strong incumbent year", "Incumbents are protected", 0, {
-    incumbencyAdvantage: 5,
-    antiIncumbentWave: -3,
-  }),
-  createLegislativePreset(
-    "Anti-incumbent Senate year",
-    "Incumbents are penalized in competitive states",
-    0,
-    {
-      incumbencyAdvantage: -4,
-      antiIncumbentWave: 6,
-      candidateQuality: -1,
-    },
-  ),
-  createLegislativePreset("Presidential coattails", "D +4 Senate coattail pull", 1, {
-    presidentialCoattails: 4,
-    statePartisanshipElasticity: 2,
-  }),
-  createLegislativePreset("Split-ticket Senate", "Senate moves against coattails", -2, {
-    presidentialCoattails: -4,
-    candidateQuality: -2,
-    independentVoteShift: -2,
-  }),
-  createLegislativePreset("Rural surge", "Rural states and turnout shift R", 0, {
-    genericTurnout: -2,
-    ruralDistrictShift: -6,
-    independentVoteShift: -1.5,
-  }),
-  createLegislativePreset("Suburban shift", "Suburban states and independents shift D", 0, {
-    suburbanDistrictShift: 5,
-    independentVoteShift: 3,
-  }),
-  createLegislativePreset("Reset to baseline", "Return to sourced Senate margins", 0),
-];
-
 function getChamberTitle(chamber: LegislativeChamber) {
   return chamber === "house" ? "House" : "Senate";
 }
@@ -185,10 +71,6 @@ function getChamberEnvironmentLabel(chamber: LegislativeChamber) {
 
 function getPresetLibraryTitle(chamber: LegislativeChamber) {
   return chamber === "house" ? "House preset library" : "Senate preset library";
-}
-
-function getPresetsForChamber(chamber: LegislativeChamber) {
-  return chamber === "house" ? housePresets : senatePresets;
 }
 
 function formatSliderValue(value: number) {
@@ -285,12 +167,12 @@ export function LegislativeControls({
     ? Object.keys(assumptions.overrides.districts).length > 0
     : Object.keys(assumptions.overrides.races).length > 0;
   const isAtDefault = Math.abs(assumptions.nationalSwing) < 0.05 &&
-    chamberSliderConfigs.every(
-      (config) => Math.abs(sliderAssumptions[config.id]) < 0.05,
-    ) && !hasChamberOverrides;
+    Object.values(sliderAssumptions).every((value) => Math.abs(value) < 0.05) &&
+    !hasChamberOverrides;
   const showChamberSliders = Boolean(onSliderChange && chamberSliderConfigs.length);
   const showPresetLibrary = Boolean(onApplyAssumptions);
-  const chamberPresetsForLibrary = getPresetsForChamber(chamber);
+  const chamberPresetsForLibrary = getLegislativePresets(chamber);
+  const matchingPreset = getMatchingLegislativePreset(chamber, assumptions);
 
   useEffect(() => {
     return () => {
@@ -432,12 +314,17 @@ export function LegislativeControls({
               ? chamberPresetsForLibrary.map((preset) => (
                   <button
                     aria-label={`Apply ${preset.label} preset`}
-                    className={styles.presetButton}
-                    key={preset.label}
+                    aria-pressed={matchingPreset?.id === preset.id}
+                    className={`${styles.presetButton} ${
+                      matchingPreset?.id === preset.id
+                        ? styles.activePresetButton
+                        : ""
+                    }`}
+                    key={preset.id}
                     onClick={() =>
                       onApplyAssumptions?.({
                         ...preset.assumptions,
-                        overrides: preset.label === "Reset to baseline"
+                        overrides: preset.id.endsWith("baseline")
                           ? {
                               states: assumptions.overrides.states,
                               districts: {},
@@ -448,7 +335,9 @@ export function LegislativeControls({
                     }
                     type="button"
                   >
-                    {preset.label === "Reset to baseline" ? (
+                    {matchingPreset?.id === preset.id ? (
+                      <Check size={15} strokeWidth={2.4} />
+                    ) : preset.id.endsWith("baseline") ? (
                       <RotateCcw size={15} strokeWidth={2.2} />
                     ) : (
                       <Zap size={15} strokeWidth={2.2} />

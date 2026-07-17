@@ -93,3 +93,17 @@ export const scenarioPresets: ScenarioPreset[] = [
     assumptions: buildAssumptions(0),
   },
 ];
+
+export function getMatchingScenarioPreset(assumptions: ScenarioAssumptions) {
+  return scenarioPresets.find(
+    (preset) =>
+      preset.id !== resetBaselinePresetId &&
+      Math.abs(preset.assumptions.nationalSwing - assumptions.nationalSwing) < 0.05 &&
+      Object.entries(preset.assumptions.demographics).every(
+        ([id, value]) =>
+          Math.abs(
+            value - assumptions.demographics[id as keyof DemographicAssumptions],
+          ) < 0.05,
+      ),
+  ) ?? null;
+}

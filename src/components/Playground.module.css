@@ -5024,3 +5024,606 @@
     justify-content: flex-start;
   }
 }
+
+/* Compact simulation cockpit */
+.shell {
+  padding: 10px;
+}
+
+.appFrame {
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: none;
+}
+
+.appSidebar {
+  top: 10px;
+  height: calc(100dvh - 20px);
+  padding: 12px;
+}
+
+.contentShell {
+  gap: 10px;
+}
+
+.unifiedSummary {
+  display: grid;
+  grid-template-areas:
+    "simulation-header simulation-results"
+    "simulation-header simulation-settings"
+    "simulation-saved simulation-saved";
+  grid-template-columns: minmax(218px, 250px) minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 6px;
+  padding: 10px;
+}
+
+.unifiedSummaryHeader {
+  grid-area: simulation-header;
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0;
+  padding: 2px 8px 2px 2px;
+  border-right: 1px solid var(--line);
+}
+
+.simulationIdentity {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.simulationIdentity .summaryPill {
+  flex: 0 0 auto;
+}
+
+.simulationDockActions {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.simulationDockActions button {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 9px;
+  color: var(--muted-strong);
+  background: var(--surface-soft);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.simulationDockActions button:hover:not(:disabled) {
+  border-color: rgba(240, 95, 59, 0.32);
+  color: var(--accent);
+}
+
+.simulationDockActions button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+.simulationDockActions .completeResetButton {
+  border-color: rgba(190, 46, 57, 0.24);
+  color: #a52d39;
+  background: rgba(255, 236, 238, 0.72);
+}
+
+.unifiedSummaryGrid {
+  grid-area: simulation-results;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.unifiedSummaryGrid div {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+
+.unifiedSummaryGrid div[data-active="true"] {
+  border-color: rgba(240, 95, 59, 0.38);
+  background:
+    linear-gradient(90deg, rgba(240, 95, 59, 0.12), transparent 78%),
+    var(--surface-raised);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.unifiedSummaryGrid strong {
+  font-size: 15px;
+}
+
+.activeSettingsBar {
+  grid-area: simulation-settings;
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.activeSettingsBar strong,
+.activeSettingsBar span {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.activeSettingsBar strong {
+  color: var(--ink);
+  background: rgba(240, 95, 59, 0.14);
+}
+
+.activeSettingsBar span {
+  border: 1px solid rgba(0, 168, 120, 0.18);
+  color: #007a59;
+  background: rgba(0, 168, 120, 0.08);
+}
+
+.scenarioBookmarkDisclosure {
+  grid-area: simulation-saved;
+  margin-top: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+
+.scenarioBookmarkDisclosure > summary {
+  min-height: 28px;
+  padding: 6px 9px;
+  color: var(--muted-strong);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.scenarioBookmarkDisclosure > section {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.modelDisclosure summary {
+  min-height: 32px;
+  padding: 7px 9px;
+  font-size: 10px;
+  text-transform: none;
+}
+
+.modelSummaryText {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.modelSummaryText b {
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.modelSummaryText small {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.modelResourceBody {
+  display: grid;
+  gap: 7px;
+  padding: 0 8px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.modelFormula {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+}
+
+.modelFormula > span,
+.modelResourceCard > span {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.modelFormula code {
+  display: block;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--surface-soft);
+  font-size: 9px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.modelResourceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.modelResourceCard {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+
+.modelResourceCard strong {
+  display: block;
+  padding: 0;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.modelResourceCard small,
+.modelResourceLinks span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.modelResourceCard a,
+.modelResourceLinks a {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.modelResourceCard a:hover,
+.modelResourceLinks a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.modelResourceLinks {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+  padding: 1px 2px 0;
+}
+
+.summaryDeepDive {
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.summaryDeepDive > summary {
+  padding: 10px 12px;
+  color: var(--muted-strong);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.detailDisclosure {
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.detailDisclosure > summary {
+  padding: 10px 12px;
+  color: var(--muted-strong);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.detailDisclosureBody {
+  display: grid;
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.sensitivityDeepDiveGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.activePresetButton {
+  border: 2px solid var(--accent) !important;
+  color: var(--ink) !important;
+  background:
+    linear-gradient(90deg, rgba(240, 95, 59, 0.16), transparent 82%),
+    var(--surface-raised) !important;
+  box-shadow: 0 0 0 3px rgba(240, 95, 59, 0.08) !important;
+}
+
+.workspace,
+.focusWorkspace {
+  grid-template-areas:
+    "center detail"
+    "left left"
+    "analysis analysis";
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+  gap: 10px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.leftRail {
+  position: static;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.leftRail > .panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: 9px;
+}
+
+.leftRail > .panel > .panelHeader {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.leftRail > .panel > .optionDisclosure {
+  margin-top: 0;
+}
+
+.detailRail {
+  position: sticky;
+  top: 10px;
+  z-index: 2;
+  max-height: calc(100dvh - 20px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.analysisRail,
+.focusWorkspace .analysisRail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.analysisRail > .modelNote,
+.focusWorkspace .analysisRail > .modelNote {
+  align-self: start;
+}
+
+.centerStage {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mapPanel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.mapCanvas,
+.focusWorkspace .mapCanvas,
+.houseBoundaryCanvas,
+.focusWorkspace .houseBoundaryCanvas {
+  min-height: clamp(340px, 48vh, 540px);
+}
+
+.counter {
+  margin-bottom: 10px;
+  padding: 10px 14px;
+}
+
+.counterTopline {
+  gap: 10px;
+}
+
+.partyTotal strong {
+  font-size: 40px;
+}
+
+.counterMetaGrid {
+  margin-top: 8px;
+}
+
+.chamberCounterMetaGrid {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.counterMetaGrid div {
+  padding: 7px 10px;
+}
+
+.counterBar {
+  height: 18px;
+  margin-top: 8px;
+}
+
+.demBar,
+.repBar,
+.remainingBar {
+  top: 6px;
+}
+
+.thresholdMarker {
+  top: 2px;
+  bottom: 2px;
+}
+
+.scaleTicks {
+  margin-top: 4px;
+}
+
+.stateShape[data-selected="true"],
+.houseDistrictShape[data-selected="true"] {
+  stroke: var(--state-stroke, var(--seat-stroke));
+  stroke-width: 1.05;
+}
+
+.stateSelectedOutline,
+.houseDistrictSelectedOutline {
+  stroke-width: 2.25;
+}
+
+@media (max-width: 1200px) {
+  .leftRail > .panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .appFrame {
+    grid-template-columns: 1fr;
+  }
+
+  .appSidebar {
+    position: static;
+    height: auto;
+  }
+
+  .workspace,
+  .focusWorkspace {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+  }
+}
+
+@media (max-width: 760px) {
+  .unifiedSummary {
+    display: block;
+  }
+
+  .workspace,
+  .focusWorkspace {
+    grid-template-areas:
+      "center"
+      "detail"
+      "left"
+      "analysis";
+    grid-template-columns: 1fr;
+  }
+
+  .leftRail > .panel,
+  .analysisRail,
+  .focusWorkspace .analysisRail,
+  .sensitivityDeepDiveGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .unifiedSummaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unifiedSummaryGrid div[data-active="true"] {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+
+  .detailRail {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .unifiedSummaryHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 8px;
+    padding: 0;
+    border-right: 0;
+  }
+
+  .simulationIdentity {
+    align-items: center;
+  }
+
+  .simulationDockActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .activeSettingsBar,
+  .scenarioBookmarkDisclosure {
+    margin-top: 7px;
+  }
+
+  .modelResourceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modelSummaryText small {
+    display: none;
+  }
+
+  .mapCanvas,
+  .focusWorkspace .mapCanvas,
+  .houseBoundaryCanvas,
+  .focusWorkspace .houseBoundaryCanvas {
+    min-height: 330px;
+  }
+}

@@ -1,13 +1,20 @@
 "use client";
 
-import { Check, Copy, Download } from "lucide-react";
+import { Check, Copy, Download, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { ScenarioBookmarks } from "@/components/ScenarioBookmarks";
+import { demographicSliderConfigs } from "@/data/demographicSliders";
 import {
-  formatPartyShort,
+  getMatchingLegislativePreset,
+} from "@/data/legislativePresets";
+import { getLegislativeSliderConfigsForChamber } from "@/data/legislativeSliders";
+import { getMatchingScenarioPreset } from "@/data/scenarioPresets";
+import {
   formatSwing,
 } from "@/lib/format";
 import type {
   LegislativeScenarioResult,
+  HistoricalElectionYear,
   ScenarioResult,
   SimulationTab,
 } from "@/types/election";
@@ -19,6 +26,9 @@ type UnifiedScenarioSummaryProps = {
   houseScenario: LegislativeScenarioResult;
   senateScenario: LegislativeScenarioResult;
   shareUrl: string;
+  baselineYear: HistoricalElectionYear;
+  onResetAll: () => void;
+  resetDisabled: boolean;
 };
 
 type ShareStatus = "idle" | "copied" | "saved" | "failed";
@@ -55,18 +65,6 @@ function getChamberControl(scenario: LegislativeScenarioResult) {
     : "Republican control";
 }
 
-function getChamberLeadShort(scenario: LegislativeScenarioResult) {
-  if (scenario.controlTotals.democratic === scenario.controlTotals.republican) {
-    return "Tie";
-  }
-
-  return `${formatPartyShort(
-    scenario.controlTotals.democratic > scenario.controlTotals.republican
-      ? "democratic"
-      : "republican",
-  )} lead`;
-}
-
 function formatCountDelta(value: number, label: string) {
   if (value === 0) {
     return `No ${label} change`;
@@ -77,10 +75,13 @@ function formatCountDelta(value: number, label: string) {
 
 export function UnifiedScenarioSummary({
   activeTab,
+  baselineYear,
   presidentialScenario,
   houseScenario,
   senateScenario,
   shareUrl,
+  onResetAll,
+  resetDisabled,
 }: UnifiedScenarioSummaryProps) {
   const [shareStatus, setShareStatus] = useState<ShareStatus>("idle");
   const statusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,6 +103,61 @@ export function UnifiedScenarioSummary({
   const raceOverrideCount = Object.keys(
     senateScenario.assumptions.overrides.races,
   ).length;
+  const presidentialPreset = getMatchingScenarioPreset(
+    presidentialScenario.assumptions,
+  );
+  const housePreset = getMatchingLegislativePreset(
+    "house",
+    houseScenario.assumptions,
+  );
+  const senatePreset = getMatchingLegislativePreset(
+    "senate",
+    senateScenario.assumptions,
+  );
+  const activeLegislativeScenario = activeTab === "house"
+    ? houseScenario
+    : senateScenario;
+  const activeLegislativePreset = activeTab === "house"
+    ? housePreset
+    : senatePreset;
+  const activeSliderLabels = activeTab === "president"
+    ? demographicSliderConfigs
+        .filter(
+          (config) =>
+            Math.abs(presidentialScenario.assumptions.demographics[config.id]) >= 0.05,
+        )
+        .map(
+          (config) =>
+            `${config.label} ${formatSwing(
+              presidentialScenario.assumptions.demographics[config.id],
+            )}`,
+        )
+    : getLegislativeSliderConfigsForChamber(activeTab)
+        .filter(
+          (config) =>
+            Math.abs(activeLegislativeScenario.assumptions.sliders[config.id]) >= 0.05,
+        )
+        .map(
+          (config) =>
+            `${config.label} ${formatSwing(
+              activeLegislativeScenario.assumptions.sliders[config.id],
+            )}`,
+        );
+  const activeSwing = activeTab === "president"
+    ? presidentialScenario.assumptions.nationalSwing
+    : activeLegislativeScenario.assumptions.nationalSwing;
+  const activeLocalOverrideCount = activeTab === "president"
+    ? stateOverrideCount
+    : stateOverrideCount + (activeTab === "house" ? districtOverrideCount : raceOverrideCount);
+  const hasActiveCustomSettings = Math.abs(activeSwing) >= 0.05 ||
+    activeSliderLabels.length > 0 || activeLocalOverrideCount > 0;
+  const activePresetName = activeTab === "president"
+    ? presidentialPreset?.label
+    : activeLegislativePreset?.label;
+  const activeScenarioName = activePresetName ??
+    (hasActiveCustomSettings ? "Custom mix" : "Baseline");
+  const visibleSettings = activeSliderLabels.slice(0, 4);
+  const hiddenSettingCount = Math.max(0, activeSliderLabels.length - visibleSettings.length);
   const snapshotText = [
     "Election Forecast Playground · Simulation only",
     `President D ${presidentialScenario.totals.democratic} / R ${presidentialScenario.totals.republican}`,
@@ -171,15 +227,36 @@ export function UnifiedScenarioSummary({
       aria-label="Unified presidential, House, and Senate scenario summary"
     >
       <div className={styles.unifiedSummaryHeader}>
-        <div>
-          <p className={styles.sectionKicker}>All chambers</p>
-          <h2>Scenario snapshot</h2>
+        <div className={styles.simulationIdentity}>
+          <div>
+            <p className={styles.sectionKicker}>Active simulation</p>
+            <h2>{activeScenarioName}</h2>
+          </div>
+          <span className={styles.summaryPill}>{getActiveLabel(activeTab)}</span>
         </div>
-        <span className={styles.summaryPill}>{getActiveLabel(activeTab)}</span>
+        <div className={styles.simulationDockActions}>
+          <button disabled={!shareUrl} onClick={copySnapshot} type="button">
+            {shareStatus === "copied" ? <Check size={14} /> : <Copy size={14} />}
+            {shareStatus === "copied" ? "Copied" : "Copy"}
+          </button>
+          <button onClick={exportSnapshotCard} type="button">
+            {shareStatus === "saved" ? <Check size={14} /> : <Download size={14} />}
+            {shareStatus === "saved" ? "Saved" : "Export"}
+          </button>
+          <button
+            className={styles.completeResetButton}
+            disabled={resetDisabled}
+            onClick={onResetAll}
+            type="button"
+          >
+            <RotateCcw size={14} />
+            Reset all
+          </button>
+        </div>
       </div>
 
       <div className={styles.unifiedSummaryGrid}>
-        <div>
+        <div data-active={activeTab === "president"}>
           <span>President</span>
           <strong>
             D {presidentialScenario.totals.democratic} / R{" "}
@@ -189,7 +266,7 @@ export function UnifiedScenarioSummary({
             {getPresidentialLeader(presidentialScenario)} · {formatCountDelta(presidentialEvDelta, "D EV")}
           </small>
         </div>
-        <div>
+        <div data-active={activeTab === "house"}>
           <span>House</span>
           <strong>
             D {houseScenario.controlTotals.democratic} / R{" "}
@@ -197,7 +274,7 @@ export function UnifiedScenarioSummary({
           </strong>
           <small>{getChamberControl(houseScenario)} · {formatCountDelta(houseSeatDelta, "D seats")}</small>
         </div>
-        <div>
+        <div data-active={activeTab === "senate"}>
           <span>Senate</span>
           <strong>
             D {senateScenario.controlTotals.democratic} / R{" "}
@@ -205,47 +282,28 @@ export function UnifiedScenarioSummary({
           </strong>
           <small>{getChamberControl(senateScenario)} · {formatCountDelta(senateSeatDelta, "D seats")}</small>
         </div>
-        <div>
-          <span>Assumption mode</span>
-          <strong>Shared state, local seats</strong>
-          <small>
-            {stateOverrideCount} state · {districtOverrideCount} district · {raceOverrideCount} race overrides
-          </small>
-        </div>
       </div>
 
-      <div className={styles.unifiedAssumptionStrip}>
-        <span>Pres {formatSwing(presidentialScenario.assumptions.nationalSwing)}</span>
-        <span>
-          House {formatSwing(houseScenario.assumptions.nationalSwing)} /{" "}
-          {getChamberLeadShort(houseScenario)}
-        </span>
-        <span>
-          Senate {formatSwing(senateScenario.assumptions.nationalSwing)} /{" "}
-          {getChamberLeadShort(senateScenario)}
-        </span>
-        <span>
-          State overrides affect all tabs; chamber sliders remain independent
-        </span>
+      <div className={styles.activeSettingsBar} aria-label="Active simulation settings">
+        <strong>Now simulating</strong>
+        {activeTab === "president" ? <span>{baselineYear} baseline</span> : null}
+        <span>{formatSwing(activeSwing)}</span>
+        {visibleSettings.map((label) => <span key={label}>{label}</span>)}
+        {hiddenSettingCount ? <span>+{hiddenSettingCount} more settings</span> : null}
+        {stateOverrideCount ? <span>{stateOverrideCount} state override{stateOverrideCount === 1 ? "" : "s"}</span> : null}
+        {activeTab === "house" && districtOverrideCount ? (
+          <span>{districtOverrideCount} district override{districtOverrideCount === 1 ? "" : "s"}</span>
+        ) : null}
+        {activeTab === "senate" && raceOverrideCount ? (
+          <span>{raceOverrideCount} race override{raceOverrideCount === 1 ? "" : "s"}</span>
+        ) : null}
+        {!hasActiveCustomSettings ? <span>All assumptions at default</span> : null}
       </div>
 
-      <div className={styles.nationalShareCard} aria-label="Full national scenario share card">
-        <div>
-          <span>Full national share card</span>
-          <strong>President · House · Senate</strong>
-          <small>Includes all state, district, and Senate race overrides in the shared URL.</small>
-        </div>
-        <div>
-          <button disabled={!shareUrl} onClick={copySnapshot} type="button">
-            {shareStatus === "copied" ? <Check size={14} /> : <Copy size={14} />}
-            {shareStatus === "copied" ? "Copied" : "Copy snapshot"}
-          </button>
-          <button onClick={exportSnapshotCard} type="button">
-            {shareStatus === "saved" ? <Check size={14} /> : <Download size={14} />}
-            {shareStatus === "saved" ? "Saved" : "Export SVG"}
-          </button>
-        </div>
-      </div>
+      <details className={styles.scenarioBookmarkDisclosure}>
+        <summary>Save or open a named scenario</summary>
+        <ScenarioBookmarks currentUrl={shareUrl} />
+      </details>
     </section>
   );
 }

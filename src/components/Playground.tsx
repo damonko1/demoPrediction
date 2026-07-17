@@ -530,6 +530,30 @@ export function Playground() {
     setSelectedStateCode(initialSelectedState);
   }
 
+  function resetAllSimulations() {
+    setBaselineYear(defaultHistoricalElectionYear);
+    setNationalSwing(0);
+    setDemographicAssumptions({ ...defaultDemographicAssumptions });
+    setStateOverrides({});
+    setHouseAssumptions(getDefaultLegislativeAssumptions());
+    setSenateAssumptions(getDefaultLegislativeAssumptions());
+    setSelectedStateCode(initialSelectedState);
+    setSelectedHouseSeatId(initialSelectedHouseSeat);
+    setSelectedSenateSeatId(initialSelectedSenateSeat);
+  }
+
+  const isEverythingAtDefault =
+    baselineYear === defaultHistoricalElectionYear &&
+    Math.abs(nationalSwing) < 0.05 &&
+    Object.values(demographicAssumptions).every((value) => Math.abs(value) < 0.05) &&
+    Object.keys(stateOverrides).length === 0 &&
+    Math.abs(houseAssumptions.nationalSwing) < 0.05 &&
+    Object.values(houseAssumptions.sliders).every((value) => Math.abs(value) < 0.05) &&
+    Object.keys(houseAssumptions.overrides.districts).length === 0 &&
+    Math.abs(senateAssumptions.nationalSwing) < 0.05 &&
+    Object.values(senateAssumptions.sliders).every((value) => Math.abs(value) < 0.05) &&
+    Object.keys(senateAssumptions.overrides.races).length === 0;
+
   return (
     <main
       className={`${styles.shell} ${isFocusMode ? styles.focusShell : ""}`}
@@ -626,10 +650,13 @@ export function Playground() {
 
           <UnifiedScenarioSummary
             activeTab={activeTab}
+            baselineYear={baselineYear}
             presidentialScenario={scenario}
             houseScenario={houseScenario}
             senateScenario={senateScenario}
             shareUrl={currentShareUrl}
+            onResetAll={resetAllSimulations}
+            resetDisabled={isEverythingAtDefault}
           />
 
           {activeTab === "president" ? (
