@@ -162,31 +162,31 @@ export function ChamberCounter({ scenario }: ChamberCounterProps) {
             </div>
           </>
         ) : null}
-        <div>
-          <span>Tied {seatNoun}</span>
-          <strong>{scenario.tiedSeats.length}</strong>
-          <small>
-            {scenario.tiedSeats.length === 0
-              ? "No exact toss-up ties"
-              : tiedSeatNote}
-          </small>
-        </div>
-        <div>
-          <span>Independent / other</span>
-          <strong>{otherSeatLabel}</strong>
-          <small>
-            {scenario.chamber === "senate" && independentSeats > 0
-              ? "Independent seats remain separate; control uses caucus alignment"
-              : independentSeats === 0
-              ? "No independent-control seats"
-              : "Independent winners caucus by control party"}
-          </small>
-        </div>
-        <div>
-          <span>Vacant seats</span>
-          <strong>{vacancyLabel}</strong>
-          <small>Current roster vacancies, separate from simulated control</small>
-        </div>
+        {scenario.tiedSeats.length > 0 ? (
+          <div>
+            <span>Tied {seatNoun}</span>
+            <strong>{scenario.tiedSeats.length}</strong>
+            <small>{tiedSeatNote}</small>
+          </div>
+        ) : null}
+        {scenario.chamber === "senate" || independentSeats > 0 ? (
+          <div>
+            <span>Independent / other</span>
+            <strong>{otherSeatLabel}</strong>
+            <small>
+              {scenario.chamber === "senate" && independentSeats > 0
+                ? "Independent seats remain separate; control uses caucus alignment"
+                : "Independent winners caucus by control party"}
+            </small>
+          </div>
+        ) : null}
+        {vacantSeats > 0 ? (
+          <div>
+            <span>Vacant seats</span>
+            <strong>{vacancyLabel}</strong>
+            <small>Current roster vacancies, separate from simulated control</small>
+          </div>
+        ) : null}
       </div>
 
       <div className={styles.counterBar} aria-hidden="true">

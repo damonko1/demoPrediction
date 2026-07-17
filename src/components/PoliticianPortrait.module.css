@@ -1,0 +1,122 @@
+.group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.card {
+  --portrait-accent: #718991;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  min-height: 74px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--portrait-accent) 26%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--portrait-accent) 7%, rgba(255, 255, 255, 0.7));
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--portrait-accent) 72%, transparent);
+}
+
+.card[data-party="democratic"] {
+  --portrait-accent: #2878b8;
+}
+
+.card[data-party="republican"] {
+  --portrait-accent: #bc4a4a;
+}
+
+.imageFrame {
+  width: 58px;
+  height: 74px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--portrait-accent) 13%, #eaf1f2);
+}
+
+.imageFrame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.initials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: var(--portrait-accent);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.identity {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 8px 9px;
+}
+
+.identity strong {
+  overflow-wrap: anywhere;
+  color: #123442;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.identity span,
+.identity small {
+  overflow-wrap: anywhere;
+  color: #607982;
+  font-size: 9px;
+  font-weight: 760;
+  line-height: 1.3;
+}
+
+.identity span {
+  text-transform: uppercase;
+}
+
+.identity a {
+  color: color-mix(in srgb, var(--portrait-accent) 88%, #123442);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--portrait-accent) 40%, transparent);
+  text-underline-offset: 2px;
+}
+
+:global([data-theme="dark"]) .card {
+  background: color-mix(in srgb, var(--portrait-accent) 9%, #102c36);
+}
+
+:global([data-theme="dark"]) .imageFrame {
+  background: color-mix(in srgb, var(--portrait-accent) 16%, #163642);
+}
+
+:global([data-theme="dark"]) .identity strong {
+  color: #e6f0f1;
+}
+
+:global([data-theme="dark"]) .identity span,
+:global([data-theme="dark"]) .identity small {
+  color: #a9bdc3;
+}
+
+@media (max-width: 560px) {
+  .group {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    grid-template-columns: 60px minmax(0, 1fr);
+    min-height: 72px;
+  }
+
+  .imageFrame {
+    width: 60px;
+    height: 72px;
+  }
+}

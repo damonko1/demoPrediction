@@ -91,6 +91,10 @@ function getPathSeats(scenario: LegislativeScenarioResult) {
     scenario.majorityThreshold - scenario.controlTotals[party],
   );
   const candidateSeats = scenario.seats
+    .filter(
+      (result) =>
+        result.seat.chamber === "house" || result.seat.upNextCycle,
+    )
     .filter((result) => result.simulatedControlParty !== party)
     .sort((left, right) => left.marginToFlip - right.marginToFlip)
     .slice(0, Math.max(5, seatsNeeded));
@@ -141,9 +145,12 @@ function getMajorityImportanceRows(
   scenario: LegislativeScenarioResult,
 ): SensitivityListItem[] {
   const leader = getControlLeader(scenario);
+  const activeSeats = scenario.seats.filter(
+    (result) => result.seat.chamber === "house" || result.seat.upNextCycle,
+  );
 
   if (!leader) {
-    return [...scenario.seats]
+    return [...activeSeats]
       .sort((left, right) => left.marginToFlip - right.marginToFlip)
       .slice(0, 8)
       .map((result) => ({
@@ -155,7 +162,7 @@ function getMajorityImportanceRows(
   }
 
   const challenger = getOppositeParty(leader);
-  const leaderBuffer = scenario.seats
+  const leaderBuffer = activeSeats
     .filter((result) => result.simulatedControlParty === leader)
     .sort((left, right) => left.marginToFlip - right.marginToFlip)
     .slice(0, 5)
@@ -166,7 +173,7 @@ function getMajorityImportanceRows(
       detail: `${formatPartyShort(leader)} buffer`,
       result,
     }));
-  const challengerTargets = scenario.seats
+  const challengerTargets = activeSeats
     .filter((result) => result.simulatedControlParty === challenger)
     .sort((left, right) => left.marginToFlip - right.marginToFlip)
     .slice(0, 3)
@@ -180,7 +187,7 @@ function getMajorityImportanceRows(
 
   return [...leaderBuffer, ...challengerTargets]
     .sort((left, right) => left.result.marginToFlip - right.result.marginToFlip)
-    .slice(0, 8)
+    .slice(0, 6)
     .map(({ id, label, subLabel, detail }) => ({ id, label, subLabel, detail }));
 }
 
@@ -188,6 +195,9 @@ function getBiggestAssumptionRows(
   scenario: LegislativeScenarioResult,
 ): SensitivityListItem[] {
   return scenario.seats
+    .filter(
+      (result) => result.seat.chamber === "house" || result.seat.upNextCycle,
+    )
     .map((result) => ({
       result,
       driver: getStrongestAssumptionDriver(result),
@@ -202,7 +212,7 @@ function getBiggestAssumptionRows(
       (left, right) =>
         Math.abs(right.driver.delta) - Math.abs(left.driver.delta),
     )
-    .slice(0, 8)
+    .slice(0, 6)
     .map(({ driver, result }) => ({
       id: `${result.seat.id}-${driver.id}`,
       label: getSeatName(result),
@@ -396,9 +406,12 @@ function getSenateTippingPointRows(
   scenario: LegislativeScenarioResult,
 ): SensitivityListItem[] {
   const leader = getControlLeader(scenario);
+  const activeSeats = scenario.seats.filter(
+    (result) => result.seat.chamber === "senate" && result.seat.upNextCycle,
+  );
   const seats = leader
-    ? scenario.seats.filter((result) => result.simulatedControlParty === leader)
-    : scenario.seats;
+    ? activeSeats.filter((result) => result.simulatedControlParty === leader)
+    : activeSeats;
 
   return [...seats]
     .sort((left, right) => left.marginToFlip - right.marginToFlip)
@@ -577,11 +590,15 @@ export function LegislativeSummary({
   const repShift =
     scenario.controlTotals.republican - scenario.baselineControlTotals.republican;
   const closestSeats = [...scenario.seats]
+    .filter(
+      (result) =>
+        result.seat.chamber === "house" || result.seat.upNextCycle,
+    )
     .sort((left, right) => left.marginToFlip - right.marginToFlip)
-    .slice(0, 8);
+    .slice(0, 6);
   const lowDataSeats = scenario.lowDataSeats.slice(0, 8);
   const path = getPathSeats(scenario);
-  const flippedSeats = scenario.flippedSeats.slice(0, 10);
+  const flippedSeats = scenario.flippedSeats.slice(0, 6);
   const majorityImportanceRows = getMajorityImportanceRows(scenario);
   const biggestAssumptionRows = getBiggestAssumptionRows(scenario);
   const stateGainLossRows = scenario.chamber === "house"
@@ -592,9 +609,6 @@ export function LegislativeSummary({
     : [];
   const senateUpCycleSeats = scenario.chamber === "senate"
     ? getSenateCycleRows(scenario, true)
-    : [];
-  const senateNotUpCycleSeats = scenario.chamber === "senate"
-    ? getSenateCycleRows(scenario, false)
     : [];
   const senateStatePressureRows = scenario.chamber === "senate"
     ? getSenateStatePressureRows(scenario)
@@ -684,149 +698,122 @@ export function LegislativeSummary({
           />
         </div>
 
-        {scenario.chamber === "house" ? (
-          <>
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Majority importance</span>
-                <strong>Ranked</strong>
-              </div>
-              <RankedTextList
-                emptyText="No majority-importance districts available."
-                items={majorityImportanceRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Biggest assumption effect</span>
-                <strong>Driver</strong>
-              </div>
-              <RankedTextList
-                emptyText="No nonzero assumption effects in this scenario."
-                items={biggestAssumptionRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Seat gain/loss by state</span>
-                <strong>Net</strong>
-              </div>
-              <RankedTextList
-                emptyText="No state-level seat gains or losses in this scenario."
-                items={stateGainLossRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Delegation volatility</span>
-                <strong>Flags</strong>
-              </div>
-              <RankedTextList
-                emptyText="No volatile state delegations in this scenario."
-                items={volatileDelegationRows}
-              />
-            </div>
-          </>
-        ) : null}
-
-        {scenario.chamber === "senate" ? (
-          <>
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Seats up this cycle</span>
-                <strong>Active</strong>
-              </div>
-              <RankedSeatList
-                emptyText="No Senate seats are marked up this cycle."
-                items={senateUpCycleSeats}
-                renderDetail={(result) => formatMargin(result.simulatedMargin)}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Seats not up</span>
-                <strong>Held</strong>
-              </div>
-              <RankedSeatList
-                emptyText="No held Senate seats available."
-                items={senateNotUpCycleSeats}
-                renderDetail={(result) => formatMargin(result.simulatedMargin)}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Tipping-point seats</span>
-                <strong>Control</strong>
-              </div>
-              <RankedTextList
-                emptyText="No Senate tipping-point seats available."
-                items={senateTippingPointRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>Biggest assumption effect</span>
-                <strong>Driver</strong>
-              </div>
-              <RankedTextList
-                emptyText="No nonzero assumption effects in this scenario."
-                items={biggestAssumptionRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>President/Senate divergence</span>
-                <strong>State</strong>
-              </div>
-              <RankedTextList
-                emptyText="No simulated presidential and Senate divergences."
-                items={senateDivergenceRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>VP tie-break context</span>
-                <strong>Control</strong>
-              </div>
-              <RankedTextList
-                emptyText="No Senate control context available."
-                items={senateTieBreakRows}
-              />
-            </div>
-
-            <div className={styles.sensitivityBlock}>
-              <div className={styles.sensitivityBlockHeader}>
-                <span>State pressure</span>
-                <strong>Flags</strong>
-              </div>
-              <RankedTextList
-                emptyText="No close or flipped Senate states in this scenario."
-                items={senateStatePressureRows}
-              />
-            </div>
-          </>
-        ) : null}
-
         <div className={styles.sensitivityBlock}>
           <div className={styles.sensitivityBlockHeader}>
-            <span>Data flags</span>
-            <strong>{scenario.lowDataSeats.length}</strong>
+            <span>Biggest assumption effect</span>
+            <strong>Driver</strong>
           </div>
-          <RankedSeatList
-            emptyText="No low-data seats flagged."
-            items={lowDataSeats}
-            renderDetail={(result) => formatMargin(result.simulatedMargin)}
+          <RankedTextList
+            emptyText="No nonzero assumption effects in this scenario."
+            items={biggestAssumptionRows}
           />
         </div>
       </div>
+
+      <details className={styles.summaryDeepDive}>
+        <summary>Deep dive: state patterns, control context, and data flags</summary>
+        <div className={styles.sensitivityDeepDiveGrid}>
+          {scenario.chamber === "house" ? (
+            <>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>Majority importance</span>
+                  <strong>Ranked</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No majority-importance districts available."
+                  items={majorityImportanceRows}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>Seat gain/loss by state</span>
+                  <strong>Net</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No state-level seat gains or losses in this scenario."
+                  items={stateGainLossRows}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>Delegation volatility</span>
+                  <strong>Flags</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No volatile state delegations in this scenario."
+                  items={volatileDelegationRows}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>Seats up this cycle</span>
+                  <strong>Active</strong>
+                </div>
+                <RankedSeatList
+                  emptyText="No Senate seats are marked up this cycle."
+                  items={senateUpCycleSeats}
+                  renderDetail={(result) => formatMargin(result.simulatedMargin)}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>Tipping-point seats</span>
+                  <strong>Control</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No Senate tipping-point seats available."
+                  items={senateTippingPointRows}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>President/Senate divergence</span>
+                  <strong>State</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No simulated presidential and Senate divergences."
+                  items={senateDivergenceRows}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>VP tie-break context</span>
+                  <strong>Control</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No Senate control context available."
+                  items={senateTieBreakRows}
+                />
+              </div>
+              <div className={styles.sensitivityBlock}>
+                <div className={styles.sensitivityBlockHeader}>
+                  <span>State pressure</span>
+                  <strong>Flags</strong>
+                </div>
+                <RankedTextList
+                  emptyText="No close or flipped Senate states in this scenario."
+                  items={senateStatePressureRows}
+                />
+              </div>
+            </>
+          )}
+          <div className={styles.sensitivityBlock}>
+            <div className={styles.sensitivityBlockHeader}>
+              <span>Data flags</span>
+              <strong>{scenario.lowDataSeats.length}</strong>
+            </div>
+            <RankedSeatList
+              emptyText="No low-data seats flagged."
+              items={lowDataSeats}
+              renderDetail={(result) => formatMargin(result.simulatedMargin)}
+            />
+          </div>
+        </div>
+      </details>
     </section>
   );
 }

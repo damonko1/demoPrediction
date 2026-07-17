@@ -5,6 +5,11 @@ import {
   formatSignedPoints,
 } from "@/lib/format";
 import { StateOverrideControls } from "@/components/LocalOverrideControls";
+import {
+  PoliticianPortrait,
+  PoliticianPortraitGroup,
+} from "@/components/PoliticianPortrait";
+import { presidentialCandidatePortraitsByYear } from "@/data/politicianPortraits";
 import { hasStateOverride } from "@/lib/localOverrides";
 import type {
   ScenarioAssumptionDriver,
@@ -50,6 +55,8 @@ export function StateDetailPanel({
     .slice(0, 3);
   const hasSplitElectoralVotes = result.splitElectoralVotes.length > 1;
   const isCustom = hasStateOverride(stateOverride);
+  const presidentialCandidates =
+    presidentialCandidatePortraitsByYear[result.state.baselineYear];
 
   return (
     <section className={styles.panel} aria-label="Selected state details">
@@ -67,6 +74,24 @@ export function StateDetailPanel({
           </span>
         </div>
       </div>
+
+      {presidentialCandidates ? (
+        <PoliticianPortraitGroup
+          label={`${result.state.baselineYear} presidential nominees`}
+        >
+          {presidentialCandidates.map((candidate) => (
+            <PoliticianPortrait
+              imageUrl={candidate.imageUrl}
+              key={candidate.name}
+              name={candidate.name}
+              party={candidate.party}
+              role={candidate.role}
+              sourceLabel={candidate.sourceLabel}
+              sourceUrl={candidate.sourceUrl}
+            />
+          ))}
+        </PoliticianPortraitGroup>
+      ) : null}
 
       <div className={styles.detailGrid}>
         <div>

@@ -9,6 +9,11 @@ import {
   StateOverrideControls,
 } from "@/components/LocalOverrideControls";
 import { hasSeatOverride, hasStateOverride } from "@/lib/localOverrides";
+import {
+  PoliticianPortrait,
+  PoliticianPortraitGroup,
+} from "@/components/PoliticianPortrait";
+import { getBioguidePortrait } from "@/data/politicianPortraits";
 import type {
   LegislativeCandidate,
   LegislativeSeatResult,
@@ -295,6 +300,15 @@ export function LegislativeDetailPanel({
   const assumptionDrivers = getAssumptionDrivers(result);
   const hasCustomState = hasStateOverride(stateOverride);
   const hasCustomSeat = hasSeatOverride(seatOverride);
+  const incumbentPortrait = seat.incumbent
+    ? getBioguidePortrait(seat.incumbent.bioguideId)
+    : null;
+  const incumbentParty =
+    seat.incumbent?.caucusParty ??
+    (seat.incumbent?.party === "democratic" ||
+    seat.incumbent?.party === "republican"
+      ? seat.incumbent.party
+      : null);
 
   return (
     <section className={styles.panel} aria-label="Selected legislative seat details">
@@ -322,93 +336,44 @@ export function LegislativeDetailPanel({
         </div>
       </div>
 
+      <PoliticianPortraitGroup label="Current member portrait">
+        <PoliticianPortrait
+          imageUrl={incumbentPortrait?.imageUrl}
+          name={seat.incumbent?.name ?? "Vacant seat"}
+          party={incumbentParty}
+          role={
+            seat.incumbent
+              ? `${getPartyDetail(result)} / current ${
+                  seat.chamber === "house" ? "representative" : "senator"
+                }`
+              : "No current incumbent in roster snapshot"
+          }
+          sourceLabel={incumbentPortrait?.sourceLabel}
+          sourceUrl={incumbentPortrait?.sourceUrl}
+        />
+      </PoliticianPortraitGroup>
+
       <div className={styles.detailGrid}>
         <div>
-          <span>{getSeatCodeLabel(result)}</span>
-          <strong>{seat.districtLabel}</strong>
-          <small>{seat.id}</small>
-        </div>
-        <div>
-          <span>State</span>
-          <strong>{seat.stateCode}</strong>
-          <small>{seat.stateName}</small>
-        </div>
-        <div>
-          <span>{getSeatNumberLabel(result)}</span>
-          <strong>{getDistrictNumberLabel(result)}</strong>
-          <small>{getSeatNumberNote(result)}</small>
-        </div>
-        <div>
-          <span>Current member</span>
-          <strong>{getIncumbentLabel(result)}</strong>
-          <small>{seat.incumbent?.bioguideId ?? "No Bioguide ID"}</small>
-        </div>
-        <div>
-          <span>Incumbent party</span>
-          <strong>{getPartyDetail(result)}</strong>
-        </div>
-        <div>
-          <span>First served / tenure</span>
-          <strong>{tenure.label}</strong>
-          <small>{tenure.note}</small>
-        </div>
-        <div>
-          <span>Service start</span>
-          <strong>{serviceStart.label}</strong>
-          <small>{serviceStart.note}</small>
-        </div>
-        <div>
-          <span>Current term</span>
-          <strong>{currentTerm.label}</strong>
-          <small>{currentTerm.note}</small>
-        </div>
-        <div>
-          <span>Incumbent running</span>
-          <strong>{incumbentRunningStatus.label}</strong>
-          <small>{incumbentRunningStatus.note}</small>
-        </div>
-        <div>
-          <span>{getRaceYearLabel(result)}</span>
-          <strong>{seat.latestElectionYear}</strong>
-          <small>
-            {seat.specialElection ? "Special election" : "Regular general election"}
-          </small>
-        </div>
-        <div>
-          <span>Baseline winner</span>
-          <strong>{formatLegislativeParty(seat.baselineWinner)}</strong>
-        </div>
-        <div>
-          <span>Baseline margin</span>
+          <span>Baseline</span>
           <strong>{formatMargin(seat.baselineMargin)}</strong>
+          <small>{formatLegislativeParty(seat.baselineWinner)}</small>
         </div>
         <div>
-          <span>Simulated winner</span>
+          <span>Simulated</span>
           <strong>{formatLegislativeParty(result.simulatedWinner)}</strong>
-          <small>{formatParty(result.simulatedControlParty)} control</small>
-        </div>
-        <div>
-          <span>Simulated margin</span>
-          <strong>{formatMargin(result.simulatedMargin)}</strong>
+          <small>{formatMargin(result.simulatedMargin)}</small>
         </div>
         <div>
           <span>Flip status</span>
           <strong>{result.flipped ? "Flipped" : "Held"}</strong>
           <small>{getFlipDetail(result)}</small>
         </div>
-      </div>
-
-      <div className={styles.voteDetail}>
-        <span>Recorded votes</span>
-        <strong>
-          D {seat.democraticVotes.toLocaleString()} / R{" "}
-          {seat.republicanVotes.toLocaleString()}
-        </strong>
-        <small>
-          {seat.otherVotes.toLocaleString()} other /{" "}
-          {seat.totalVotes.toLocaleString()} total
-          {seat.uncontested ? " / uncontested or same-party race flagged" : ""}
-        </small>
+        <div>
+          <span>{getRaceYearLabel(result)}</span>
+          <strong>{seat.latestElectionYear}</strong>
+          <small>{seat.specialElection ? "Special election" : "Regular general election"}</small>
+        </div>
       </div>
 
       {seat.lowData || seat.missingVoteTotal ? (
@@ -429,21 +394,6 @@ export function LegislativeDetailPanel({
           <span>This seat is not up in the modeled cycle, so scenario assumptions do not change it.</span>
         </div>
       ) : null}
-
-      <div className={styles.voteDetail}>
-        <span>Major-party candidates</span>
-        <strong>{getMajorPartyCandidateLabel(result)}</strong>
-        <small>{getCandidateSourceNote(result)}</small>
-      </div>
-
-      <div className={styles.voteDetail}>
-        <span>{getBaselineLabel(result)}</span>
-        <strong>
-          {formatParty(seat.baselineControlParty)} /{" "}
-          {formatMargin(seat.baselineMargin)}
-        </strong>
-        <small>{getBaselineNote(result)}</small>
-      </div>
 
       <div className={styles.flipDistance}>
         <span>Distance from flipping</span>
@@ -485,33 +435,109 @@ export function LegislativeDetailPanel({
         </ol>
       </div>
 
-      <div className={styles.splitEvDetail}>
-        <div className={styles.assumptionDriversHeader}>
-          <span>Latest vote totals</span>
-          <strong>{seat.candidates.length}</strong>
+      <details className={styles.detailDisclosure}>
+        <summary>Member profile and seat context</summary>
+        <div className={styles.detailDisclosureBody}>
+          <div className={styles.detailGrid}>
+            <div>
+              <span>{getSeatCodeLabel(result)}</span>
+              <strong>{seat.districtLabel}</strong>
+              <small>{seat.id}</small>
+            </div>
+            <div>
+              <span>State</span>
+              <strong>{seat.stateCode}</strong>
+              <small>{seat.stateName}</small>
+            </div>
+            <div>
+              <span>{getSeatNumberLabel(result)}</span>
+              <strong>{getDistrictNumberLabel(result)}</strong>
+              <small>{getSeatNumberNote(result)}</small>
+            </div>
+            <div>
+              <span>Current member</span>
+              <strong>{getIncumbentLabel(result)}</strong>
+              <small>{seat.incumbent?.bioguideId ?? "No Bioguide ID"}</small>
+            </div>
+            <div>
+              <span>Incumbent party</span>
+              <strong>{getPartyDetail(result)}</strong>
+            </div>
+            <div>
+              <span>First served / tenure</span>
+              <strong>{tenure.label}</strong>
+              <small>{tenure.note}</small>
+            </div>
+            <div>
+              <span>Service start</span>
+              <strong>{serviceStart.label}</strong>
+              <small>{serviceStart.note}</small>
+            </div>
+            <div>
+              <span>Current term</span>
+              <strong>{currentTerm.label}</strong>
+              <small>{currentTerm.note}</small>
+            </div>
+            <div>
+              <span>Incumbent running</span>
+              <strong>{incumbentRunningStatus.label}</strong>
+              <small>{incumbentRunningStatus.note}</small>
+            </div>
+          </div>
         </div>
-        <ol className={styles.splitEvList}>
-          {seat.candidates.map((candidate) => (
-            <li key={`${candidate.name}-${candidate.partyLabel}`}>
-              <span>
-                <b>{candidate.name}</b>
-                <small>
-                  {candidate.partyLabel} / {candidate.voteShare.toFixed(1)}%
-                </small>
-              </span>
-              <strong>{candidate.votes.toLocaleString()}</strong>
-            </li>
-          ))}
-        </ol>
-      </div>
+      </details>
 
-      <div className={styles.voteDetail}>
-        <span>Data source / freshness</span>
-        <strong>{seat.sourceId}</strong>
-        <small>
-          {seat.latestElectionYear} result vintage / {seat.sourceNote}
-        </small>
-      </div>
+      <details className={styles.detailDisclosure}>
+        <summary>Vote history, candidates, and source</summary>
+        <div className={styles.detailDisclosureBody}>
+          <div className={styles.voteDetail}>
+            <span>Recorded votes</span>
+            <strong>
+              D {seat.democraticVotes.toLocaleString()} / R{" "}
+              {seat.republicanVotes.toLocaleString()}
+            </strong>
+            <small>
+              {seat.otherVotes.toLocaleString()} other /{" "}
+              {seat.totalVotes.toLocaleString()} total
+              {seat.uncontested ? " / uncontested or same-party race flagged" : ""}
+            </small>
+          </div>
+          <div className={styles.voteDetail}>
+            <span>Major-party candidates</span>
+            <strong>{getMajorPartyCandidateLabel(result)}</strong>
+            <small>{getCandidateSourceNote(result)}</small>
+          </div>
+          <div className={styles.voteDetail}>
+            <span>{getBaselineLabel(result)}</span>
+            <strong>
+              {formatParty(seat.baselineControlParty)} / {formatMargin(seat.baselineMargin)}
+            </strong>
+            <small>{getBaselineNote(result)}</small>
+          </div>
+          <div className={styles.splitEvDetail}>
+            <div className={styles.assumptionDriversHeader}>
+              <span>Latest vote totals</span>
+              <strong>{seat.candidates.length}</strong>
+            </div>
+            <ol className={styles.splitEvList}>
+              {seat.candidates.map((candidate) => (
+                <li key={`${candidate.name}-${candidate.partyLabel}`}>
+                  <span>
+                    <b>{candidate.name}</b>
+                    <small>{candidate.partyLabel} / {candidate.voteShare.toFixed(1)}%</small>
+                  </span>
+                  <strong>{candidate.votes.toLocaleString()}</strong>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className={styles.voteDetail}>
+            <span>Data source / freshness</span>
+            <strong>{seat.sourceId}</strong>
+            <small>{seat.latestElectionYear} result vintage / {seat.sourceNote}</small>
+          </div>
+        </div>
+      </details>
     </section>
   );
 }
