@@ -3,6 +3,11 @@ import {
   historicalElectionYears,
 } from "@/data/historicalElectionData.generated";
 import {
+  defaultLegislativeSliderAssumptions,
+  legislativeSliderBounds,
+  legislativeSliderIds,
+} from "@/data/legislativeSliders";
+import {
   defaultDemographicAssumptions,
   demographicSliderBounds,
   demographicSliderIds,
@@ -12,6 +17,8 @@ import type {
   DemographicSliderId,
   HistoricalElectionYear,
   LegislativeChamber,
+  LegislativeSliderAssumptions,
+  LegislativeSliderId,
   ScenarioAssumptions,
   SimulationTab,
 } from "@/types/election";
@@ -19,10 +26,23 @@ import type {
 const swingParam = "swing";
 const baselineYearParam = "year";
 const tabParam = "tab";
+const selectedStateParam = "state";
 const houseSwingParam = "houseSwing";
 const senateSwingParam = "senateSwing";
 const houseSeatParam = "houseSeat";
 const senateSeatParam = "senateSeat";
+const houseSliderParams: Record<LegislativeSliderId, string> = {
+  genericTurnout: "hTurnout",
+  incumbencyAdvantage: "hIncumb",
+  openSeatPenalty: "hOpen",
+  candidateQuality: "hQuality",
+  suburbanDistrictShift: "hSuburb",
+  ruralDistrictShift: "hRural",
+  collegeEducatedDistrictShift: "hCollege",
+  nonCollegeDistrictShift: "hNoncollege",
+  presidentialCoattails: "hCoattails",
+  antiIncumbentWave: "hAntiInc",
+};
 const demographicParams: Record<DemographicSliderId, string> = {
   youthTurnout: "youth",
   seniorTurnout: "senior",
@@ -52,12 +72,23 @@ function clampDemographicValue(value: number) {
   );
 }
 
+function clampLegislativeSliderValue(value: number) {
+  return Math.min(
+    legislativeSliderBounds.max,
+    Math.max(legislativeSliderBounds.min, value),
+  );
+}
+
 export function normalizeSwing(value: number) {
   return Number(clampSwing(value).toFixed(1));
 }
 
 function normalizeDemographicValue(value: number) {
   return Number(clampDemographicValue(value).toFixed(1));
+}
+
+function normalizeLegislativeSliderValue(value: number) {
+  return Number(clampLegislativeSliderValue(value).toFixed(1));
 }
 
 export function normalizeHistoricalElectionYear(
@@ -148,13 +179,37 @@ export function legislativeSeatFromSearchParams(
   return params.get(chamber === "house" ? houseSeatParam : senateSeatParam);
 }
 
+export function legislativeSlidersFromSearchParams(
+  params: URLSearchParams,
+): LegislativeSliderAssumptions {
+  return legislativeSliderIds.reduce<LegislativeSliderAssumptions>(
+    (currentAssumptions, id) => {
+      const rawValue = params.get(houseSliderParams[id]);
+      const parsedValue = rawValue === null ? 0 : Number(rawValue);
+
+      currentAssumptions[id] = Number.isFinite(parsedValue)
+        ? normalizeLegislativeSliderValue(parsedValue)
+        : 0;
+
+      return currentAssumptions;
+    },
+    { ...defaultLegislativeSliderAssumptions },
+  );
+}
+
+export function selectedStateFromSearchParams(params: URLSearchParams) {
+  return params.get(selectedStateParam);
+}
+
 export function appScenarioToUrl({
   activeTab,
   basePath = "/",
   baselineYear = defaultHistoricalElectionYear,
   houseSeatId,
+  houseSliders,
   houseSwing,
   presidentialAssumptions,
+  selectedStateCode,
   senateSeatId,
   senateSwing,
 }: {
@@ -162,7 +217,9 @@ export function appScenarioToUrl({
   basePath?: string;
   baselineYear?: HistoricalElectionYear;
   presidentialAssumptions: ScenarioAssumptions;
+  selectedStateCode: string;
   houseSwing: number;
+  houseSliders?: LegislativeSliderAssumptions;
   senateSwing: number;
   houseSeatId: string;
   senateSeatId: string;
@@ -175,9 +232,23 @@ export function appScenarioToUrl({
     params.set(tabParam, activeTab);
   }
 
+  if (selectedStateCode) {
+    params.set(selectedStateParam, selectedStateCode);
+  }
+
   if (Math.abs(normalizedHouseSwing) >= 0.05) {
     params.set(houseSwingParam, normalizedHouseSwing.toFixed(1));
   }
+
+  legislativeSliderIds.forEach((id) => {
+    const value = normalizeLegislativeSliderValue(
+      houseSliders?.[id] ?? defaultLegislativeSliderAssumptions[id],
+    );
+
+    if (Math.abs(value) >= 0.05) {
+      params.set(houseSliderParams[id], value.toFixed(1));
+    }
+  });
 
   if (Math.abs(normalizedSenateSwing) >= 0.05) {
     params.set(senateSwingParam, normalizedSenateSwing.toFixed(1));

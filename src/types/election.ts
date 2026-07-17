@@ -167,8 +167,43 @@ export type LegislativeOverrides = {
   races: Partial<Record<string, number>>;
 };
 
+export type LegislativeSliderId =
+  | "genericTurnout"
+  | "incumbencyAdvantage"
+  | "openSeatPenalty"
+  | "candidateQuality"
+  | "suburbanDistrictShift"
+  | "ruralDistrictShift"
+  | "collegeEducatedDistrictShift"
+  | "nonCollegeDistrictShift"
+  | "presidentialCoattails"
+  | "antiIncumbentWave";
+
+export type LegislativeSliderAssumptions = Record<LegislativeSliderId, number>;
+
+export type LegislativeSliderConfig = {
+  id: LegislativeSliderId;
+  label: string;
+  lowLabel: string;
+  neutralLabel: string;
+  highLabel: string;
+  lowReadout: string;
+  highReadout: string;
+  helperText: string;
+};
+
+export type LegislativeAssumptionDriver = {
+  id: "nationalSwing" | "localOverride" | LegislativeSliderId;
+  label: string;
+  value: number;
+  weight: number;
+  delta: number;
+  heuristic: boolean;
+};
+
 export type LegislativeAssumptions = {
   nationalSwing: number;
+  sliders: LegislativeSliderAssumptions;
   overrides: LegislativeOverrides;
 };
 
@@ -250,7 +285,9 @@ export type LegislativeSeatResult = {
   flipped: boolean;
   marginToFlip: number;
   totalAdjustment: number;
+  sliderAdjustment: number;
   overrideAdjustment: number;
+  assumptionDrivers: LegislativeAssumptionDriver[];
 };
 
 export type LegislativeScenarioResult = {
@@ -265,5 +302,6 @@ export type LegislativeScenarioResult = {
   totalSeats: number;
   majorityThreshold: number;
   flippedSeats: LegislativeSeatResult[];
+  tiedSeats: LegislativeSeatResult[];
   lowDataSeats: LegislativeSeatResult[];
 };

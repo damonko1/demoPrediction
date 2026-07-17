@@ -1,6 +1,14 @@
 "use client";
 
-import { Building2, Landmark, Moon, Sun, Vote } from "lucide-react";
+import {
+  Building2,
+  Landmark,
+  Maximize2,
+  Minimize2,
+  Moon,
+  Sun,
+  Vote,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ElectoralCounter } from "@/components/ElectoralCounter";
 import { ElectoralMap } from "@/components/ElectoralMap";
@@ -13,8 +21,10 @@ import { ScenarioSummary } from "@/components/ScenarioSummary";
 import { SensitivityView } from "@/components/SensitivityView";
 import { ShareCardPreview } from "@/components/ShareCardPreview";
 import { StateDetailPanel } from "@/components/StateDetailPanel";
+import { UnifiedScenarioSummary } from "@/components/UnifiedScenarioSummary";
 import { defaultDemographicAssumptions } from "@/data/demographicSliders";
 import { defaultHistoricalElectionYear } from "@/data/historicalElectionData.generated";
+import { getLegislativeAssumptionsFromPresident } from "@/data/legislativeSliders";
 import {
   houseDistrictBaselines,
   senateSeatBaselines,
@@ -29,8 +39,10 @@ import {
   appScenarioToUrl,
   baselineYearFromSearchParams,
   legislativeSeatFromSearchParams,
+  legislativeSlidersFromSearchParams,
   legislativeSwingFromSearchParams,
   scenarioFromSearchParams,
+  selectedStateFromSearchParams,
   simulationTabFromSearchParams,
 } from "@/lib/scenarioUrl";
 import { resetBaselinePresetId } from "@/data/scenarioPresets";
@@ -39,6 +51,7 @@ import type {
   DemographicSliderId,
   HistoricalElectionYear,
   LegislativeAssumptions,
+  LegislativeSliderId,
   ScenarioPreset,
   SimulationTab,
 } from "@/types/election";
@@ -75,6 +88,7 @@ export function Playground() {
     initialSelectedSenateSeat,
   );
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [urlReady, setUrlReady] = useState(false);
 
   const scenarioAssumptions = useMemo(
@@ -130,6 +144,7 @@ export function Playground() {
       const restoredBaselineYear = baselineYearFromSearchParams(
         searchParams,
       );
+      const restoredState = selectedStateFromSearchParams(searchParams);
       const restoredHouseSeat = legislativeSeatFromSearchParams(searchParams, "house");
       const restoredSenateSeat = legislativeSeatFromSearchParams(searchParams, "senate");
 
@@ -140,11 +155,21 @@ export function Playground() {
       setHouseAssumptions({
         ...getDefaultLegislativeAssumptions(),
         nationalSwing: legislativeSwingFromSearchParams(searchParams, "house"),
+        sliders: legislativeSlidersFromSearchParams(searchParams),
       });
       setSenateAssumptions({
         ...getDefaultLegislativeAssumptions(),
         nationalSwing: legislativeSwingFromSearchParams(searchParams, "senate"),
       });
+
+      if (
+        restoredState &&
+        getStateBaselinesForYear(restoredBaselineYear).some(
+          (state) => state.code === restoredState,
+        )
+      ) {
+        setSelectedStateCode(restoredState);
+      }
 
       if (
         restoredHouseSeat &&
@@ -180,7 +205,9 @@ export function Playground() {
       basePath: window.location.pathname,
       baselineYear,
       presidentialAssumptions: scenarioAssumptions,
+      selectedStateCode,
       houseSwing: houseAssumptions.nationalSwing,
+      houseSliders: houseAssumptions.sliders,
       senateSwing: senateAssumptions.nationalSwing,
       houseSeatId: selectedHouseSeatId,
       senateSeatId: selectedSenateSeatId,
@@ -189,8 +216,9 @@ export function Playground() {
   }, [
     activeTab,
     baselineYear,
-    houseAssumptions.nationalSwing,
+    houseAssumptions,
     scenarioAssumptions,
+    selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
     senateAssumptions.nationalSwing,
@@ -207,7 +235,9 @@ export function Playground() {
       basePath: window.location.pathname,
       baselineYear,
       presidentialAssumptions: scenarioAssumptions,
+      selectedStateCode,
       houseSwing: houseAssumptions.nationalSwing,
+      houseSliders: houseAssumptions.sliders,
       senateSwing: senateAssumptions.nationalSwing,
       houseSeatId: selectedHouseSeatId,
       senateSeatId: selectedSenateSeatId,
@@ -217,8 +247,9 @@ export function Playground() {
   }, [
     activeTab,
     baselineYear,
-    houseAssumptions.nationalSwing,
+    houseAssumptions,
     scenarioAssumptions,
+    selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
     senateAssumptions.nationalSwing,
@@ -235,7 +266,9 @@ export function Playground() {
       basePath: window.location.pathname,
       baselineYear,
       presidentialAssumptions: scenarioAssumptions,
+      selectedStateCode,
       houseSwing: houseAssumptions.nationalSwing,
+      houseSliders: houseAssumptions.sliders,
       senateSwing: senateAssumptions.nationalSwing,
       houseSeatId: selectedHouseSeatId,
       senateSeatId: selectedSenateSeatId,
@@ -271,8 +304,9 @@ export function Playground() {
   }, [
     activeTab,
     baselineYear,
-    houseAssumptions.nationalSwing,
+    houseAssumptions,
     scenarioAssumptions,
+    selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
     senateAssumptions.nationalSwing,
@@ -308,6 +342,26 @@ export function Playground() {
     }));
   }
 
+  function updateHouseSlider(id: LegislativeSliderId, value: number) {
+    setHouseAssumptions((currentAssumptions) => ({
+      ...currentAssumptions,
+      sliders: {
+        ...currentAssumptions.sliders,
+        [id]: value,
+      },
+    }));
+  }
+
+  function applyPresidentAssumptionsToHouse() {
+    setHouseAssumptions((currentAssumptions) => ({
+      ...currentAssumptions,
+      sliders: getLegislativeAssumptionsFromPresident(
+        demographicAssumptions,
+        nationalSwing,
+      ),
+    }));
+  }
+
   function updateSenateSwing(value: number) {
     setSenateAssumptions((currentAssumptions) => ({
       ...currentAssumptions,
@@ -323,141 +377,208 @@ export function Playground() {
   }
 
   return (
-    <main className={styles.shell} data-theme={themeMode}>
-      <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>
-            Interactive Electoral College scenarios
-          </p>
-          <h1>Election Forecast Playground</h1>
-        </div>
-        <div className={styles.headerMeta}>
-          <span>State colors and electoral votes update live</span>
-          <strong>Simulation only</strong>
-          <div className={styles.themeSwitch} aria-label="Display mode">
-            <button
-              aria-label="Use light aero mode"
-              aria-pressed={themeMode === "light"}
-              className={themeMode === "light" ? styles.activeThemeButton : ""}
-              onClick={() => setThemeMode("light")}
-              title="Light aero mode"
-              type="button"
-            >
-              <Sun size={15} strokeWidth={2.2} />
-              <span>Light</span>
-            </button>
-            <button
-              aria-label="Use dark tactical mode"
-              aria-pressed={themeMode === "dark"}
-              className={themeMode === "dark" ? styles.activeThemeButton : ""}
-              onClick={() => setThemeMode("dark")}
-              title="Dark tactical mode"
-              type="button"
-            >
-              <Moon size={15} strokeWidth={2.2} />
-              <span>Dark</span>
-            </button>
+    <main
+      className={`${styles.shell} ${isFocusMode ? styles.focusShell : ""}`}
+      data-theme={themeMode}
+    >
+      <div className={styles.appFrame}>
+        <aside className={styles.appSidebar} aria-label="Application controls">
+          <div className={styles.brandLockup}>
+            <div className={styles.brandMark} aria-hidden="true">
+              <Vote size={20} strokeWidth={2.4} />
+            </div>
+            <div className={styles.brandText}>
+              <p className={styles.eyebrow}>Scenario Lab</p>
+              <h1>Election Forecast Playground</h1>
+            </div>
           </div>
-        </div>
-      </header>
 
-      <nav className={styles.tabBar} aria-label="Simulation modes">
-        {tabs.map(({ Icon, detail, id, label }) => (
-          <button
-            aria-current={activeTab === id ? "page" : undefined}
-            className={activeTab === id ? styles.activeTab : ""}
-            key={id}
-            onClick={() => setActiveTab(id)}
-            type="button"
-          >
-            <Icon size={16} strokeWidth={2.2} />
-            <span>{label}</span>
-            <small>{detail}</small>
-          </button>
-        ))}
-      </nav>
+          <nav className={styles.tabBar} aria-label="Simulation modes" role="tablist">
+            {tabs.map(({ Icon, detail, id, label }) => (
+              <button
+                aria-current={activeTab === id ? "page" : undefined}
+                aria-controls={`${id}-panel`}
+                aria-selected={activeTab === id}
+                className={activeTab === id ? styles.activeTab : ""}
+                id={`${id}-tab`}
+                key={id}
+                onClick={() => setActiveTab(id)}
+                role="tab"
+                type="button"
+              >
+                <Icon size={18} strokeWidth={2.2} />
+                <span>{label}</span>
+                <small>{detail}</small>
+              </button>
+            ))}
+          </nav>
 
-      {activeTab === "president" ? (
-        <>
-          <ElectoralCounter
-            totals={scenario.totals}
-            baselineTotals={scenario.baselineTotals}
-          />
-
-          <section className={styles.workspace} aria-label="Election scenario workspace">
-            <aside className={styles.leftRail} aria-label="Scenario controls">
-              <ScenarioControls
-                baselineYear={baselineYear}
-                nationalSwing={nationalSwing}
-                demographicAssumptions={demographicAssumptions}
-                onBaselineYearChange={setBaselineYear}
-                onNationalSwingChange={setNationalSwing}
-                onDemographicAssumptionChange={updateDemographicAssumption}
-                onApplyPreset={applyScenarioPreset}
-                onCopyLink={copyScenarioLink}
-                onReset={resetPresidentTab}
-              />
-            </aside>
-
-            <div className={styles.centerStage}>
-              <ElectoralMap
-                results={scenario.states}
-                selectedStateCode={selectedState.state.code}
-                onSelectState={setSelectedStateCode}
-              />
+          <div className={styles.sidebarFooter}>
+            <div className={styles.themeSwitch} aria-label="Display mode">
+              <button
+                aria-label="Use light mode"
+                aria-pressed={themeMode === "light"}
+                className={themeMode === "light" ? styles.activeThemeButton : ""}
+                onClick={() => setThemeMode("light")}
+                title="Light mode"
+                type="button"
+              >
+                <Sun size={15} strokeWidth={2.2} />
+                <span>Light</span>
+              </button>
+              <button
+                aria-label="Use dark mode"
+                aria-pressed={themeMode === "dark"}
+                className={themeMode === "dark" ? styles.activeThemeButton : ""}
+                onClick={() => setThemeMode("dark")}
+                title="Dark mode"
+                type="button"
+              >
+                <Moon size={15} strokeWidth={2.2} />
+                <span>Dark</span>
+              </button>
             </div>
 
-            <aside className={styles.detailRail} aria-label="Selected state details">
-              <StateDetailPanel result={selectedState} />
-            </aside>
+            <button
+              aria-pressed={isFocusMode}
+              className={`${styles.focusToggle} ${
+                isFocusMode ? styles.activeFocusToggle : ""
+              }`}
+              onClick={() => setIsFocusMode((currentValue) => !currentValue)}
+              title={isFocusMode ? "Return to balanced view" : "Focus map"}
+              type="button"
+            >
+              {isFocusMode ? (
+                <Minimize2 size={16} strokeWidth={2.3} />
+              ) : (
+                <Maximize2 size={16} strokeWidth={2.3} />
+              )}
+              <span>{isFocusMode ? "Balanced view" : "Focus map"}</span>
+            </button>
+          </div>
+        </aside>
 
-            <aside className={styles.analysisRail} aria-label="Scenario summary and pressure points">
-              <ScenarioSummary scenario={scenario} />
-              <ScenarioComparison baselineYear={baselineYear} scenario={scenario} />
-              <MonteCarloPanel scenario={scenario} />
-              <SensitivityView scenario={scenario} />
-              <ShareCardPreview
-                baselineYear={baselineYear}
-                scenario={scenario}
-                shareUrl={currentShareUrl}
+        <div className={styles.contentShell}>
+          <header className={styles.header}>
+            <div>
+              <p className={styles.eyebrow}>Interactive election scenarios</p>
+              <h2>{tabs.find((tab) => tab.id === activeTab)?.label} workspace</h2>
+            </div>
+            <div className={styles.headerMeta}>
+              <span>State, seat, and chamber results update live</span>
+              <strong>Simulation only</strong>
+            </div>
+          </header>
+
+          <UnifiedScenarioSummary
+            activeTab={activeTab}
+            presidentialScenario={scenario}
+            houseScenario={houseScenario}
+            senateScenario={senateScenario}
+          />
+
+          {activeTab === "president" ? (
+            <div
+              id="president-panel"
+              role="tabpanel"
+              aria-labelledby="president-tab"
+            >
+              <ElectoralCounter
+                totals={scenario.totals}
+                baselineTotals={scenario.baselineTotals}
               />
-              <ModelExplanation />
-            </aside>
-          </section>
-        </>
-      ) : null}
 
-      {activeTab === "house" ? (
-        <LegislativeWorkspace
-          chamber="house"
-          scenario={houseScenario}
-          selectedSeatId={selectedHouseSeatId}
-          nationalSwing={houseAssumptions.nationalSwing}
-          onSelectSeat={setSelectedHouseSeatId}
-          onNationalSwingChange={updateHouseSwing}
-          onCopyLink={copyScenarioLink}
-          onReset={() => {
-            setHouseAssumptions(getDefaultLegislativeAssumptions());
-            setSelectedHouseSeatId(initialSelectedHouseSeat);
-          }}
-        />
-      ) : null}
+              <section
+                className={`${styles.workspace} ${
+                  isFocusMode ? styles.focusWorkspace : ""
+                }`}
+                aria-label="Election scenario workspace"
+              >
+                <aside className={styles.leftRail} aria-label="Scenario controls">
+                  <ScenarioControls
+                    baselineYear={baselineYear}
+                    nationalSwing={nationalSwing}
+                    demographicAssumptions={demographicAssumptions}
+                    onBaselineYearChange={setBaselineYear}
+                    onNationalSwingChange={setNationalSwing}
+                    onDemographicAssumptionChange={updateDemographicAssumption}
+                    onApplyPreset={applyScenarioPreset}
+                    onCopyLink={copyScenarioLink}
+                    onReset={resetPresidentTab}
+                  />
+                </aside>
 
-      {activeTab === "senate" ? (
-        <LegislativeWorkspace
-          chamber="senate"
-          scenario={senateScenario}
-          selectedSeatId={selectedSenateSeatId}
-          nationalSwing={senateAssumptions.nationalSwing}
-          onSelectSeat={setSelectedSenateSeatId}
-          onNationalSwingChange={updateSenateSwing}
-          onCopyLink={copyScenarioLink}
-          onReset={() => {
-            setSenateAssumptions(getDefaultLegislativeAssumptions());
-            setSelectedSenateSeatId(initialSelectedSenateSeat);
-          }}
-        />
-      ) : null}
+                <div className={styles.centerStage}>
+                  <ElectoralMap
+                    results={scenario.states}
+                    selectedStateCode={selectedState.state.code}
+                    onSelectState={setSelectedStateCode}
+                  />
+                </div>
+
+                <aside className={styles.detailRail} aria-label="Selected state details">
+                  <StateDetailPanel result={selectedState} />
+                </aside>
+
+                <aside className={styles.analysisRail} aria-label="Scenario summary and pressure points">
+                  <ScenarioSummary scenario={scenario} />
+                  <ScenarioComparison baselineYear={baselineYear} scenario={scenario} />
+                  <MonteCarloPanel scenario={scenario} />
+                  <SensitivityView scenario={scenario} />
+                  <ShareCardPreview
+                    baselineYear={baselineYear}
+                    scenario={scenario}
+                    shareUrl={currentShareUrl}
+                  />
+                  <ModelExplanation />
+                </aside>
+              </section>
+            </div>
+          ) : null}
+
+          {activeTab === "house" ? (
+            <div id="house-panel" role="tabpanel" aria-labelledby="house-tab">
+              <LegislativeWorkspace
+                chamber="house"
+                scenario={houseScenario}
+                selectedSeatId={selectedHouseSeatId}
+                assumptions={houseAssumptions}
+                presidentialAssumptions={scenarioAssumptions}
+                isFocusMode={isFocusMode}
+                onSelectSeat={setSelectedHouseSeatId}
+                onNationalSwingChange={updateHouseSwing}
+                onSliderChange={updateHouseSlider}
+                onApplyPresidentAssumptions={applyPresidentAssumptionsToHouse}
+                onApplyAssumptions={setHouseAssumptions}
+                onCopyLink={copyScenarioLink}
+                onReset={() => {
+                  setHouseAssumptions(getDefaultLegislativeAssumptions());
+                  setSelectedHouseSeatId(initialSelectedHouseSeat);
+                }}
+              />
+            </div>
+          ) : null}
+
+          {activeTab === "senate" ? (
+            <div id="senate-panel" role="tabpanel" aria-labelledby="senate-tab">
+              <LegislativeWorkspace
+                chamber="senate"
+                scenario={senateScenario}
+                selectedSeatId={selectedSenateSeatId}
+                assumptions={senateAssumptions}
+                isFocusMode={isFocusMode}
+                onSelectSeat={setSelectedSenateSeatId}
+                onNationalSwingChange={updateSenateSwing}
+                onCopyLink={copyScenarioLink}
+                onReset={() => {
+                  setSenateAssumptions(getDefaultLegislativeAssumptions());
+                  setSelectedSenateSeatId(initialSelectedSenateSeat);
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+      </div>
     </main>
   );
 }

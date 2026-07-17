@@ -5,13 +5,20 @@ import type { CSSProperties } from "react";
 
 type SwingSliderProps = {
   value: number;
+  label?: string;
+  ariaLabel?: string;
   onChange: (value: number) => void;
 };
 
 const minSwing = scenarioSwingBounds.min;
 const maxSwing = scenarioSwingBounds.max;
 
-export function SwingSlider({ value, onChange }: SwingSliderProps) {
+export function SwingSlider({
+  ariaLabel = "National swing in percentage points",
+  label = "Current assumption",
+  value,
+  onChange,
+}: SwingSliderProps) {
   const sliderPosition = ((value - minSwing) / (maxSwing - minSwing)) * 100;
   const isNeutral = Math.abs(value) < 0.05;
   const swingDirection = isNeutral
@@ -23,14 +30,14 @@ export function SwingSlider({ value, onChange }: SwingSliderProps) {
   return (
     <div className={styles.sliderBlock}>
       <div className={styles.sliderValue}>
-        <span>Current assumption</span>
+        <span>{label}</span>
         <strong>{formatSwing(value)}</strong>
       </div>
 
       <div className={styles.sliderFrame}>
         <span className={styles.sliderNeutralMarker} aria-hidden="true" />
         <input
-          aria-label="National swing in percentage points"
+          aria-label={ariaLabel}
           aria-valuetext={formatSwing(value)}
           className={styles.swingSlider}
           max={maxSwing}

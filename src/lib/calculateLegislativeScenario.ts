@@ -1,6 +1,12 @@
-import { getPartyFromMargin } from "@/lib/format";
+import {
+  defaultLegislativeSliderAssumptions,
+  getLegislativeSliderWeight,
+  legislativeSliderConfigs,
+} from "@/data/legislativeSliders";
+import { getPartyFromMargin, isTiedMargin } from "@/lib/format";
 import type {
   LegislativeAssumptions,
+  LegislativeAssumptionDriver,
   LegislativeChamber,
   LegislativeOverrides,
   LegislativeParty,
@@ -32,6 +38,7 @@ export const defaultLegislativeOverrides: LegislativeOverrides = {
 export function getDefaultLegislativeAssumptions(): LegislativeAssumptions {
   return {
     nationalSwing: 0,
+    sliders: { ...defaultLegislativeSliderAssumptions },
     overrides: {
       states: {},
       districts: {},
@@ -59,6 +66,61 @@ function getOverrideAdjustment(
   return stateAdjustment + districtAdjustment + raceAdjustment;
 }
 
+function getScenarioSliders(assumptions: LegislativeAssumptions) {
+  return {
+    ...defaultLegislativeSliderAssumptions,
+    ...assumptions.sliders,
+  };
+}
+
+function calculateAssumptionDrivers(
+  seat: LegislativeSeatBaseline,
+  assumptions: LegislativeAssumptions,
+): LegislativeAssumptionDriver[] {
+  const sliders = getScenarioSliders(assumptions);
+  const overrideAdjustment = getOverrideAdjustment(seat, assumptions.overrides);
+  const drivers: LegislativeAssumptionDriver[] = [
+    {
+      id: "nationalSwing",
+      label: "National chamber swing",
+      value: assumptions.nationalSwing,
+      weight: 1,
+      delta: assumptions.nationalSwing,
+      heuristic: false,
+    },
+    ...legislativeSliderConfigs.map((config) => {
+      const value = sliders[config.id];
+      const weight = getLegislativeSliderWeight(seat, config.id);
+
+      return {
+        id: config.id,
+        label: config.label,
+        value,
+        weight,
+        delta: value * weight,
+        heuristic: true,
+      };
+    }),
+  ];
+
+  if (Math.abs(overrideAdjustment) >= 0.05) {
+    drivers.push({
+      id: "localOverride",
+      label: "Local override",
+      value: overrideAdjustment,
+      weight: 1,
+      delta: overrideAdjustment,
+      heuristic: true,
+    });
+  }
+
+  return drivers;
+}
+
+function sumDriverDeltas(drivers: readonly LegislativeAssumptionDriver[]) {
+  return drivers.reduce((total, driver) => total + driver.delta, 0);
+}
+
 function getSimulatedWinner(
   seat: LegislativeSeatBaseline,
   simulatedControlParty: Party,
@@ -80,7 +142,11 @@ function calculateSeatResult(
   assumptions: LegislativeAssumptions,
 ): LegislativeSeatResult {
   const overrideAdjustment = getOverrideAdjustment(seat, assumptions.overrides);
-  const totalAdjustment = assumptions.nationalSwing + overrideAdjustment;
+  const assumptionDrivers = calculateAssumptionDrivers(seat, assumptions);
+  const totalAdjustment = sumDriverDeltas(assumptionDrivers);
+  const sliderAdjustment = assumptionDrivers
+    .filter((driver) => driver.id !== "nationalSwing" && driver.id !== "localOverride")
+    .reduce((total, driver) => total + driver.delta, 0);
   const simulatedMargin = seat.baselineMargin + totalAdjustment;
   const simulatedControlParty = getPartyFromMargin(simulatedMargin);
   const flipped = simulatedControlParty !== seat.baselineControlParty;
@@ -93,7 +159,9 @@ function calculateSeatResult(
     flipped,
     marginToFlip: Math.abs(simulatedMargin),
     totalAdjustment,
+    sliderAdjustment,
     overrideAdjustment,
+    assumptionDrivers,
   };
 }
 
@@ -175,6 +243,9 @@ export function calculateLegislativeScenario(
     majorityThreshold: majorityThresholds[chamber],
     flippedSeats: seatResults
       .filter((result) => result.flipped)
+      .sort((a, b) => Math.abs(a.seat.baselineMargin) - Math.abs(b.seat.baselineMargin)),
+    tiedSeats: seatResults
+      .filter((result) => isTiedMargin(result.simulatedMargin))
       .sort((a, b) => Math.abs(a.seat.baselineMargin) - Math.abs(b.seat.baselineMargin)),
     lowDataSeats: seatResults.filter((result) => result.seat.lowData),
   };

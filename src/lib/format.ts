@@ -1,5 +1,9 @@
 import type { LegislativeParty, Party } from "@/types/election";
-export { formatMargin, getPartyFromMargin } from "@/lib/formatMargin";
+export {
+  formatMargin,
+  getPartyFromMargin,
+  isTiedMargin,
+} from "@/lib/formatMargin";
 
 export function formatParty(party: Party) {
   return party === "democratic" ? "Democratic" : "Republican";

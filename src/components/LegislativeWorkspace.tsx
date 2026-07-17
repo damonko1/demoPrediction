@@ -9,7 +9,10 @@ import { LegislativeSummary } from "@/components/LegislativeSummary";
 import { SenateMap } from "@/components/SenateMap";
 import type {
   LegislativeChamber,
+  LegislativeAssumptions,
+  LegislativeSliderId,
   LegislativeScenarioResult,
+  ScenarioAssumptions,
 } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
@@ -17,9 +20,14 @@ type LegislativeWorkspaceProps = {
   chamber: LegislativeChamber;
   scenario: LegislativeScenarioResult;
   selectedSeatId: string;
-  nationalSwing: number;
+  assumptions: LegislativeAssumptions;
+  presidentialAssumptions?: ScenarioAssumptions;
+  isFocusMode?: boolean;
   onSelectSeat: (seatId: string) => void;
   onNationalSwingChange: (value: number) => void;
+  onSliderChange?: (id: LegislativeSliderId, value: number) => void;
+  onApplyPresidentAssumptions?: () => void;
+  onApplyAssumptions?: (assumptions: LegislativeAssumptions) => void;
   onCopyLink: () => Promise<void>;
   onReset: () => void;
 };
@@ -28,9 +36,14 @@ export function LegislativeWorkspace({
   chamber,
   scenario,
   selectedSeatId,
-  nationalSwing,
+  assumptions,
+  presidentialAssumptions,
+  isFocusMode = false,
   onSelectSeat,
   onNationalSwingChange,
+  onSliderChange,
+  onApplyPresidentAssumptions,
+  onApplyAssumptions,
   onCopyLink,
   onReset,
 }: LegislativeWorkspaceProps) {
@@ -43,7 +56,7 @@ export function LegislativeWorkspace({
       <ChamberCounter scenario={scenario} />
 
       <section
-        className={styles.workspace}
+        className={`${styles.workspace} ${isFocusMode ? styles.focusWorkspace : ""}`}
         aria-label={`${chamber === "house" ? "House" : "Senate"} scenario workspace`}
       >
         <aside
@@ -52,8 +65,12 @@ export function LegislativeWorkspace({
         >
           <LegislativeControls
             chamber={chamber}
-            nationalSwing={nationalSwing}
+            assumptions={assumptions}
+            presidentialAssumptions={presidentialAssumptions}
             onNationalSwingChange={onNationalSwingChange}
+            onSliderChange={onSliderChange}
+            onApplyPresidentAssumptions={onApplyPresidentAssumptions}
+            onApplyAssumptions={onApplyAssumptions}
             onCopyLink={onCopyLink}
             onReset={onReset}
           />
