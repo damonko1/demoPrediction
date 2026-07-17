@@ -154,6 +154,50 @@ function validateSenateSeats(senateSeats) {
     invalidStateCounts.length === 0,
     `Expected two Senate seats per state; invalid counts: ${invalidStateCounts.join(", ")}`,
   );
+
+  const controlMismatches = senateSeats
+    .filter((seat) => {
+      const incumbentControl =
+        seat.incumbent?.caucusParty ??
+        (seat.incumbent?.party === "democratic" || seat.incumbent?.party === "republican"
+          ? seat.incumbent.party
+          : null);
+      return incumbentControl && incumbentControl !== seat.baselineControlParty;
+    })
+    .map((seat) => seat.id);
+  assert(
+    controlMismatches.length === 0,
+    `Senate incumbent/control mismatches: ${controlMismatches.join(", ")}`,
+  );
+
+  const signedMarginMismatches = senateSeats
+    .filter(
+      (seat) =>
+        Math.abs(seat.baselineMargin) >= 0.05 &&
+        ((seat.baselineMargin > 0) !== (seat.baselineControlParty === "democratic")),
+    )
+    .map((seat) => seat.id);
+  assert(
+    signedMarginMismatches.length === 0,
+    `Senate signed-margin/control mismatches: ${signedMarginMismatches.join(", ")}`,
+  );
+
+  const unflaggedPartyCoverageGaps = senateSeats
+    .filter(
+      (seat) =>
+        (seat.democraticVotes === 0 || seat.republicanVotes === 0) && !seat.lowData,
+    )
+    .map((seat) => seat.id);
+  assert(
+    unflaggedPartyCoverageGaps.length === 0,
+    `Senate incomplete party mapping must be low data: ${unflaggedPartyCoverageGaps.join(", ")}`,
+  );
+
+  const activeCycleSeats = senateSeats.filter((seat) => seat.upNextCycle);
+  assert(
+    activeCycleSeats.length === 33,
+    `Expected 33 Class 2 seats up in 2026, got ${activeCycleSeats.length}`,
+  );
 }
 
 function validateNestedRecords(seats) {

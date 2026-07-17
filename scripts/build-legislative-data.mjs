@@ -39,13 +39,13 @@ const legislativeSourceMetadata = {
     sourceName: "MIT Election Data and Science Lab, U.S. Senate statewide 1976-2024",
     sourcePublisher: "MIT Election Data and Science Lab",
     sourceUrl: "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PEJ5QU",
-    dataVintage: "Version 8.0, released 2026-05-11; latest matched seat results from 2020, 2021, 2022, and 2024",
+    dataVintage: "Version 8.0, released 2026-05-11; latest matched seat results through 2024 with an explicitly flagged 2016 Connecticut fallback",
     retrievedAt: sourceRetrievedAt,
     trustLevel: "widely trusted published research dataset",
     cleaningNotes:
-      "Filters to US SENATE statewide TOTAL-mode general and runoff rows, then matches current seats by state, Senate class, term year, and winner where possible.",
+      "Filters to US SENATE statewide TOTAL-mode general and runoff rows, prefers detailed party labels, matches current seats by state/class/term/winner, and flags stale or incomplete-party fallbacks as low data.",
     validationSummary:
-      "Race totals use MIT totalvotes when available; candidate-vote differences from totalvotes are listed in the generated validation report.",
+      "Race totals use MIT totalvotes when available; validation enforces per-seat incumbent/control consistency, signed-margin consistency, and low-data flags for incomplete major-party mapping.",
   },
   congressionalRoster: {
     id: "unitedstates-congress-legislators-current",
@@ -713,7 +713,6 @@ function buildSenateRaceBaselines(senateRows) {
       return stage === "gen" || stage === "runoff" || stage === "gen runoff";
     })
     .filter((row) => row.mode.toLowerCase() === "total")
-    .filter((row) => [2020, 2021, 2022, 2024].includes(Number(row.year)))
     .forEach((row) => {
       const key = `${row.year}-${row.state_po}-${row.special}-${row.stage}`;
       const group = groupedRows.get(key) ?? {
@@ -738,7 +737,7 @@ function buildSenateRaceBaselines(senateRows) {
     group.rows.forEach((row) => {
       const candidate = {
         ...row,
-        party: row.party_simplified,
+        party: row.party_detailed || row.party_simplified,
       };
       addCandidateRow(candidateMap, candidate);
     });
@@ -815,6 +814,17 @@ function findSenateRaceForMember(member, races) {
     return candidateMatch;
   }
 
+  const staleIncumbentMatch = races
+    .filter((race) => race.stateCode === member.stateCode)
+    .filter((race) =>
+      normalizeCandidateName(race.winner?.name ?? "").includes(lastName),
+    )
+    .sort(sortSenateRacesByFinality)[0];
+
+  if (staleIncumbentMatch) {
+    return staleIncumbentMatch;
+  }
+
   return (
     races
       .filter((race) => race.stateCode === member.stateCode)
@@ -841,11 +851,56 @@ function getSenateMargin(race, member) {
     return roundMargin(((winnerVotes - race.republicanVotes) / race.totalVotes) * 100);
   }
 
-  if (controlParty === "republican") {
-    return roundMargin(((race.democraticVotes - race.republicanVotes) / race.totalVotes) * 100);
+  if (race.democraticVotes > 0 && race.republicanVotes > 0) {
+    return roundMargin(
+      ((race.democraticVotes - race.republicanVotes) / race.totalVotes) * 100,
+    );
   }
 
-  return roundMargin(((race.democraticVotes - race.republicanVotes) / race.totalVotes) * 100);
+  const winnerVotes = race.candidates[0]?.votes ?? 0;
+  const runnerUpVotes = race.candidates[1]?.votes ?? 0;
+  const fallbackMargin = race.totalVotes > 0
+    ? ((winnerVotes - runnerUpVotes) / race.totalVotes) * 100
+    : 0;
+
+  return roundMargin(controlParty === "democratic" ? fallbackMargin : -fallbackMargin);
+}
+
+function getSenateRaceForSeat(race, member) {
+  if (!race) {
+    return null;
+  }
+
+  const memberLastName = getLastName(member.name);
+  const candidates = race.candidates.map((candidate) => {
+    if (
+      candidate.party === "independent" &&
+      normalizeCandidateName(candidate.name).includes(memberLastName)
+    ) {
+      return {
+        ...candidate,
+        party: member.party,
+        partyLabel: formatPartyLabel(member.party, member.sourceParty),
+      };
+    }
+
+    return candidate;
+  });
+  const democraticVotes = candidates
+    .filter((candidate) => candidate.party === "democratic")
+    .reduce((total, candidate) => total + candidate.votes, 0);
+  const republicanVotes = candidates
+    .filter((candidate) => candidate.party === "republican")
+    .reduce((total, candidate) => total + candidate.votes, 0);
+
+  return {
+    ...race,
+    candidates,
+    winner: candidates[0],
+    democraticVotes,
+    republicanVotes,
+    otherVotes: Math.max(0, race.totalVotes - democraticVotes - republicanVotes),
+  };
 }
 
 function buildSenateBaselines(senateRows, rosterMembers) {
@@ -864,8 +919,16 @@ function buildSenateBaselines(senateRows, rosterMembers) {
     });
 
   return currentSenators.map((member) => {
-    const race = findSenateRaceForMember(member, senateRaces);
+    const race = getSenateRaceForSeat(
+      findSenateRaceForMember(member, senateRaces),
+      member,
+    );
     const baselineMargin = race ? getSenateMargin(race, member) : 0;
+    const expectedElectionYear = Number(member.termStart.slice(0, 4)) - 1;
+    const usesStaleFallback = Boolean(race && race.year < expectedElectionYear);
+    const hasIncompletePartyMapping = Boolean(
+      race && (race.democraticVotes === 0 || race.republicanVotes === 0),
+    );
 
     return {
       id: `${member.stateCode}-S${member.senateClass}`,
@@ -877,7 +940,7 @@ function buildSenateBaselines(senateRows, rosterMembers) {
       sortIndex: member.senateClass,
       incumbent: getIncumbentSnapshot(member),
       baselineWinner: member.party,
-      baselineControlParty: baselineMargin >= 0 ? "democratic" : "republican",
+      baselineControlParty: getSeatControlParty(member),
       baselineMargin,
       latestElectionYear: race?.year ?? senateElectionYearByClass[member.senateClass],
       democraticVotes: race?.democraticVotes ?? 0,
@@ -885,8 +948,13 @@ function buildSenateBaselines(senateRows, rosterMembers) {
       otherVotes: race?.otherVotes ?? 0,
       totalVotes: race?.totalVotes ?? 0,
       uncontested: Boolean(race) && (race.democraticVotes === 0 || race.republicanVotes === 0),
-      lowData: !race || race.totalVotes < 1000,
-      specialElection: race?.special ?? false,
+      lowData:
+        !race ||
+        race.totalVotes < 1000 ||
+        usesStaleFallback ||
+        hasIncompletePartyMapping,
+      specialElection: false,
+      latestElectionSpecialElection: race?.special ?? false,
       runoff: race?.runoff ?? false,
       missingVoteTotal: race?.missingVoteTotal ?? true,
       cancelledElection: race?.cancelledElection ?? false,
@@ -897,7 +965,11 @@ function buildSenateBaselines(senateRows, rosterMembers) {
       candidates: race?.candidates.slice(0, 4) ?? [],
       sourceId: "mit-senate-state-1976-2024",
       sourceNote:
-        "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+        usesStaleFallback
+          ? "Stale completed statewide Senate result matched to the current incumbent because the expected term result is absent from the source; flagged low data."
+          : hasIncompletePartyMapping
+            ? "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data."
+            : "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
       overrideKeys: {
         state: member.stateCode,
         district: `${member.stateCode}-S${member.senateClass}`,
@@ -1084,7 +1156,7 @@ export const senateSeatBaselines = ${formatAsConstObject(senateSeatBaselines)} s
       specialElectionTiming: {
         status: "passed",
         note:
-          "Regular House baselines exclude special elections and mark specialElection=false; Senate seats preserve matched special-election and runoff flags.",
+          "Regular House baselines exclude special elections. Senate modeled-cycle specialElection is separate from latestElectionSpecialElection so an old special result is not presented as a future-cycle special election.",
       },
       rosterCompleteness: {
         status: "passed",

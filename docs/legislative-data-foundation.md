@@ -17,7 +17,7 @@ Use the most official source that is still repeatable and machine-readable. When
 | House election results | Clerk election statistics and state certifications | MIT House 1976-2024 | Uses MIT 2024 district returns |
 | Senate election results | Clerk election statistics, FEC/state certifications | MIT Senate statewide 1976-2024 | Uses MIT latest completed races by seat class |
 | House boundaries | Census cartographic boundary file for 119th Congressional Districts | Census TIGER/Line `cd119`, block equivalency, relationship files | Uses generated 1:20m 119th district map asset for all 435 voting districts |
-| Senate boundaries | Census state boundaries | Existing state TopoJSON | Current Senate map uses local state shapes |
+| Senate boundaries | Census state boundaries | Existing state TopoJSON | Complete: us-atlas/Census 2017 state shapes validated for 50 Senate states |
 | District partisan baseline | The Downballot presidential-by-CD data or computed presidential returns by current CD | Cook PVI as a labeled external index | Not ingested yet |
 | State partisan baseline | MIT presidential state returns, FEC certified presidential results | Cook PVI state index | Presidential state baselines exist elsewhere in app; not wired into Senate seats yet |
 | Candidate ballot data | FEC congressional candidate ballot files | State election office files | Candidate names are currently derived from MIT result rows |
@@ -88,7 +88,8 @@ Validation:
 
 Current status:
 
-- Mostly complete for rendering through the app's existing state TopoJSON. Add explicit legislative source metadata if Senate map geometry becomes part of the generated legislative dataset.
+- Complete for current rendering. The bundled `public/us-states-albers-10m.json` is the us-atlas Albers TopoJSON derived from U.S. Census Bureau 2017 cartographic boundaries, retrieved 2026-06-29.
+- `npm run validate:state-map` verifies 51 unique state/DC geometries, excludes DC from the 50-state Senate layer, and confirms every Senate state maps to exactly two generated seat records.
 
 ### 3. Current Member Rosters
 

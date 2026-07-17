@@ -138,12 +138,12 @@ export const currentDatasetAccuracyProfiles: DatasetAccuracyProfile[] = [
     label: "State and District of Columbia map shapes",
     readiness: "calculation-ready",
     allowedUse: "Allowed for rendering state-level map geometry.",
-    sourceName: "Local TopoJSON state-boundary asset",
-    sourceUrl: "/us-states-albers-10m.json",
-    vintage: "Bundled MVP map asset",
-    retrievedAt: null,
+    sourceName: "us-atlas TopoJSON derived from U.S. Census Bureau cartographic boundaries",
+    sourceUrl: "https://github.com/topojson/us-atlas",
+    vintage: "us-atlas 3.x, Census Bureau 2017 cartographic state boundaries",
+    retrievedAt: "2026-06-29",
     validationSummary:
-      "Validated locally against the 51 state/DC baseline records by map shape id coverage.",
+      "npm run validate:state-map verifies 51 unique state/DC shapes, excludes DC for 50-state Senate rendering, and confirms two Senate seat records per state.",
     requirements: [],
   },
 ];
