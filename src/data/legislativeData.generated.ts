@@ -17,11 +17,11 @@ export const legislativeDataSources = {
     "sourceName": "MIT Election Data and Science Lab, U.S. Senate statewide 1976-2024",
     "sourcePublisher": "MIT Election Data and Science Lab",
     "sourceUrl": "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PEJ5QU",
-    "dataVintage": "Version 8.0, released 2026-05-11; latest matched seat results from 2020, 2021, 2022, and 2024",
+    "dataVintage": "Version 8.0, released 2026-05-11; latest matched seat results through 2024 with an explicitly flagged 2016 Connecticut fallback",
     "retrievedAt": "2026-07-02",
     "trustLevel": "widely trusted published research dataset",
-    "cleaningNotes": "Filters to US SENATE statewide TOTAL-mode general and runoff rows, then matches current seats by state, Senate class, term year, and winner where possible.",
-    "validationSummary": "Race totals use MIT totalvotes when available; candidate-vote differences from totalvotes are listed in the generated validation report."
+    "cleaningNotes": "Filters to US SENATE statewide TOTAL-mode general and runoff rows, prefers detailed party labels, matches current seats by state/class/term/winner, and flags stale or incomplete-party fallbacks as low data.",
+    "validationSummary": "Race totals use MIT totalvotes when available; validation enforces per-seat incumbent/control consistency, signed-margin consistency, and low-data flags for incomplete major-party mapping."
   },
   "congressionalRoster": {
     "id": "unitedstates-congress-legislators-current",
@@ -34052,6 +34052,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34133,6 +34134,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34225,6 +34227,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34258,11 +34261,11 @@ export const senateSeatBaselines = [
       {
         "name": "John Wayne Howe",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Alaskan Independence Party",
         "votes": 16806,
         "voteShare": 4.7,
         "sourceParties": [
-          "OTHER"
+          "ALASKAN INDEPENDENCE PARTY"
         ],
         "writeIn": false
       },
@@ -34307,16 +34310,17 @@ export const senateSeatBaselines = [
       "bioguideId": "M001153"
     },
     "baselineWinner": "republican",
-    "baselineControlParty": "democratic",
-    "baselineMargin": 0,
+    "baselineControlParty": "republican",
+    "baselineMargin": -0.77,
     "latestElectionYear": 2022,
     "democraticVotes": 0,
-    "republicanVotes": 0,
-    "otherVotes": 263526,
+    "republicanVotes": 114118,
+    "otherVotes": 149408,
     "totalVotes": 263526,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34327,8 +34331,8 @@ export const senateSeatBaselines = [
     "candidates": [
       {
         "name": "Murkowski, Lisa",
-        "party": "independent",
-        "partyLabel": "Other",
+        "party": "republican",
+        "partyLabel": "Republican",
         "votes": 114118,
         "voteShare": 43.3,
         "sourceParties": [
@@ -34371,7 +34375,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "AK",
       "district": "AK-S3",
@@ -34409,6 +34413,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34442,11 +34447,11 @@ export const senateSeatBaselines = [
       {
         "name": "Eduardo Quintana",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 75868,
         "voteShare": 2.3,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -34490,6 +34495,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34573,15 +34579,16 @@ export const senateSeatBaselines = [
     },
     "baselineWinner": "republican",
     "baselineControlParty": "republican",
-    "baselineMargin": -66.53,
+    "baselineMargin": -33.06,
     "latestElectionYear": 2020,
     "democraticVotes": 0,
     "republicanVotes": 793871,
     "otherVotes": 399390,
     "totalVotes": 1193261,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34614,7 +34621,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "AR",
       "district": "AR-S2",
@@ -34652,6 +34659,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34733,6 +34741,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34803,6 +34812,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34873,6 +34883,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -34917,11 +34928,11 @@ export const senateSeatBaselines = [
       {
         "name": "Daniel Doyle",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Approval Voting Party",
         "votes": 9820,
         "voteShare": 0.3,
         "sourceParties": [
-          "OTHER"
+          "APPROVAL VOTING PARTY"
         ],
         "writeIn": false
       }
@@ -34965,6 +34976,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35009,11 +35021,11 @@ export const senateSeatBaselines = [
       {
         "name": "T.J. Cole",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Unity Party Of Colorado",
         "votes": 16379,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "UNITY PARTY OF COLORADO"
         ],
         "writeIn": false
       }
@@ -35057,6 +35069,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35072,8 +35085,8 @@ export const senateSeatBaselines = [
         "votes": 1000695,
         "voteShare": 58.6,
         "sourceParties": [
-          "DEMOCRAT",
-          "OTHER"
+          "DEMOCRATIC",
+          "WORKING FAMILIES"
         ],
         "writeIn": false
       },
@@ -35091,22 +35104,22 @@ export const senateSeatBaselines = [
       {
         "name": "Robert Finley Hyde",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Cheaper Gas Groceries",
         "votes": 14879,
         "voteShare": 0.9,
         "sourceParties": [
-          "OTHER"
+          "CHEAPER GAS GROCERIES"
         ],
         "writeIn": false
       },
       {
         "name": "Justin C. Paglino",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 14422,
         "voteShare": 0.8,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -35141,25 +35154,72 @@ export const senateSeatBaselines = [
     },
     "baselineWinner": "democratic",
     "baselineControlParty": "democratic",
-    "baselineMargin": 0,
-    "latestElectionYear": 2022,
-    "democraticVotes": 0,
-    "republicanVotes": 0,
-    "otherVotes": 0,
-    "totalVotes": 0,
+    "baselineMargin": 28.57,
+    "latestElectionYear": 2016,
+    "democraticVotes": 1008714,
+    "republicanVotes": 552621,
+    "otherVotes": 34941,
+    "totalVotes": 1596276,
     "uncontested": false,
     "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
-    "missingVoteTotal": true,
+    "missingVoteTotal": false,
     "cancelledElection": false,
-    "writeInVotes": 0,
-    "writeInCandidateCount": 0,
+    "writeInVotes": 38,
+    "writeInCandidateCount": 1,
     "candidateVoteTotalDifference": 0,
     "upNextCycle": false,
-    "candidates": [],
+    "candidates": [
+      {
+        "name": "Richard Blumenthal",
+        "party": "democratic",
+        "partyLabel": "Democratic",
+        "votes": 1008714,
+        "voteShare": 63.2,
+        "sourceParties": [
+          "DEMOCRAT",
+          "WORKING FAMILIES"
+        ],
+        "writeIn": false
+      },
+      {
+        "name": "Dan Carter",
+        "party": "republican",
+        "partyLabel": "Republican",
+        "votes": 552621,
+        "voteShare": 34.6,
+        "sourceParties": [
+          "REPUBLICAN"
+        ],
+        "writeIn": false
+      },
+      {
+        "name": "Richard Lion",
+        "party": "independent",
+        "partyLabel": "Libertarian",
+        "votes": 18190,
+        "voteShare": 1.1,
+        "sourceParties": [
+          "LIBERTARIAN"
+        ],
+        "writeIn": false
+      },
+      {
+        "name": "Jeffery Russell",
+        "party": "independent",
+        "partyLabel": "Green",
+        "votes": 16713,
+        "voteShare": 1,
+        "sourceParties": [
+          "GREEN"
+        ],
+        "writeIn": false
+      }
+    ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Stale completed statewide Senate result matched to the current incumbent because the expected term result is absent from the source; flagged low data.",
     "overrideKeys": {
       "state": "CT",
       "district": "CT-S3",
@@ -35197,6 +35257,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35212,7 +35273,7 @@ export const senateSeatBaselines = [
         "votes": 283298,
         "voteShare": 56.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -35230,11 +35291,11 @@ export const senateSeatBaselines = [
       {
         "name": "Michael \\dr. Mike\\ Katz",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent Party Of Delaware",
         "votes": 19555,
         "voteShare": 3.9,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT PARTY OF DELAWARE"
         ],
         "writeIn": false
       }
@@ -35278,6 +35339,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35311,11 +35373,11 @@ export const senateSeatBaselines = [
       {
         "name": "Mark W. Turley",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent Party Of Delaware",
         "votes": 7833,
         "voteShare": 1.6,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT PARTY OF DELAWARE"
         ],
         "writeIn": false
       },
@@ -35370,6 +35432,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35403,22 +35466,22 @@ export const senateSeatBaselines = [
       {
         "name": "Ben Everidge",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "No Party Affiliation",
         "votes": 62683,
         "voteShare": 0.6,
         "sourceParties": [
-          "OTHER"
+          "NO PARTY AFFILIATION"
         ],
         "writeIn": false
       },
       {
         "name": "Feena Bonoan",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Libertarian Party Of Florida",
         "votes": 57363,
         "voteShare": 0.5,
         "sourceParties": [
-          "OTHER"
+          "LIBERTARIAN PARTY OF FLORIDA"
         ],
         "writeIn": false
       }
@@ -35460,8 +35523,9 @@ export const senateSeatBaselines = [
     "otherVotes": 81645,
     "totalVotes": 7758014,
     "uncontested": false,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35495,28 +35559,28 @@ export const senateSeatBaselines = [
       {
         "name": "Dennis Misigoy",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Libertarian Party Of Florida",
         "votes": 32177,
         "voteShare": 0.4,
         "sourceParties": [
-          "OTHER"
+          "LIBERTARIAN PARTY OF FLORIDA"
         ],
         "writeIn": false
       },
       {
         "name": "Steven B. Grant",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "No Party Affiliation",
         "votes": 31816,
         "voteShare": 0.4,
         "sourceParties": [
-          "OTHER"
+          "NO PARTY AFFILIATION"
         ],
         "writeIn": false
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Stale completed statewide Senate result matched to the current incumbent because the expected term result is absent from the source; flagged low data.",
     "overrideKeys": {
       "state": "FL",
       "district": "FL-S3",
@@ -35554,6 +35618,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": true,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35624,6 +35689,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": true,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35694,6 +35760,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35727,22 +35794,22 @@ export const senateSeatBaselines = [
       {
         "name": "Shelby Pikachu Billionaire",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "We The People",
         "votes": 9224,
         "voteShare": 1.8,
         "sourceParties": [
-          "OTHER"
+          "WE THE PEOPLE"
         ],
         "writeIn": false
       },
       {
         "name": "Emma Jane Avila Pohlman",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 8270,
         "voteShare": 1.6,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -35786,6 +35853,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35830,11 +35898,11 @@ export const senateSeatBaselines = [
       {
         "name": "Pohlman, Emma Jane A.",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 4141,
         "voteShare": 1,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -35878,6 +35946,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -35911,22 +35980,22 @@ export const senateSeatBaselines = [
       {
         "name": "Natalie M Fleming",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 25329,
         "voteShare": 2.9,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Ray J. Writz",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Constitution Party",
         "votes": 10188,
         "voteShare": 1.2,
         "sourceParties": [
-          "OTHER"
+          "CONSTITUTION PARTY"
         ],
         "writeIn": false
       }
@@ -35970,6 +36039,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36003,22 +36073,22 @@ export const senateSeatBaselines = [
       {
         "name": "Scott Oh Cleveland",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 49917,
         "voteShare": 8.4,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Ray J. Writz",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Conservative",
         "votes": 8500,
         "voteShare": 1.4,
         "sourceParties": [
-          "OTHER"
+          "CONSERVATIVE"
         ],
         "writeIn": false
       }
@@ -36062,6 +36132,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36095,11 +36166,11 @@ export const senateSeatBaselines = [
       {
         "name": "Willie L. Wilson",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Willie Wilson Party",
         "votes": 237699,
         "voteShare": 4,
         "sourceParties": [
-          "OTHER"
+          "WILLIE WILSON PARTY"
         ],
         "writeIn": false
       },
@@ -36144,16 +36215,17 @@ export const senateSeatBaselines = [
       "bioguideId": "D000622"
     },
     "baselineWinner": "democratic",
-    "baselineControlParty": "republican",
-    "baselineMargin": -41.5,
+    "baselineControlParty": "democratic",
+    "baselineMargin": 15.32,
     "latestElectionYear": 2022,
-    "democraticVotes": 0,
+    "democraticVotes": 2329136,
     "republicanVotes": 1701055,
-    "otherVotes": 2397841,
+    "otherVotes": 68705,
     "totalVotes": 4098896,
-    "uncontested": true,
+    "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36164,12 +36236,12 @@ export const senateSeatBaselines = [
     "candidates": [
       {
         "name": "Tammy Duckworth",
-        "party": "independent",
-        "partyLabel": "Other",
+        "party": "democratic",
+        "partyLabel": "Democratic",
         "votes": 2329136,
         "voteShare": 56.8,
         "sourceParties": [
-          "OTHER"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -36246,6 +36318,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36272,7 +36345,7 @@ export const senateSeatBaselines = [
         "votes": 1097061,
         "voteShare": 38.8,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -36338,6 +36411,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36430,6 +36504,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36522,6 +36597,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36614,6 +36690,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36695,6 +36772,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36739,11 +36817,11 @@ export const senateSeatBaselines = [
       {
         "name": "David C. Graham",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "David C. Graham",
         "votes": 7137,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "DAVID C. GRAHAM"
         ],
         "writeIn": false
       }
@@ -36787,6 +36865,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36879,6 +36958,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -36960,6 +37040,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37052,6 +37133,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37144,6 +37226,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37155,11 +37238,11 @@ export const senateSeatBaselines = [
       {
         "name": "Angus S. King Jr..",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 427570,
         "voteShare": 50.8,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
@@ -37181,7 +37264,7 @@ export const senateSeatBaselines = [
         "votes": 88875,
         "voteShare": 10.5,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -37236,6 +37319,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37269,22 +37353,22 @@ export const senateSeatBaselines = [
       {
         "name": "Lisa Savage",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 40579,
         "voteShare": 4.9,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Max Patrick Linn",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 13508,
         "voteShare": 1.6,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
@@ -37328,6 +37412,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37343,7 +37428,7 @@ export const senateSeatBaselines = [
         "votes": 1650912,
         "voteShare": 54.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -37410,16 +37495,17 @@ export const senateSeatBaselines = [
       "bioguideId": "V000128"
     },
     "baselineWinner": "democratic",
-    "baselineControlParty": "republican",
-    "baselineMargin": -34.07,
+    "baselineControlParty": "democratic",
+    "baselineMargin": 31.69,
     "latestElectionYear": 2022,
-    "democraticVotes": 0,
+    "democraticVotes": 1316897,
     "republicanVotes": 682293,
-    "otherVotes": 1320043,
+    "otherVotes": 3146,
     "totalVotes": 2002336,
-    "uncontested": true,
+    "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37430,12 +37516,12 @@ export const senateSeatBaselines = [
     "candidates": [
       {
         "name": "Chris Van Hollen",
-        "party": "independent",
-        "partyLabel": "Other",
+        "party": "democratic",
+        "partyLabel": "Democratic",
         "votes": 1316897,
         "voteShare": 65.8,
         "sourceParties": [
-          "OTHER"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -37501,6 +37587,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37516,7 +37603,7 @@ export const senateSeatBaselines = [
         "votes": 2041668,
         "voteShare": 58.1,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -37593,6 +37680,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37685,6 +37773,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37700,7 +37789,7 @@ export const senateSeatBaselines = [
         "votes": 2712686,
         "voteShare": 48.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -37729,11 +37818,11 @@ export const senateSeatBaselines = [
       {
         "name": "Douglas P. Marsh",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 53978,
         "voteShare": 1,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -37777,6 +37866,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37810,22 +37900,22 @@ export const senateSeatBaselines = [
       {
         "name": "Valerie L. Willis",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Us Taxpayers",
         "votes": 50597,
         "voteShare": 0.9,
         "sourceParties": [
-          "OTHER"
+          "US TAXPAYERS"
         ],
         "writeIn": false
       },
       {
         "name": "Marcia Squier",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 39217,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -37869,6 +37959,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37884,7 +37975,7 @@ export const senateSeatBaselines = [
         "votes": 1792441,
         "voteShare": 56.2,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC-FARMER-LABOR"
         ],
         "writeIn": false
       },
@@ -37913,11 +38004,11 @@ export const senateSeatBaselines = [
       {
         "name": "Joyce Lynne Lacey",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independence-Alliance",
         "votes": 46377,
         "voteShare": 1.5,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENCE-ALLIANCE"
         ],
         "writeIn": false
       }
@@ -37961,6 +38052,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -37994,22 +38086,22 @@ export const senateSeatBaselines = [
       {
         "name": "Kevin O'Connor",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Legal Marijuana Now",
         "votes": 190154,
         "voteShare": 5.9,
         "sourceParties": [
-          "OTHER"
+          "LEGAL MARIJUANA NOW"
         ],
         "writeIn": false
       },
       {
         "name": "Oliver Steinberg",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Grassroots",
         "votes": 57174,
         "voteShare": 1.8,
         "sourceParties": [
-          "OTHER"
+          "GRASSROOTS"
         ],
         "writeIn": false
       }
@@ -38053,6 +38145,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38123,6 +38216,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38204,6 +38298,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38230,7 +38325,7 @@ export const senateSeatBaselines = [
         "votes": 1243728,
         "voteShare": 41.8,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -38248,11 +38343,11 @@ export const senateSeatBaselines = [
       {
         "name": "Jared Young",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Better",
         "votes": 21111,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "BETTER"
         ],
         "writeIn": false
       }
@@ -38296,6 +38391,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38366,6 +38462,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38410,11 +38507,11 @@ export const senateSeatBaselines = [
       {
         "name": "Robert Barb",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 4003,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -38458,6 +38555,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38519,15 +38617,16 @@ export const senateSeatBaselines = [
     },
     "baselineWinner": "republican",
     "baselineControlParty": "republican",
-    "baselineMargin": -53.19,
+    "baselineMargin": -6.67,
     "latestElectionYear": 2024,
     "democraticVotes": 0,
     "republicanVotes": 499124,
     "otherVotes": 439212,
     "totalVotes": 938336,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38550,11 +38649,11 @@ export const senateSeatBaselines = [
       {
         "name": "Dan Osborn",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "By Petition",
         "votes": 436493,
         "voteShare": 46.5,
         "sourceParties": [
-          "OTHER"
+          "BY PETITION"
         ],
         "writeIn": false
       },
@@ -38571,7 +38670,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "NE",
       "district": "NE-S1",
@@ -38608,7 +38707,8 @@ export const senateSeatBaselines = [
     "totalVotes": 935005,
     "uncontested": false,
     "lowData": false,
-    "specialElection": true,
+    "specialElection": false,
+    "latestElectionSpecialElection": true,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38679,6 +38779,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38771,6 +38872,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38815,11 +38917,11 @@ export const senateSeatBaselines = [
       {
         "name": "Lindemann, Barry",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Non Partisan",
         "votes": 8075,
         "voteShare": 0.8,
         "sourceParties": [
-          "OTHER"
+          "NON PARTISAN"
         ],
         "writeIn": false
       }
@@ -38863,6 +38965,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -38955,6 +39058,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39047,6 +39151,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39062,7 +39167,7 @@ export const senateSeatBaselines = [
         "votes": 2161491,
         "voteShare": 53.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -39080,11 +39185,11 @@ export const senateSeatBaselines = [
       {
         "name": "Christina Khalil",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 45443,
         "voteShare": 1.1,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       },
@@ -39139,6 +39244,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39172,22 +39278,22 @@ export const senateSeatBaselines = [
       {
         "name": "Madelyn R. Hoffman",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 38288,
         "voteShare": 0.9,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       },
       {
         "name": "Veronica Fernandez",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Of, By, For!",
         "votes": 32290,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "OF, BY, FOR!"
         ],
         "writeIn": false
       }
@@ -39231,6 +39337,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39246,7 +39353,7 @@ export const senateSeatBaselines = [
         "votes": 497333,
         "voteShare": 55.1,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -39301,6 +39408,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39376,12 +39484,13 @@ export const senateSeatBaselines = [
     "baselineMargin": 17.48,
     "latestElectionYear": 2024,
     "democraticVotes": 4711669,
-    "republicanVotes": 3246690,
-    "otherVotes": 423038,
+    "republicanVotes": 0,
+    "otherVotes": 3669728,
     "totalVotes": 8381397,
-    "uncontested": false,
-    "lowData": false,
+    "uncontested": true,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39397,18 +39506,18 @@ export const senateSeatBaselines = [
         "votes": 4711669,
         "voteShare": 56.2,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC/WORKING FAMILIES"
         ],
         "writeIn": false
       },
       {
         "name": "Michael D. Sapraicone",
-        "party": "republican",
-        "partyLabel": "Republican",
+        "party": "independent",
+        "partyLabel": "Republican/conservative",
         "votes": 3246690,
         "voteShare": 38.7,
         "sourceParties": [
-          "REPUBLICAN"
+          "REPUBLICAN/CONSERVATIVE"
         ],
         "writeIn": false
       },
@@ -39426,17 +39535,17 @@ export const senateSeatBaselines = [
       {
         "name": "Diane Sare",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Larouche",
         "votes": 39421,
         "voteShare": 0.5,
         "sourceParties": [
-          "OTHER"
+          "LAROUCHE"
         ],
         "writeIn": false
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "NY",
       "district": "NY-S1",
@@ -39474,6 +39583,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39490,7 +39600,7 @@ export const senateSeatBaselines = [
         "voteShare": 56.8,
         "sourceParties": [
           "DEMOCRAT",
-          "OTHER"
+          "WORKING FAMILIES"
         ],
         "writeIn": false
       },
@@ -39501,7 +39611,7 @@ export const senateSeatBaselines = [
         "votes": 2501151,
         "voteShare": 42.8,
         "sourceParties": [
-          "OTHER",
+          "CONSERVATIVE",
           "REPUBLICAN"
         ],
         "writeIn": false
@@ -39509,11 +39619,11 @@ export const senateSeatBaselines = [
       {
         "name": "Diane Sare",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Larouche",
         "votes": 26844,
         "voteShare": 0.5,
         "sourceParties": [
-          "OTHER"
+          "LAROUCHE"
         ],
         "writeIn": false
       }
@@ -39557,6 +39667,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39601,11 +39712,11 @@ export const senateSeatBaselines = [
       {
         "name": "Kevin E. Hayes",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Constitution Party",
         "votes": 67818,
         "voteShare": 1.2,
         "sourceParties": [
-          "OTHER"
+          "CONSTITUTION PARTY"
         ],
         "writeIn": false
       }
@@ -39649,6 +39760,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39693,11 +39805,11 @@ export const senateSeatBaselines = [
       {
         "name": "Matthew Hoh",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 29934,
         "voteShare": 0.8,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -39741,6 +39853,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39767,7 +39880,7 @@ export const senateSeatBaselines = [
         "votes": 121602,
         "voteShare": 33.4,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC-NPL"
         ],
         "writeIn": false
       },
@@ -39822,6 +39935,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39855,22 +39969,22 @@ export const senateSeatBaselines = [
       {
         "name": "Rick Becker",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Rick Becker",
         "votes": 44406,
         "voteShare": 18.5,
         "sourceParties": [
-          "OTHER"
+          "RICK BECKER"
         ],
         "writeIn": false
       },
       {
         "name": "Write-In",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Write-In",
         "votes": 265,
         "voteShare": 0.1,
         "sourceParties": [
-          "OTHER"
+          "WRITE-IN"
         ],
         "writeIn": true
       }
@@ -39914,6 +40028,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -39940,7 +40055,7 @@ export const senateSeatBaselines = [
         "votes": 2650949,
         "voteShare": 46.5,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -40004,8 +40119,9 @@ export const senateSeatBaselines = [
     "otherVotes": 1739,
     "totalVotes": 4133342,
     "uncontested": false,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40049,7 +40165,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Stale completed statewide Senate result matched to the current incumbent because the expected term result is absent from the source; flagged low data.",
     "overrideKeys": {
       "state": "OH",
       "district": "OH-S3",
@@ -40085,8 +40201,9 @@ export const senateSeatBaselines = [
     "otherVotes": 67458,
     "totalVotes": 1556361,
     "uncontested": false,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40131,17 +40248,17 @@ export const senateSeatBaselines = [
       {
         "name": "Joan Farr",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 21652,
         "voteShare": 1.4,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Stale completed statewide Senate result matched to the current incumbent because the expected term result is absent from the source; flagged low data.",
     "overrideKeys": {
       "state": "OK",
       "district": "OK-S2",
@@ -40179,6 +40296,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40212,11 +40330,11 @@ export const senateSeatBaselines = [
       {
         "name": "Michael L Delaney",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 20907,
         "voteShare": 1.8,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
@@ -40271,6 +40389,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40315,11 +40434,11 @@ export const senateSeatBaselines = [
       {
         "name": "Ibrahim A Taher",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Pacific Green",
         "votes": 42239,
         "voteShare": 1.8,
         "sourceParties": [
-          "OTHER"
+          "PACIFIC GREEN"
         ],
         "writeIn": false
       }
@@ -40363,6 +40482,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40396,22 +40516,22 @@ export const senateSeatBaselines = [
       {
         "name": "Henry Chris",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Progressive",
         "votes": 36883,
         "voteShare": 1.9,
         "sourceParties": [
-          "OTHER"
+          "PROGRESSIVE"
         ],
         "writeIn": false
       },
       {
         "name": "Pulju Dan",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Pacific Green",
         "votes": 23454,
         "voteShare": 1.2,
         "sourceParties": [
-          "OTHER"
+          "PACIFIC GREEN"
         ],
         "writeIn": false
       }
@@ -40455,6 +40575,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40481,7 +40602,7 @@ export const senateSeatBaselines = [
         "votes": 3384180,
         "voteShare": 48.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -40499,11 +40620,11 @@ export const senateSeatBaselines = [
       {
         "name": "Leila Hazou",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 66388,
         "voteShare": 1,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -40547,6 +40668,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40591,11 +40713,11 @@ export const senateSeatBaselines = [
       {
         "name": "Richard L Weiss",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 30434,
         "voteShare": 0.6,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -40639,6 +40761,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40654,7 +40777,7 @@ export const senateSeatBaselines = [
         "votes": 294665,
         "voteShare": 59.9,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -40720,6 +40843,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40801,6 +40925,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40834,11 +40959,11 @@ export const senateSeatBaselines = [
       {
         "name": "Bill Bledsoe",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Constitution Party",
         "votes": 32845,
         "voteShare": 1.3,
         "sourceParties": [
-          "OTHER"
+          "CONSTITUTION PARTY"
         ],
         "writeIn": false
       },
@@ -40893,6 +41018,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -40974,6 +41100,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41044,6 +41171,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41125,6 +41253,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41151,29 +41280,29 @@ export const senateSeatBaselines = [
         "votes": 1027461,
         "voteShare": 34.2,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
       {
         "name": "Tharon Chandler",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 28444,
         "voteShare": 0.9,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Pamela Jeanine \\p.\\ Moses",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 24682,
         "voteShare": 0.8,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
@@ -41217,6 +41346,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41250,22 +41380,22 @@ export const senateSeatBaselines = [
       {
         "name": "Elizabeth Mcleod",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 16652,
         "voteShare": 0.6,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Yomi \\fapas\\ Faparusi Sr..",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 10727,
         "voteShare": 0.4,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
@@ -41309,6 +41439,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41335,7 +41466,7 @@ export const senateSeatBaselines = [
         "votes": 5031249,
         "voteShare": 44.6,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -41401,6 +41532,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41445,11 +41577,11 @@ export const senateSeatBaselines = [
       {
         "name": "David B. Collins",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green",
         "votes": 81893,
         "voteShare": 0.7,
         "sourceParties": [
-          "OTHER"
+          "GREEN"
         ],
         "writeIn": false
       }
@@ -41493,6 +41625,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41519,18 +41652,18 @@ export const senateSeatBaselines = [
         "votes": 464515,
         "voteShare": 31.7,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
       {
         "name": "Carlton E. Bowen",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent American",
         "votes": 83972,
         "voteShare": 5.7,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT AMERICAN"
         ],
         "writeIn": false
       },
@@ -41576,15 +41709,16 @@ export const senateSeatBaselines = [
     },
     "baselineWinner": "republican",
     "baselineControlParty": "republican",
-    "baselineMargin": -53.15,
+    "baselineMargin": -10.41,
     "latestElectionYear": 2022,
     "democraticVotes": 0,
     "republicanVotes": 571974,
     "otherVotes": 504087,
     "totalVotes": 1076061,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41607,11 +41741,11 @@ export const senateSeatBaselines = [
       {
         "name": "Evan Mcmullin",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 459958,
         "voteShare": 42.7,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
@@ -41629,17 +41763,17 @@ export const senateSeatBaselines = [
       {
         "name": "Tommy Williams",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 12103,
         "voteShare": 1.1,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "UT",
       "district": "UT-S3",
@@ -41675,8 +41809,9 @@ export const senateSeatBaselines = [
     "otherVotes": 256373,
     "totalVotes": 372885,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41688,11 +41823,11 @@ export const senateSeatBaselines = [
       {
         "name": "Bernie Sanders",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 229429,
         "voteShare": 61.5,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
@@ -41721,17 +41856,17 @@ export const senateSeatBaselines = [
       {
         "name": "Steve Berry",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 7941,
         "voteShare": 2.1,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "VT",
       "district": "VT-S1",
@@ -41769,6 +41904,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41802,22 +41938,22 @@ export const senateSeatBaselines = [
       {
         "name": "Dawn Marie Ellis",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 2752,
         "voteShare": 1,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Natasha Diamondstone-Kohout",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Green Mountain Peace And Justice Party Of Vermont",
         "votes": 1574,
         "voteShare": 0.5,
         "sourceParties": [
-          "OTHER"
+          "GREEN MOUNTAIN PEACE AND JUSTICE PARTY OF VERMONT"
         ],
         "writeIn": false
       }
@@ -41861,6 +41997,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -41876,7 +42013,7 @@ export const senateSeatBaselines = [
         "votes": 2417115,
         "voteShare": 54.4,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -41942,6 +42079,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42017,12 +42155,13 @@ export const senateSeatBaselines = [
     "baselineMargin": 18.45,
     "latestElectionYear": 2024,
     "democraticVotes": 2252577,
-    "republicanVotes": 1549187,
-    "otherVotes": 10627,
+    "republicanVotes": 0,
+    "otherVotes": 1559814,
     "totalVotes": 3812391,
-    "uncontested": false,
-    "lowData": false,
+    "uncontested": true,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42038,18 +42177,18 @@ export const senateSeatBaselines = [
         "votes": 2252577,
         "voteShare": 59.1,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
       {
         "name": "Dr Raul Garcia",
-        "party": "republican",
-        "partyLabel": "Republican",
+        "party": "independent",
+        "partyLabel": "Gop",
         "votes": 1549187,
         "voteShare": 40.6,
         "sourceParties": [
-          "REPUBLICAN"
+          "GOP"
         ],
         "writeIn": false
       },
@@ -42066,7 +42205,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "WA",
       "district": "WA-S1",
@@ -42104,6 +42243,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42185,6 +42325,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42211,7 +42352,7 @@ export const senateSeatBaselines = [
         "votes": 207548,
         "voteShare": 27.8,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -42277,6 +42418,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42358,6 +42500,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42373,7 +42516,7 @@ export const senateSeatBaselines = [
         "votes": 1672777,
         "voteShare": 49.3,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -42391,22 +42534,22 @@ export const senateSeatBaselines = [
       {
         "name": "Phil Anderson",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 42315,
         "voteShare": 1.2,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       },
       {
         "name": "Thomas Leager",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Independent",
         "votes": 28751,
         "voteShare": 0.8,
         "sourceParties": [
-          "OTHER"
+          "INDEPENDENT"
         ],
         "writeIn": false
       }
@@ -42450,6 +42593,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42483,11 +42627,11 @@ export const senateSeatBaselines = [
       {
         "name": "Scattering",
         "party": "independent",
-        "partyLabel": "Other",
+        "partyLabel": "Scattering",
         "votes": 4758,
         "voteShare": 0.2,
         "sourceParties": [
-          "OTHER"
+          "SCATTERING"
         ],
         "writeIn": false
       },
@@ -42542,6 +42686,7 @@ export const senateSeatBaselines = [
     "uncontested": false,
     "lowData": false,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42568,7 +42713,7 @@ export const senateSeatBaselines = [
         "votes": 63727,
         "voteShare": 23.5,
         "sourceParties": [
-          "DEMOCRAT"
+          "DEMOCRATIC"
         ],
         "writeIn": false
       },
@@ -42624,16 +42769,17 @@ export const senateSeatBaselines = [
       "bioguideId": "L000571"
     },
     "baselineWinner": "republican",
-    "baselineControlParty": "democratic",
-    "baselineMargin": 0,
+    "baselineControlParty": "republican",
+    "baselineMargin": -45,
     "latestElectionYear": 2020,
     "democraticVotes": 0,
-    "republicanVotes": 0,
-    "otherVotes": 278503,
+    "republicanVotes": 198100,
+    "otherVotes": 80403,
     "totalVotes": 278503,
     "uncontested": true,
-    "lowData": false,
+    "lowData": true,
     "specialElection": false,
+    "latestElectionSpecialElection": false,
     "runoff": false,
     "missingVoteTotal": false,
     "cancelledElection": false,
@@ -42644,8 +42790,8 @@ export const senateSeatBaselines = [
     "candidates": [
       {
         "name": "Cynthia M. Lummis",
-        "party": "independent",
-        "partyLabel": "Other",
+        "party": "republican",
+        "partyLabel": "Republican",
         "votes": 198100,
         "voteShare": 71.1,
         "sourceParties": [
@@ -42688,7 +42834,7 @@ export const senateSeatBaselines = [
       }
     ],
     "sourceId": "mit-senate-state-1976-2024",
-    "sourceNote": "Latest completed statewide Senate result matched to the current seat by class, year, state, and winner where possible.",
+    "sourceNote": "Latest completed statewide Senate result matched to the current seat; incomplete major-party labels use winner-versus-runner-up margin and are flagged low data.",
     "overrideKeys": {
       "state": "WY",
       "district": "WY-S2",

@@ -89,7 +89,12 @@ export type DemographicSliderConfig = {
 export type StateDemographicWeights = Record<DemographicSliderId, number>;
 
 export type ScenarioAssumptionDriver = {
-  id: "nationalSwing" | DemographicSliderId;
+  id:
+    | "nationalSwing"
+    | "stateTurnout"
+    | "statePartisanShift"
+    | "stateCandidateQuality"
+    | DemographicSliderId;
   label: string;
   value: number;
   weight: number;
@@ -99,6 +104,7 @@ export type ScenarioAssumptionDriver = {
 export type ScenarioAssumptions = {
   nationalSwing: number;
   demographics: DemographicAssumptions;
+  stateOverrides?: StateOverrides;
   adjustments?: ScenarioAdjustment[];
 };
 
@@ -129,6 +135,7 @@ export type StateScenarioResult = {
   marginToFlip: number;
   totalAdjustment: number;
   demographicDelta: number;
+  overrideAdjustment: number;
   assumptionDrivers: ScenarioAssumptionDriver[];
 };
 
@@ -161,10 +168,30 @@ export type LegislativeOverrideKeys = {
   race: string;
 };
 
+export type StateOverride = {
+  turnout: number;
+  partisanShift: number;
+  candidateQuality: number;
+};
+
+export type SeatStatusOverride =
+  | "baseline"
+  | "open"
+  | "democratic"
+  | "republican";
+
+export type SeatOverride = {
+  turnout: number;
+  candidateQuality: number;
+  seatStatus: SeatStatusOverride;
+};
+
+export type StateOverrides = Partial<Record<StateCode, StateOverride>>;
+
 export type LegislativeOverrides = {
-  states: Partial<Record<StateCode, number>>;
-  districts: Partial<Record<string, number>>;
-  races: Partial<Record<string, number>>;
+  states: StateOverrides;
+  districts: Partial<Record<string, SeatOverride>>;
+  races: Partial<Record<string, SeatOverride>>;
 };
 
 export type LegislativeSliderId =
@@ -177,12 +204,15 @@ export type LegislativeSliderId =
   | "collegeEducatedDistrictShift"
   | "nonCollegeDistrictShift"
   | "presidentialCoattails"
+  | "statePartisanshipElasticity"
+  | "independentVoteShift"
   | "antiIncumbentWave";
 
 export type LegislativeSliderAssumptions = Record<LegislativeSliderId, number>;
 
 export type LegislativeSliderConfig = {
   id: LegislativeSliderId;
+  chambers: readonly LegislativeChamber[];
   label: string;
   lowLabel: string;
   neutralLabel: string;
@@ -193,7 +223,15 @@ export type LegislativeSliderConfig = {
 };
 
 export type LegislativeAssumptionDriver = {
-  id: "nationalSwing" | "localOverride" | LegislativeSliderId;
+  id:
+    | "nationalSwing"
+    | "stateTurnout"
+    | "statePartisanShift"
+    | "stateCandidateQuality"
+    | "localTurnout"
+    | "localCandidateQuality"
+    | "localSeatStatus"
+    | LegislativeSliderId;
   label: string;
   value: number;
   weight: number;
@@ -207,7 +245,7 @@ export type LegislativeAssumptions = {
   overrides: LegislativeOverrides;
 };
 
-export type LegislativeIncumbent = {
+export type LegislatorProfile = {
   name: string;
   party: LegislativeParty;
   partyLabel: string;
@@ -219,6 +257,8 @@ export type LegislativeIncumbent = {
   tenureYears: number;
   bioguideId: string;
 };
+
+export type LegislativeIncumbent = LegislatorProfile;
 
 export type LegislativeCandidate = {
   name: string;
@@ -249,6 +289,7 @@ export type LegislativeSeatBaselineBase = {
   uncontested: boolean;
   lowData: boolean;
   specialElection: boolean;
+  latestElectionSpecialElection?: boolean;
   runoff: boolean;
   missingVoteTotal: boolean;
   cancelledElection: boolean;
@@ -266,12 +307,14 @@ export type HouseDistrictBaseline = LegislativeSeatBaselineBase & {
   district: number;
 };
 
-export type SenateSeatBaseline = LegislativeSeatBaselineBase & {
+export type SenateRaceBaseline = LegislativeSeatBaselineBase & {
   chamber: "senate";
   senateClass: 1 | 2 | 3;
   specialElection: boolean;
   upNextCycle: boolean;
 };
+
+export type SenateSeatBaseline = SenateRaceBaseline;
 
 export type LegislativeSeatBaseline =
   | HouseDistrictBaseline

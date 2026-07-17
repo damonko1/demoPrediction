@@ -38,6 +38,7 @@ import {
 import {
   appScenarioToUrl,
   baselineYearFromSearchParams,
+  legislativeOverridesFromSearchParams,
   legislativeSeatFromSearchParams,
   legislativeSlidersFromSearchParams,
   legislativeSwingFromSearchParams,
@@ -45,6 +46,7 @@ import {
   selectedStateFromSearchParams,
   simulationTabFromSearchParams,
 } from "@/lib/scenarioUrl";
+import { hasSeatOverride, hasStateOverride } from "@/lib/localOverrides";
 import { resetBaselinePresetId } from "@/data/scenarioPresets";
 import type {
   DemographicAssumptions,
@@ -52,8 +54,11 @@ import type {
   HistoricalElectionYear,
   LegislativeAssumptions,
   LegislativeSliderId,
+  SeatOverride,
   ScenarioPreset,
   SimulationTab,
+  StateOverride,
+  StateOverrides,
 } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
@@ -77,6 +82,7 @@ export function Playground() {
     useState<LegislativeAssumptions>(() => getDefaultLegislativeAssumptions());
   const [senateAssumptions, setSenateAssumptions] =
     useState<LegislativeAssumptions>(() => getDefaultLegislativeAssumptions());
+  const [stateOverrides, setStateOverrides] = useState<StateOverrides>({});
   const [baselineYear, setBaselineYear] = useState<HistoricalElectionYear>(
     defaultHistoricalElectionYear,
   );
@@ -95,9 +101,34 @@ export function Playground() {
     () => ({
       nationalSwing,
       demographics: demographicAssumptions,
+      stateOverrides,
       adjustments: [],
     }),
-    [demographicAssumptions, nationalSwing],
+    [demographicAssumptions, nationalSwing, stateOverrides],
+  );
+
+  const houseScenarioAssumptions = useMemo<LegislativeAssumptions>(
+    () => ({
+      ...houseAssumptions,
+      overrides: {
+        states: stateOverrides,
+        districts: houseAssumptions.overrides.districts,
+        races: {},
+      },
+    }),
+    [houseAssumptions, stateOverrides],
+  );
+
+  const senateScenarioAssumptions = useMemo<LegislativeAssumptions>(
+    () => ({
+      ...senateAssumptions,
+      overrides: {
+        states: stateOverrides,
+        districts: {},
+        races: senateAssumptions.overrides.races,
+      },
+    }),
+    [senateAssumptions, stateOverrides],
   );
 
   const historicalStateBaselines = useMemo(
@@ -114,18 +145,18 @@ export function Playground() {
       calculateLegislativeScenario(
         "house",
         houseDistrictBaselines,
-        houseAssumptions,
+        houseScenarioAssumptions,
       ),
-    [houseAssumptions],
+    [houseScenarioAssumptions],
   );
   const senateScenario = useMemo(
     () =>
       calculateLegislativeScenario(
         "senate",
         senateSeatBaselines,
-        senateAssumptions,
+        senateScenarioAssumptions,
       ),
-    [senateAssumptions],
+    [senateScenarioAssumptions],
   );
 
   const selectedState = useMemo(() => {
@@ -147,19 +178,31 @@ export function Playground() {
       const restoredState = selectedStateFromSearchParams(searchParams);
       const restoredHouseSeat = legislativeSeatFromSearchParams(searchParams, "house");
       const restoredSenateSeat = legislativeSeatFromSearchParams(searchParams, "senate");
+      const restoredHouseOverrides = legislativeOverridesFromSearchParams(
+        searchParams,
+        "house",
+      );
+      const restoredSenateOverrides = legislativeOverridesFromSearchParams(
+        searchParams,
+        "senate",
+      );
 
       setActiveTab(simulationTabFromSearchParams(searchParams));
       setNationalSwing(restoredAssumptions.nationalSwing);
       setDemographicAssumptions(restoredAssumptions.demographics);
+      setStateOverrides(restoredAssumptions.stateOverrides ?? {});
       setBaselineYear(restoredBaselineYear);
       setHouseAssumptions({
         ...getDefaultLegislativeAssumptions(),
         nationalSwing: legislativeSwingFromSearchParams(searchParams, "house"),
-        sliders: legislativeSlidersFromSearchParams(searchParams),
+        sliders: legislativeSlidersFromSearchParams(searchParams, "house"),
+        overrides: restoredHouseOverrides,
       });
       setSenateAssumptions({
         ...getDefaultLegislativeAssumptions(),
         nationalSwing: legislativeSwingFromSearchParams(searchParams, "senate"),
+        sliders: legislativeSlidersFromSearchParams(searchParams, "senate"),
+        overrides: restoredSenateOverrides,
       });
 
       if (
@@ -200,28 +243,37 @@ export function Playground() {
       return;
     }
 
-    const scenarioUrl = appScenarioToUrl({
-      activeTab,
-      basePath: window.location.pathname,
-      baselineYear,
-      presidentialAssumptions: scenarioAssumptions,
-      selectedStateCode,
-      houseSwing: houseAssumptions.nationalSwing,
-      houseSliders: houseAssumptions.sliders,
-      senateSwing: senateAssumptions.nationalSwing,
-      houseSeatId: selectedHouseSeatId,
-      senateSeatId: selectedSenateSeatId,
-    });
-    window.history.replaceState(null, "", scenarioUrl);
+    const updateUrlTimeout = window.setTimeout(() => {
+      const scenarioUrl = appScenarioToUrl({
+        activeTab,
+        basePath: window.location.pathname,
+        baselineYear,
+        presidentialAssumptions: scenarioAssumptions,
+        selectedStateCode,
+        houseSwing: houseAssumptions.nationalSwing,
+        houseSliders: houseAssumptions.sliders,
+        houseOverrides: houseScenarioAssumptions.overrides,
+        senateSwing: senateAssumptions.nationalSwing,
+        senateSliders: senateAssumptions.sliders,
+        senateOverrides: senateScenarioAssumptions.overrides,
+        houseSeatId: selectedHouseSeatId,
+        senateSeatId: selectedSenateSeatId,
+      });
+      window.history.replaceState(null, "", scenarioUrl);
+    }, 120);
+
+    return () => window.clearTimeout(updateUrlTimeout);
   }, [
     activeTab,
     baselineYear,
     houseAssumptions,
+    houseScenarioAssumptions.overrides,
     scenarioAssumptions,
     selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
-    senateAssumptions.nationalSwing,
+    senateAssumptions,
+    senateScenarioAssumptions.overrides,
     urlReady,
   ]);
 
@@ -238,7 +290,10 @@ export function Playground() {
       selectedStateCode,
       houseSwing: houseAssumptions.nationalSwing,
       houseSliders: houseAssumptions.sliders,
+      houseOverrides: houseScenarioAssumptions.overrides,
       senateSwing: senateAssumptions.nationalSwing,
+      senateSliders: senateAssumptions.sliders,
+      senateOverrides: senateScenarioAssumptions.overrides,
       houseSeatId: selectedHouseSeatId,
       senateSeatId: selectedSenateSeatId,
     });
@@ -248,11 +303,13 @@ export function Playground() {
     activeTab,
     baselineYear,
     houseAssumptions,
+    houseScenarioAssumptions.overrides,
     scenarioAssumptions,
     selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
-    senateAssumptions.nationalSwing,
+    senateAssumptions,
+    senateScenarioAssumptions.overrides,
     urlReady,
   ]);
 
@@ -269,7 +326,10 @@ export function Playground() {
       selectedStateCode,
       houseSwing: houseAssumptions.nationalSwing,
       houseSliders: houseAssumptions.sliders,
+      houseOverrides: houseScenarioAssumptions.overrides,
       senateSwing: senateAssumptions.nationalSwing,
+      senateSliders: senateAssumptions.sliders,
+      senateOverrides: senateScenarioAssumptions.overrides,
       houseSeatId: selectedHouseSeatId,
       senateSeatId: selectedSenateSeatId,
     });
@@ -305,11 +365,13 @@ export function Playground() {
     activeTab,
     baselineYear,
     houseAssumptions,
+    houseScenarioAssumptions.overrides,
     scenarioAssumptions,
     selectedStateCode,
     selectedHouseSeatId,
     selectedSenateSeatId,
-    senateAssumptions.nationalSwing,
+    senateAssumptions,
+    senateScenarioAssumptions.overrides,
   ]);
 
   function updateDemographicAssumption(
@@ -367,6 +429,98 @@ export function Playground() {
       ...currentAssumptions,
       nationalSwing: value,
     }));
+  }
+
+  function updateSenateSlider(id: LegislativeSliderId, value: number) {
+    setSenateAssumptions((currentAssumptions) => ({
+      ...currentAssumptions,
+      sliders: {
+        ...currentAssumptions.sliders,
+        [id]: value,
+      },
+    }));
+  }
+
+  function applyPresidentAssumptionsToSenate() {
+    setSenateAssumptions((currentAssumptions) => ({
+      ...currentAssumptions,
+      sliders: getLegislativeAssumptionsFromPresident(
+        demographicAssumptions,
+        nationalSwing,
+      ),
+    }));
+  }
+
+  function updateStateOverride(stateCode: string, value: StateOverride) {
+    setStateOverrides((currentOverrides) => {
+      const nextOverrides = { ...currentOverrides };
+      if (hasStateOverride(value)) {
+        nextOverrides[stateCode] = value;
+      } else {
+        delete nextOverrides[stateCode];
+      }
+      return nextOverrides;
+    });
+  }
+
+  function resetStateOverride(stateCode: string) {
+    setStateOverrides((currentOverrides) => {
+      const nextOverrides = { ...currentOverrides };
+      delete nextOverrides[stateCode];
+      return nextOverrides;
+    });
+  }
+
+  function updateHouseSeatOverride(seatId: string, value: SeatOverride) {
+    setHouseAssumptions((currentAssumptions) => {
+      const districts = { ...currentAssumptions.overrides.districts };
+      if (hasSeatOverride(value)) {
+        districts[seatId] = value;
+      } else {
+        delete districts[seatId];
+      }
+      return {
+        ...currentAssumptions,
+        overrides: { ...currentAssumptions.overrides, districts },
+      };
+    });
+  }
+
+  function resetHouseSeatOverride(seatId: string) {
+    setHouseAssumptions((currentAssumptions) => {
+      const districts = { ...currentAssumptions.overrides.districts };
+      delete districts[seatId];
+      return {
+        ...currentAssumptions,
+        overrides: { ...currentAssumptions.overrides, districts },
+      };
+    });
+  }
+
+  function updateSenateRaceOverride(seatId: string, value: SeatOverride) {
+    setSenateAssumptions((currentAssumptions) => {
+      const races = { ...currentAssumptions.overrides.races };
+      if (hasSeatOverride(value)) {
+        races[seatId] = value;
+      } else {
+        delete races[seatId];
+      }
+      return {
+        ...currentAssumptions,
+        overrides: { ...currentAssumptions.overrides, races },
+      };
+    });
+  }
+
+  function resetSenateRaceOverride(seatId: string) {
+    setSenateAssumptions((currentAssumptions) => {
+      const races = { ...currentAssumptions.overrides.races };
+      delete races[seatId];
+      return {
+        ...currentAssumptions,
+        overrides: { ...currentAssumptions.overrides, races },
+      };
+    });
   }
 
   function resetPresidentTab() {
@@ -475,6 +629,7 @@ export function Playground() {
             presidentialScenario={scenario}
             houseScenario={houseScenario}
             senateScenario={senateScenario}
+            shareUrl={currentShareUrl}
           />
 
           {activeTab === "president" ? (
@@ -512,12 +667,22 @@ export function Playground() {
                   <ElectoralMap
                     results={scenario.states}
                     selectedStateCode={selectedState.state.code}
+                    customStateCodes={new Set(Object.keys(stateOverrides))}
                     onSelectState={setSelectedStateCode}
                   />
                 </div>
 
                 <aside className={styles.detailRail} aria-label="Selected state details">
-                  <StateDetailPanel result={selectedState} />
+                  <StateDetailPanel
+                    result={selectedState}
+                    stateOverride={stateOverrides[selectedState.state.code]}
+                    onStateOverrideChange={(value) =>
+                      updateStateOverride(selectedState.state.code, value)
+                    }
+                    onStateOverrideReset={() =>
+                      resetStateOverride(selectedState.state.code)
+                    }
+                  />
                 </aside>
 
                 <aside className={styles.analysisRail} aria-label="Scenario summary and pressure points">
@@ -542,7 +707,7 @@ export function Playground() {
                 chamber="house"
                 scenario={houseScenario}
                 selectedSeatId={selectedHouseSeatId}
-                assumptions={houseAssumptions}
+                assumptions={houseScenarioAssumptions}
                 presidentialAssumptions={scenarioAssumptions}
                 isFocusMode={isFocusMode}
                 onSelectSeat={setSelectedHouseSeatId}
@@ -550,6 +715,10 @@ export function Playground() {
                 onSliderChange={updateHouseSlider}
                 onApplyPresidentAssumptions={applyPresidentAssumptionsToHouse}
                 onApplyAssumptions={setHouseAssumptions}
+                onStateOverrideChange={updateStateOverride}
+                onStateOverrideReset={resetStateOverride}
+                onSeatOverrideChange={updateHouseSeatOverride}
+                onSeatOverrideReset={resetHouseSeatOverride}
                 onCopyLink={copyScenarioLink}
                 onReset={() => {
                   setHouseAssumptions(getDefaultLegislativeAssumptions());
@@ -565,10 +734,19 @@ export function Playground() {
                 chamber="senate"
                 scenario={senateScenario}
                 selectedSeatId={selectedSenateSeatId}
-                assumptions={senateAssumptions}
+                assumptions={senateScenarioAssumptions}
+                presidentialAssumptions={scenarioAssumptions}
+                presidentialScenario={scenario}
                 isFocusMode={isFocusMode}
                 onSelectSeat={setSelectedSenateSeatId}
                 onNationalSwingChange={updateSenateSwing}
+                onSliderChange={updateSenateSlider}
+                onApplyPresidentAssumptions={applyPresidentAssumptionsToSenate}
+                onApplyAssumptions={setSenateAssumptions}
+                onStateOverrideChange={updateStateOverride}
+                onStateOverrideReset={resetStateOverride}
+                onSeatOverrideChange={updateSenateRaceOverride}
+                onSeatOverrideReset={resetSenateRaceOverride}
                 onCopyLink={copyScenarioLink}
                 onReset={() => {
                   setSenateAssumptions(getDefaultLegislativeAssumptions());

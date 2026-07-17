@@ -22,6 +22,7 @@ import styles from "@/components/Playground.module.css";
 type ElectoralMapProps = {
   results: StateScenarioResult[];
   selectedStateCode: string;
+  customStateCodes?: ReadonlySet<string>;
   onSelectState: (stateCode: string) => void;
 };
 
@@ -197,6 +198,7 @@ function getStyleForResult(result: StateScenarioResult) {
 export function ElectoralMap({
   results,
   selectedStateCode,
+  customStateCodes = new Set<string>(),
   onSelectState,
 }: ElectoralMapProps) {
   const mapCanvasRef = useRef<HTMLDivElement>(null);
@@ -455,6 +457,7 @@ export function ElectoralMap({
             <span><b className={styles.legendLean} />LEAN</span>
             <span><b className={styles.legendLikely} />LIKELY</span>
             <span><b className={styles.legendSafe} />SAFE</span>
+            <span><b className={styles.legendCustom} />CUSTOM</span>
           </div>
           <button
             aria-label={exportButtonLabel}
@@ -514,9 +517,10 @@ export function ElectoralMap({
                       tabIndex={0}
                       data-selected={isSelected}
                       data-flipped={result.flipped}
+                      data-custom={customStateCodes.has(shape.code)}
                       style={getStyleForResult(result)}
                       aria-pressed={isSelected}
-                      aria-label={`${result.state.name}, ${result.state.electoralVotes} electoral votes, current ${formatMargin(result.simulatedMargin)}, baseline ${formatMargin(result.state.baselineMargin)}`}
+                      aria-label={`${result.state.name}, ${result.state.electoralVotes} electoral votes, current ${formatMargin(result.simulatedMargin)}, baseline ${formatMargin(result.state.baselineMargin)}${customStateCodes.has(shape.code) ? ", custom state assumptions" : ""}`}
                       onClick={() => handleSelectState(shape.code)}
                       onKeyDown={(event) => handleKeyDown(event, shape.code)}
                       onPointerEnter={(event) => handlePointerActivity(event, shape.code)}
@@ -579,8 +583,9 @@ export function ElectoralMap({
                   style={getStyleForResult(result)}
                   aria-pressed={isSelected}
                   data-selected={isSelected}
-                  title={`${result.state.name}: ${formatMargin(result.simulatedMargin)}`}
-                  aria-label={`${result.state.name}, ${result.state.electoralVotes} electoral votes, current ${formatMargin(result.simulatedMargin)}`}
+                  data-custom={customStateCodes.has(stateCode)}
+                  title={`${result.state.name}: ${formatMargin(result.simulatedMargin)}${customStateCodes.has(stateCode) ? " / Custom assumptions" : ""}`}
+                  aria-label={`${result.state.name}, ${result.state.electoralVotes} electoral votes, current ${formatMargin(result.simulatedMargin)}${customStateCodes.has(stateCode) ? ", custom state assumptions" : ""}`}
                   onClick={() => handleSelectState(stateCode)}
                   onPointerEnter={(event) => handlePointerActivity(event, stateCode)}
                   onPointerMove={moveTooltip}

@@ -4,14 +4,27 @@ import {
   formatParty,
   formatSignedPoints,
 } from "@/lib/format";
+import {
+  SeatOverrideControls,
+  StateOverrideControls,
+} from "@/components/LocalOverrideControls";
+import { hasSeatOverride, hasStateOverride } from "@/lib/localOverrides";
 import type {
   LegislativeCandidate,
   LegislativeSeatResult,
+  SeatOverride,
+  StateOverride,
 } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
 type LegislativeDetailPanelProps = {
   result: LegislativeSeatResult;
+  stateOverride?: StateOverride;
+  seatOverride?: SeatOverride;
+  onStateOverrideChange: (value: StateOverride) => void;
+  onStateOverrideReset: () => void;
+  onSeatOverrideChange: (value: SeatOverride) => void;
+  onSeatOverrideReset: () => void;
 };
 
 function getSeatKicker(result: LegislativeSeatResult) {
@@ -71,6 +84,54 @@ function getTenureLabel(result: LegislativeSeatResult) {
   return {
     label: `${incumbent.firstYear}`,
     note: `${incumbent.tenureYears.toFixed(1)} years served`,
+  };
+}
+
+function formatProfileDate(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function getServiceStartLabel(result: LegislativeSeatResult) {
+  const incumbent = result.seat.incumbent;
+
+  if (!incumbent) {
+    return {
+      label: "No incumbent",
+      note: "No service profile in roster snapshot",
+    };
+  }
+
+  return {
+    label: formatProfileDate(incumbent.firstChamberServiceDate),
+    note: "First chamber service date in roster source",
+  };
+}
+
+function getCurrentTermLabel(result: LegislativeSeatResult) {
+  const incumbent = result.seat.incumbent;
+
+  if (!incumbent) {
+    return {
+      label: "No current term",
+      note: "Seat is vacant in roster snapshot",
+    };
+  }
+
+  return {
+    label: `${formatProfileDate(incumbent.currentTermStart)} - ${formatProfileDate(
+      incumbent.currentTermEnd,
+    )}`,
+    note: "Current term dates from roster source",
   };
 }
 
@@ -164,8 +225,12 @@ function getDriverNote(
     } baseline`;
   }
 
-  if (driver.id === "localOverride") {
-    return "State, district, or race-specific adjustment";
+  if (driver.id.startsWith("state")) {
+    return "Shared state override applied across President, House, and Senate";
+  }
+
+  if (driver.id.startsWith("local")) {
+    return "Selected district or race override";
   }
 
   return `Heuristic ${
@@ -213,11 +278,23 @@ function getBaselineNote(result: LegislativeSeatResult) {
     : "Model baseline from latest Senate statewide D-R margin for this class; presidential/PVI baseline is not yet ingested";
 }
 
-export function LegislativeDetailPanel({ result }: LegislativeDetailPanelProps) {
+export function LegislativeDetailPanel({
+  onSeatOverrideChange,
+  onSeatOverrideReset,
+  onStateOverrideChange,
+  onStateOverrideReset,
+  result,
+  seatOverride,
+  stateOverride,
+}: LegislativeDetailPanelProps) {
   const seat = result.seat;
   const tenure = getTenureLabel(result);
+  const serviceStart = getServiceStartLabel(result);
+  const currentTerm = getCurrentTermLabel(result);
   const incumbentRunningStatus = getIncumbentRunningStatus(result);
   const assumptionDrivers = getAssumptionDrivers(result);
+  const hasCustomState = hasStateOverride(stateOverride);
+  const hasCustomSeat = hasSeatOverride(seatOverride);
 
   return (
     <section className={styles.panel} aria-label="Selected legislative seat details">
@@ -226,13 +303,23 @@ export function LegislativeDetailPanel({ result }: LegislativeDetailPanelProps) 
           <p className={styles.sectionKicker}>{getSeatKicker(result)}</p>
           <h2>{getSeatHeading(result)}</h2>
         </div>
-        <span
-          className={
-            result.flipped || seat.lowData ? styles.flipBadge : styles.steadyBadge
-          }
-        >
-          {getFlipLabel(result)}
-        </span>
+        <div className={styles.panelActions}>
+          {hasCustomState ? (
+            <span className={styles.customOverrideBadge}>Custom state</span>
+          ) : null}
+          {hasCustomSeat ? (
+            <span className={styles.customOverrideBadge}>
+              Custom {seat.chamber === "house" ? "district" : "race"}
+            </span>
+          ) : null}
+          <span
+            className={
+              result.flipped || seat.lowData ? styles.flipBadge : styles.steadyBadge
+            }
+          >
+            {getFlipLabel(result)}
+          </span>
+        </div>
       </div>
 
       <div className={styles.detailGrid}>
@@ -264,6 +351,16 @@ export function LegislativeDetailPanel({ result }: LegislativeDetailPanelProps) 
           <span>First served / tenure</span>
           <strong>{tenure.label}</strong>
           <small>{tenure.note}</small>
+        </div>
+        <div>
+          <span>Service start</span>
+          <strong>{serviceStart.label}</strong>
+          <small>{serviceStart.note}</small>
+        </div>
+        <div>
+          <span>Current term</span>
+          <strong>{currentTerm.label}</strong>
+          <small>{currentTerm.note}</small>
         </div>
         <div>
           <span>Incumbent running</span>
@@ -314,6 +411,25 @@ export function LegislativeDetailPanel({ result }: LegislativeDetailPanelProps) 
         </small>
       </div>
 
+      {seat.lowData || seat.missingVoteTotal ? (
+        <div className={styles.dataCompletenessNote} role="note">
+          <strong>Limited race data</strong>
+          <span>
+            {seat.missingVoteTotal
+              ? "The source does not provide a complete vote total for this race. "
+              : ""}
+            This baseline is flagged as low confidence; treat local changes as a stress test.
+          </span>
+        </div>
+      ) : null}
+
+      {seat.chamber === "senate" && !seat.upNextCycle ? (
+        <div className={styles.dataCompletenessNote} role="note">
+          <strong>Held seat</strong>
+          <span>This seat is not up in the modeled cycle, so scenario assumptions do not change it.</span>
+        </div>
+      ) : null}
+
       <div className={styles.voteDetail}>
         <span>Major-party candidates</span>
         <strong>{getMajorPartyCandidateLabel(result)}</strong>
@@ -333,6 +449,23 @@ export function LegislativeDetailPanel({ result }: LegislativeDetailPanelProps) 
         <span>Distance from flipping</span>
         <strong>{result.marginToFlip.toFixed(1)} pts</strong>
       </div>
+
+      <StateOverrideControls
+        stateName={seat.stateName}
+        value={stateOverride}
+        onChange={onStateOverrideChange}
+        onReset={onStateOverrideReset}
+      />
+
+      {seat.chamber === "house" || seat.upNextCycle ? (
+        <SeatOverrideControls
+          kind={seat.chamber === "house" ? "district" : "race"}
+          label={seat.districtLabel}
+          value={seatOverride}
+          onChange={onSeatOverrideChange}
+          onReset={onSeatOverrideReset}
+        />
+      ) : null}
 
       <div className={styles.assumptionDrivers}>
         <div className={styles.assumptionDriversHeader}>

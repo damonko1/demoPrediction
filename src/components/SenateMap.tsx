@@ -24,6 +24,8 @@ import styles from "@/components/Playground.module.css";
 type SenateMapProps = {
   results: LegislativeSeatResult[];
   selectedSeatId: string;
+  customStateCodes?: ReadonlySet<string>;
+  customSeatIds?: ReadonlySet<string>;
   onSelectSeat: (seatId: string) => void;
 };
 
@@ -214,6 +216,22 @@ function getCycleLabel(result: LegislativeSeatResult) {
 }
 
 function getStateStyle(results: LegislativeSeatResult[]) {
+  const activeRace = results.find(
+    (result) => "upNextCycle" in result.seat && result.seat.upNextCycle,
+  );
+
+  if (activeRace) {
+    const color = getStateColor(activeRace.simulatedMargin);
+    return {
+      "--state-fill": color.background,
+      "--state-stroke": color.border,
+      "--state-fg": color.foreground,
+      "--state-fill-dark": color.darkBackground,
+      "--state-stroke-dark": color.darkBorder,
+      "--state-fg-dark": color.darkForeground,
+    } as CSSProperties;
+  }
+
   const demSeats = results.filter(
     (result) => result.simulatedControlParty === "democratic",
   ).length;
@@ -262,6 +280,8 @@ function groupResultsByState(results: LegislativeSeatResult[]) {
 export function SenateMap({
   results,
   selectedSeatId,
+  customStateCodes = new Set<string>(),
+  customSeatIds = new Set<string>(),
   onSelectSeat,
 }: SenateMapProps) {
   const mapCanvasRef = useRef<HTMLDivElement>(null);
@@ -390,6 +410,7 @@ export function SenateMap({
             <b className={styles.legendFlagged} />
             No active race / special flag
           </span>
+          <span><b className={styles.legendCustom} />Custom</span>
         </div>
       </div>
 
@@ -418,13 +439,22 @@ export function SenateMap({
 
                   return (
                     <path
-                      aria-label={`${shape.code} Senate seats`}
+                      aria-label={`${shape.code} Senate seats${
+                        customStateCodes.has(shape.code) ||
+                        stateResults.some((result) => customSeatIds.has(result.seat.id))
+                          ? ", custom assumptions"
+                          : ""
+                      }`}
                       className={styles.stateShape}
                       d={shape.path}
                       data-flipped={hasFlippedSeat(stateResults)}
                       data-no-active-race={!hasActiveCycleRace(stateResults)}
                       data-selected={shape.code === selectedStateCode}
                       data-special-election={hasSpecialElection(stateResults)}
+                      data-custom={
+                        customStateCodes.has(shape.code) ||
+                        stateResults.some((result) => customSeatIds.has(result.seat.id))
+                      }
                       key={shape.code}
                       onClick={() => selectState(shape.code)}
                       onKeyDown={(event) => handleStateKeyDown(event, shape.code)}
@@ -477,6 +507,10 @@ export function SenateMap({
                   aria-label={`Select ${stateCode} Senate seats`}
                   className={styles.smallStateButton}
                   data-selected={stateCode === selectedStateCode}
+                  data-custom={
+                    customStateCodes.has(stateCode) ||
+                    stateResults.some((result) => customSeatIds.has(result.seat.id))
+                  }
                   key={stateCode}
                   onClick={() => selectState(stateCode)}
                   style={stateResults.length ? getStateStyle(stateResults) : undefined}
@@ -541,6 +575,10 @@ export function SenateMap({
                 data-selected={result.seat.id === selectedSeatId}
                 data-special-election={result.seat.specialElection}
                 data-up-next={"upNextCycle" in result.seat && result.seat.upNextCycle}
+                data-custom={
+                  customSeatIds.has(result.seat.id) ||
+                  customStateCodes.has(result.seat.stateCode)
+                }
                 key={result.seat.id}
                 onClick={() => onSelectSeat(result.seat.id)}
                 type="button"

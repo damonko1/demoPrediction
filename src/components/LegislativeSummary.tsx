@@ -10,11 +10,13 @@ import type {
   LegislativeScenarioResult,
   LegislativeSeatResult,
   Party,
+  ScenarioResult,
 } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
 type LegislativeSummaryProps = {
   scenario: LegislativeScenarioResult;
+  presidentialScenario?: ScenarioResult;
 };
 
 type SensitivityListItem = {
@@ -113,8 +115,12 @@ function formatDriverLabel(driver: LegislativeAssumptionDriver) {
     return "National swing";
   }
 
-  if (driver.id === "localOverride") {
-    return "Local override";
+  if (driver.id.startsWith("state")) {
+    return "State override";
+  }
+
+  if (driver.id.startsWith("local")) {
+    return "Local seat override";
   }
 
   return driver.label
@@ -386,6 +392,127 @@ function getSenateStatePressureRows(
     }));
 }
 
+function getSenateTippingPointRows(
+  scenario: LegislativeScenarioResult,
+): SensitivityListItem[] {
+  const leader = getControlLeader(scenario);
+  const seats = leader
+    ? scenario.seats.filter((result) => result.simulatedControlParty === leader)
+    : scenario.seats;
+
+  return [...seats]
+    .sort((left, right) => left.marginToFlip - right.marginToFlip)
+    .slice(0, 8)
+    .map((result) => ({
+      id: `${result.seat.id}-senate-tipping`,
+      label: getSeatName(result),
+      subLabel: result.seat.stateName,
+      detail: leader
+        ? `${formatPartyShort(leader)} buffer ${result.marginToFlip.toFixed(1)} pts`
+        : `Pivot ${result.marginToFlip.toFixed(1)} pts`,
+    }));
+}
+
+function pickSenateComparisonSeat(results: LegislativeSeatResult[]) {
+  return [...results].sort((left, right) => {
+    const leftUpNext = "upNextCycle" in left.seat && left.seat.upNextCycle;
+    const rightUpNext = "upNextCycle" in right.seat && right.seat.upNextCycle;
+
+    if (leftUpNext !== rightUpNext) {
+      return leftUpNext ? -1 : 1;
+    }
+
+    return left.marginToFlip - right.marginToFlip;
+  })[0];
+}
+
+function getSenateDivergenceRows(
+  scenario: LegislativeScenarioResult,
+  presidentialScenario?: ScenarioResult,
+): SensitivityListItem[] {
+  if (!presidentialScenario) {
+    return [];
+  }
+
+  const presidentialWinnerByState = new Map(
+    presidentialScenario.states.map((result) => [
+      result.state.code,
+      result.simulatedWinner,
+    ]),
+  );
+  const senateResultsByState = new Map<string, LegislativeSeatResult[]>();
+
+  scenario.seats.forEach((result) => {
+    const stateResults = senateResultsByState.get(result.seat.stateCode) ?? [];
+    stateResults.push(result);
+    senateResultsByState.set(result.seat.stateCode, stateResults);
+  });
+
+  return [...senateResultsByState.values()]
+    .map((stateResults) => {
+      const senateResult = pickSenateComparisonSeat(stateResults);
+      const presidentialWinner = presidentialWinnerByState.get(
+        senateResult.seat.stateCode,
+      );
+
+      if (!presidentialWinner || presidentialWinner === senateResult.simulatedControlParty) {
+        return null;
+      }
+
+      return {
+        id: `${senateResult.seat.stateCode}-presidential-divergence`,
+        label: senateResult.seat.stateName,
+        subLabel: `President ${formatPartyShort(presidentialWinner)}`,
+        detail: `Senate ${formatPartyShort(senateResult.simulatedControlParty)} / Class ${
+          "senateClass" in senateResult.seat ? senateResult.seat.senateClass : "-"
+        }`,
+      };
+    })
+    .filter((row): row is SensitivityListItem => row !== null)
+    .sort((left, right) => left.label.localeCompare(right.label))
+    .slice(0, 8);
+}
+
+function getSenateTieBreakRows(
+  scenario: LegislativeScenarioResult,
+): SensitivityListItem[] {
+  const democraticSeats = scenario.controlTotals.democratic;
+  const republicanSeats = scenario.controlTotals.republican;
+  const outrightControl =
+    democraticSeats >= scenario.majorityThreshold
+      ? "Democratic control"
+      : republicanSeats >= scenario.majorityThreshold
+        ? "Republican control"
+        : "No outright control";
+
+  return [
+    {
+      id: "senate-outright-control",
+      label: "Outright control",
+      subLabel: `${scenario.majorityThreshold}-seat threshold`,
+      detail: outrightControl,
+    },
+    {
+      id: "senate-democratic-vp",
+      label: "D vice-president",
+      subLabel: "50 seats can organize",
+      detail:
+        democraticSeats >= 50
+          ? "Democratic control"
+          : `${50 - democraticSeats} short`,
+    },
+    {
+      id: "senate-republican-vp",
+      label: "R vice-president",
+      subLabel: "50 seats can organize",
+      detail:
+        republicanSeats >= 50
+          ? "Republican control"
+          : `${50 - republicanSeats} short`,
+    },
+  ];
+}
+
 function RankedSeatList({
   emptyText,
   items,
@@ -440,7 +567,10 @@ function RankedTextList({
   );
 }
 
-export function LegislativeSummary({ scenario }: LegislativeSummaryProps) {
+export function LegislativeSummary({
+  presidentialScenario,
+  scenario,
+}: LegislativeSummaryProps) {
   const chamberLabel = getChamberLabel(scenario);
   const demShift =
     scenario.controlTotals.democratic - scenario.baselineControlTotals.democratic;
@@ -469,6 +599,15 @@ export function LegislativeSummary({ scenario }: LegislativeSummaryProps) {
   const senateStatePressureRows = scenario.chamber === "senate"
     ? getSenateStatePressureRows(scenario)
     : [];
+  const senateTippingPointRows = scenario.chamber === "senate"
+    ? getSenateTippingPointRows(scenario)
+    : [];
+  const senateDivergenceRows = scenario.chamber === "senate"
+    ? getSenateDivergenceRows(scenario, presidentialScenario)
+    : [];
+  const senateTieBreakRows = scenario.chamber === "senate"
+    ? getSenateTieBreakRows(scenario)
+    : [];
   const closestLabel = scenario.chamber === "house"
     ? "Closest districts"
     : "Closest Senate seats";
@@ -481,7 +620,7 @@ export function LegislativeSummary({ scenario }: LegislativeSummaryProps) {
       <div className={styles.panelHeader}>
         <div>
           <p className={styles.sectionKicker}>{chamberLabel} summary</p>
-          <h2>{scenario.chamber === "house" ? "Sensitivity view" : "What changed"}</h2>
+          <h2>Sensitivity view</h2>
         </div>
         <span className={styles.summaryPill}>
           {formatSwing(scenario.assumptions.nationalSwing)}
@@ -616,6 +755,50 @@ export function LegislativeSummary({ scenario }: LegislativeSummaryProps) {
                 emptyText="No held Senate seats available."
                 items={senateNotUpCycleSeats}
                 renderDetail={(result) => formatMargin(result.simulatedMargin)}
+              />
+            </div>
+
+            <div className={styles.sensitivityBlock}>
+              <div className={styles.sensitivityBlockHeader}>
+                <span>Tipping-point seats</span>
+                <strong>Control</strong>
+              </div>
+              <RankedTextList
+                emptyText="No Senate tipping-point seats available."
+                items={senateTippingPointRows}
+              />
+            </div>
+
+            <div className={styles.sensitivityBlock}>
+              <div className={styles.sensitivityBlockHeader}>
+                <span>Biggest assumption effect</span>
+                <strong>Driver</strong>
+              </div>
+              <RankedTextList
+                emptyText="No nonzero assumption effects in this scenario."
+                items={biggestAssumptionRows}
+              />
+            </div>
+
+            <div className={styles.sensitivityBlock}>
+              <div className={styles.sensitivityBlockHeader}>
+                <span>President/Senate divergence</span>
+                <strong>State</strong>
+              </div>
+              <RankedTextList
+                emptyText="No simulated presidential and Senate divergences."
+                items={senateDivergenceRows}
+              />
+            </div>
+
+            <div className={styles.sensitivityBlock}>
+              <div className={styles.sensitivityBlockHeader}>
+                <span>VP tie-break context</span>
+                <strong>Control</strong>
+              </div>
+              <RankedTextList
+                emptyText="No Senate control context available."
+                items={senateTieBreakRows}
               />
             </div>
 

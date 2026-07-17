@@ -4,14 +4,20 @@ import {
   formatPartyShort,
   formatSignedPoints,
 } from "@/lib/format";
+import { StateOverrideControls } from "@/components/LocalOverrideControls";
+import { hasStateOverride } from "@/lib/localOverrides";
 import type {
   ScenarioAssumptionDriver,
+  StateOverride,
   StateScenarioResult,
 } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
 type StateDetailPanelProps = {
   result: StateScenarioResult;
+  stateOverride?: StateOverride;
+  onStateOverrideChange: (value: StateOverride) => void;
+  onStateOverrideReset: () => void;
 };
 
 function formatDriverDelta(delta: number) {
@@ -29,7 +35,12 @@ function formatDriverDetail(driver: ScenarioAssumptionDriver) {
   return `${direction}, ${weight} state weight`;
 }
 
-export function StateDetailPanel({ result }: StateDetailPanelProps) {
+export function StateDetailPanel({
+  onStateOverrideChange,
+  onStateOverrideReset,
+  result,
+  stateOverride,
+}: StateDetailPanelProps) {
   const flippedLabel = result.flipped
     ? `Flipped to ${formatParty(result.simulatedWinner)}`
     : "No flip";
@@ -38,6 +49,7 @@ export function StateDetailPanel({ result }: StateDetailPanelProps) {
     .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
     .slice(0, 3);
   const hasSplitElectoralVotes = result.splitElectoralVotes.length > 1;
+  const isCustom = hasStateOverride(stateOverride);
 
   return (
     <section className={styles.panel} aria-label="Selected state details">
@@ -46,9 +58,14 @@ export function StateDetailPanel({ result }: StateDetailPanelProps) {
           <p className={styles.sectionKicker}>Selected state</p>
           <h2>{result.state.name}</h2>
         </div>
-        <span className={result.flipped ? styles.flipBadge : styles.steadyBadge}>
-          {flippedLabel}
-        </span>
+        <div className={styles.panelActions}>
+          {isCustom ? (
+            <span className={styles.customOverrideBadge}>Custom state</span>
+          ) : null}
+          <span className={result.flipped ? styles.flipBadge : styles.steadyBadge}>
+            {flippedLabel}
+          </span>
+        </div>
       </div>
 
       <div className={styles.detailGrid}>
@@ -95,6 +112,13 @@ export function StateDetailPanel({ result }: StateDetailPanelProps) {
         <span>Distance from flipping</span>
         <strong>{result.marginToFlip.toFixed(1)} pts</strong>
       </div>
+
+      <StateOverrideControls
+        stateName={result.state.name}
+        value={stateOverride}
+        onChange={onStateOverrideChange}
+        onReset={onStateOverrideReset}
+      />
 
       {hasSplitElectoralVotes ? (
         <div className={styles.splitEvDetail}>

@@ -43,7 +43,6 @@ export function SwingSlider({
           max={maxSwing}
           min={minSwing}
           onChange={(event) => onChange(Number(event.target.value))}
-          onInput={(event) => onChange(Number(event.currentTarget.value))}
           step={0.5}
           style={{ "--slider-position": `${sliderPosition}%` } as CSSProperties}
           type="range"

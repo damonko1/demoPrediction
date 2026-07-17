@@ -37,6 +37,7 @@ function calculateAssumptionDrivers(
 ): ScenarioAssumptionDriver[] {
   const demographicAssumptions = getScenarioDemographics(assumptions);
   const demographicWeights = getDemographicWeightsForState(state);
+  const stateOverride = assumptions.stateOverrides?.[state.code];
 
   return [
     {
@@ -58,6 +59,31 @@ function calculateAssumptionDrivers(
         delta: value * weight,
       };
     }),
+    ...(stateOverride
+      ? [
+          {
+            id: "stateTurnout" as const,
+            label: "State turnout override",
+            value: stateOverride.turnout,
+            weight: 1,
+            delta: stateOverride.turnout,
+          },
+          {
+            id: "statePartisanShift" as const,
+            label: "State partisan shift",
+            value: stateOverride.partisanShift,
+            weight: 1,
+            delta: stateOverride.partisanShift,
+          },
+          {
+            id: "stateCandidateQuality" as const,
+            label: "State candidate quality",
+            value: stateOverride.candidateQuality,
+            weight: 1,
+            delta: stateOverride.candidateQuality,
+          },
+        ]
+      : []),
   ];
 }
 
@@ -144,7 +170,10 @@ function calculateStateResult(
 ): StateScenarioResult {
   const assumptionDrivers = calculateAssumptionDrivers(state, assumptions);
   const demographicDelta = assumptionDrivers
-    .filter((driver) => driver.id !== "nationalSwing")
+    .filter((driver) => demographicSliderConfigs.some((config) => config.id === driver.id))
+    .reduce((total, driver) => total + driver.delta, 0);
+  const overrideAdjustment = assumptionDrivers
+    .filter((driver) => driver.id.startsWith("state"))
     .reduce((total, driver) => total + driver.delta, 0);
   const totalAdjustment = sumDriverDeltas(assumptionDrivers);
   const simulatedMargin = state.baselineMargin + totalAdjustment;
@@ -164,6 +193,7 @@ function calculateStateResult(
     marginToFlip: Math.abs(simulatedMargin),
     totalAdjustment,
     demographicDelta,
+    overrideAdjustment,
     assumptionDrivers,
   };
 }
@@ -184,6 +214,7 @@ function calculateBaselineStateResult(state: StateBaseline): StateScenarioResult
     marginToFlip: Math.abs(state.baselineMargin),
     totalAdjustment: 0,
     demographicDelta: 0,
+    overrideAdjustment: 0,
     assumptionDrivers: [],
   };
 }

@@ -196,6 +196,65 @@
   text-transform: uppercase;
 }
 
+.nationalShareCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 9px;
+  padding: 10px 11px;
+  border: 1px solid rgba(37, 126, 145, 0.14);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.nationalShareCard > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.nationalShareCard span,
+.nationalShareCard small {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.nationalShareCard span {
+  text-transform: uppercase;
+}
+
+.nationalShareCard strong {
+  color: #123442;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.nationalShareCard > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.nationalShareCard button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid rgba(37, 126, 145, 0.2);
+  border-radius: 6px;
+  color: #1c6070;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.nationalShareCard button:disabled {
+  opacity: 0.46;
+  cursor: default;
+}
+
 .unifiedSummaryGrid strong {
   overflow-wrap: anywhere;
   color: #123442;
@@ -661,6 +720,11 @@
     );
 }
 
+.legendCustom {
+  border: 1px dashed #d89621;
+  background: #fff0c9;
+}
+
 .mapViewport {
   position: relative;
   overflow: auto;
@@ -749,6 +813,12 @@
 
 .stateShape[data-flipped="true"] {
   stroke-dasharray: 3 2;
+}
+
+.stateShape[data-custom="true"] {
+  stroke: #d89621;
+  stroke-width: 2.2;
+  stroke-dasharray: 5 2;
 }
 
 .stateShape[data-no-active-race="true"] {
@@ -1069,6 +1139,12 @@
   stroke-width: 1.2;
 }
 
+.houseDistrictShape[data-custom="true"] {
+  stroke: #d89621;
+  stroke-width: 1.8;
+  stroke-dasharray: 3 1.5;
+}
+
 .houseDistrictShape[data-selected="true"] {
   filter:
     drop-shadow(0 0 8px rgba(0, 168, 124, 0.34))
@@ -1169,6 +1245,12 @@
 
 .houseFocusButton[data-flipped="true"] {
   box-shadow: inset 0 0 0 1px rgba(216, 148, 33, 0.88);
+}
+
+.houseFocusButton[data-custom="true"],
+.senateSeatButton[data-custom="true"],
+.smallStateButton[data-custom="true"] {
+  box-shadow: inset 0 0 0 2px rgba(216, 150, 33, 0.92);
 }
 
 .houseFocusButton[data-low-data="true"] span,
@@ -1921,6 +2003,153 @@
   margin-top: 10px;
   padding: 11px;
   background: rgba(255, 255, 255, 0.34);
+}
+
+.localOverridePanel {
+  display: grid;
+  gap: 11px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(37, 126, 145, 0.18);
+  background: rgba(240, 249, 250, 0.72);
+}
+
+.localOverrideHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.localOverrideHeader > div {
+  display: grid;
+  gap: 3px;
+}
+
+.localOverrideHeader span,
+.localOverrideSelect > span {
+  color: #5d7781;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.localOverrideHeader strong {
+  color: #123442;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.customOverrideBadge,
+.defaultOverrideBadge {
+  padding: 5px 7px;
+  border-radius: 999px;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.customOverrideBadge {
+  color: #8a4b00 !important;
+  background: #fff0c9;
+}
+
+.defaultOverrideBadge {
+  color: #397066 !important;
+  background: #dcf2ec;
+}
+
+.localOverridePanel > p {
+  margin: 0;
+  color: #55717b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.localOverrideField {
+  display: grid;
+  gap: 7px;
+}
+
+.localOverrideField > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.localOverrideField b,
+.localOverrideField strong {
+  color: #123442;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.localOverrideField small {
+  color: #68838d;
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.localOverrideSelect {
+  display: grid;
+  gap: 6px;
+}
+
+.localOverrideSelect select {
+  width: 100%;
+  padding: 8px 9px;
+  border: 1px solid rgba(37, 126, 145, 0.24);
+  border-radius: 6px;
+  color: #123442;
+  background: rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.localOverridePanel > button {
+  justify-self: start;
+  padding: 7px 9px;
+  border: 1px solid rgba(37, 126, 145, 0.22);
+  border-radius: 6px;
+  color: #1c6070;
+  background: rgba(255, 255, 255, 0.78);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.localOverridePanel > button:disabled {
+  opacity: 0.46;
+  cursor: default;
+}
+
+.dataCompletenessNote {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-left: 3px solid #d89621;
+  color: #6d4b13;
+  background: rgba(255, 239, 199, 0.64);
+}
+
+.dataCompletenessNote strong {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.dataCompletenessNote span {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .splitEvDetail {
@@ -4739,6 +4968,27 @@
     var(--surface-soft);
 }
 
+.shell[data-theme="dark"] .localOverridePanel,
+.shell[data-theme="dark"] .nationalShareCard {
+  border-color: rgba(142, 211, 224, 0.18);
+  background: rgba(14, 34, 44, 0.72);
+}
+
+.shell[data-theme="dark"] .localOverrideHeader strong,
+.shell[data-theme="dark"] .localOverrideField b,
+.shell[data-theme="dark"] .localOverrideField strong,
+.shell[data-theme="dark"] .nationalShareCard strong {
+  color: #f2f7fb;
+}
+
+.shell[data-theme="dark"] .localOverrideSelect select,
+.shell[data-theme="dark"] .localOverridePanel > button,
+.shell[data-theme="dark"] .nationalShareCard button {
+  color: #d9edf2;
+  border-color: rgba(142, 211, 224, 0.2);
+  background: rgba(21, 49, 61, 0.9);
+}
+
 @media (max-width: 760px) {
   .header h2 {
     font-size: 24px;
@@ -4763,5 +5013,14 @@
 
   .houseDistrictMap {
     min-width: 0;
+  }
+
+  .nationalShareCard {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nationalShareCard > div:last-child {
+    justify-content: flex-start;
   }
 }

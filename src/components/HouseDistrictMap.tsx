@@ -19,6 +19,8 @@ import styles from "@/components/Playground.module.css";
 type HouseDistrictMapProps = {
   results: LegislativeSeatResult[];
   selectedSeatId: string;
+  customStateCodes?: ReadonlySet<string>;
+  customSeatIds?: ReadonlySet<string>;
   onSelectSeat: (seatId: string) => void;
 };
 
@@ -236,6 +238,8 @@ function shouldShowDistrictLabel({
 export function HouseDistrictMap({
   results,
   selectedSeatId,
+  customStateCodes = new Set<string>(),
+  customSeatIds = new Set<string>(),
   onSelectSeat,
 }: HouseDistrictMapProps) {
   const [mapAsset, setMapAsset] = useState<HouseDistrictMapAsset | null>(null);
@@ -360,6 +364,7 @@ export function HouseDistrictMap({
           <span><b className={styles.legendLikely} />Likely</span>
           <span><b className={styles.legendSafe} />Safe</span>
           <span><b className={styles.legendFlagged} />Flagged</span>
+          <span><b className={styles.legendCustom} />Custom</span>
         </div>
       </div>
 
@@ -376,7 +381,7 @@ export function HouseDistrictMap({
             <option value={nationalStateCode}>National</option>
             {groups.map((group) => (
               <option key={group.stateCode} value={group.stateCode}>
-                {group.stateName} ({group.results.length})
+                {group.stateName} ({group.results.length}){customStateCodes.has(group.stateCode) ? " · Custom" : ""}
               </option>
             ))}
           </select>
@@ -397,7 +402,7 @@ export function HouseDistrictMap({
           >
             {selectorGroup?.results.map((result) => (
               <option key={result.seat.id} value={result.seat.id}>
-                {getDistrictSelectLabel(result)}
+                {getDistrictSelectLabel(result)}{customSeatIds.has(result.seat.id) ? " / custom" : ""}
               </option>
             ))}
           </select>
@@ -505,7 +510,12 @@ export function HouseDistrictMap({
 
                   return (
                     <path
-                      aria-label={getDistrictAriaLabel(result)}
+                      aria-label={`${getDistrictAriaLabel(result)}${
+                        customSeatIds.has(result.seat.id) ||
+                        customStateCodes.has(result.seat.stateCode)
+                          ? ", custom assumptions"
+                          : ""
+                      }`}
                       aria-pressed={result.seat.id === selectedSeatId}
                       className={styles.houseDistrictShape}
                       d={district.path}
@@ -515,6 +525,10 @@ export function HouseDistrictMap({
                       data-selected={result.seat.id === selectedSeatId}
                       data-uncontested={result.seat.uncontested}
                       data-flagged={flags.length > 0}
+                      data-custom={
+                        customSeatIds.has(result.seat.id) ||
+                        customStateCodes.has(result.seat.stateCode)
+                      }
                       fillRule="evenodd"
                       key={district.id}
                       onClick={() => selectDistrict(result)}
@@ -615,6 +629,10 @@ export function HouseDistrictMap({
                 data-low-data={result.seat.lowData}
                 data-selected={result.seat.id === selectedSeatId}
                 data-uncontested={result.seat.uncontested}
+                data-custom={
+                  customSeatIds.has(result.seat.id) ||
+                  customStateCodes.has(result.seat.stateCode)
+                }
                 key={result.seat.id}
                 onClick={() => selectDistrict(result)}
                 onPointerEnter={() => setHoveredSeatId(result.seat.id)}

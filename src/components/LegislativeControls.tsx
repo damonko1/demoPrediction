@@ -7,8 +7,8 @@ import { ResetButton } from "@/components/ResetButton";
 import { SwingSlider } from "@/components/SwingSlider";
 import {
   defaultLegislativeSliderAssumptions,
+  getLegislativeSliderConfigsForChamber,
   legislativeSliderBounds,
-  legislativeSliderConfigs,
 } from "@/data/legislativeSliders";
 import { formatSignedPoints, formatSwing } from "@/lib/format";
 import type {
@@ -34,7 +34,7 @@ type LegislativeControlsProps = {
 
 type CopyStatus = "idle" | "copied" | "failed";
 
-type HousePreset = {
+type LegislativePreset = {
   label: string;
   summary: string;
   assumptions: LegislativeAssumptions;
@@ -63,12 +63,12 @@ const chamberPresets = [
   },
 ] as const;
 
-function createHousePreset(
+function createLegislativePreset(
   label: string,
   summary: string,
   nationalSwing: number,
   sliders: Partial<Record<LegislativeSliderId, number>> = {},
-): HousePreset {
+): LegislativePreset {
   return {
     label,
     summary,
@@ -87,10 +87,10 @@ function createHousePreset(
   };
 }
 
-const housePresets: HousePreset[] = [
-  createHousePreset("Generic blue wave", "D +5 national House swing", 5),
-  createHousePreset("Generic red wave", "R +5 national House swing", -5),
-  createHousePreset(
+const housePresets: LegislativePreset[] = [
+  createLegislativePreset("Generic blue wave", "D +5 national House swing", 5),
+  createLegislativePreset("Generic red wave", "R +5 national House swing", -5),
+  createLegislativePreset(
     "Suburban backlash",
     "Suburbs and college districts shift R",
     0,
@@ -100,12 +100,12 @@ const housePresets: HousePreset[] = [
       candidateQuality: -1.5,
     },
   ),
-  createHousePreset("Rural surge", "Rural and non-college districts shift R", 0, {
+  createLegislativePreset("Rural surge", "Rural and non-college districts shift R", 0, {
     genericTurnout: -2,
     ruralDistrictShift: -6,
     nonCollegeDistrictShift: -4,
   }),
-  createHousePreset(
+  createLegislativePreset(
     "Incumbent protection",
     "Incumbents and open-seat baselines are protected",
     0,
@@ -115,7 +115,7 @@ const housePresets: HousePreset[] = [
       antiIncumbentWave: -4,
     },
   ),
-  createHousePreset(
+  createLegislativePreset(
     "Anti-incumbent environment",
     "Incumbents are penalized across close districts",
     0,
@@ -125,20 +125,70 @@ const housePresets: HousePreset[] = [
       antiIncumbentWave: 6,
     },
   ),
-  createHousePreset("Presidential coattails", "D +4 downballot pull", 1, {
+  createLegislativePreset("Presidential coattails", "D +4 downballot pull", 1, {
     genericTurnout: 1,
     presidentialCoattails: 4,
   }),
-  createHousePreset("Split-ticket House", "House moves against coattails", -2, {
+  createLegislativePreset("Split-ticket House", "House moves against coattails", -2, {
     incumbencyAdvantage: 2,
     candidateQuality: -2,
     presidentialCoattails: -4,
   }),
-  createHousePreset("Reset to baseline", "Return to sourced district margins", 0),
+  createLegislativePreset("Reset to baseline", "Return to sourced district margins", 0),
+];
+
+const senatePresets: LegislativePreset[] = [
+  createLegislativePreset("Generic blue Senate wave", "D +5 national Senate swing", 5),
+  createLegislativePreset("Generic red Senate wave", "R +5 national Senate swing", -5),
+  createLegislativePreset("Strong incumbent year", "Incumbents are protected", 0, {
+    incumbencyAdvantage: 5,
+    antiIncumbentWave: -3,
+  }),
+  createLegislativePreset(
+    "Anti-incumbent Senate year",
+    "Incumbents are penalized in competitive states",
+    0,
+    {
+      incumbencyAdvantage: -4,
+      antiIncumbentWave: 6,
+      candidateQuality: -1,
+    },
+  ),
+  createLegislativePreset("Presidential coattails", "D +4 Senate coattail pull", 1, {
+    presidentialCoattails: 4,
+    statePartisanshipElasticity: 2,
+  }),
+  createLegislativePreset("Split-ticket Senate", "Senate moves against coattails", -2, {
+    presidentialCoattails: -4,
+    candidateQuality: -2,
+    independentVoteShift: -2,
+  }),
+  createLegislativePreset("Rural surge", "Rural states and turnout shift R", 0, {
+    genericTurnout: -2,
+    ruralDistrictShift: -6,
+    independentVoteShift: -1.5,
+  }),
+  createLegislativePreset("Suburban shift", "Suburban states and independents shift D", 0, {
+    suburbanDistrictShift: 5,
+    independentVoteShift: 3,
+  }),
+  createLegislativePreset("Reset to baseline", "Return to sourced Senate margins", 0),
 ];
 
 function getChamberTitle(chamber: LegislativeChamber) {
   return chamber === "house" ? "House" : "Senate";
+}
+
+function getChamberEnvironmentLabel(chamber: LegislativeChamber) {
+  return chamber === "house" ? "District environment" : "State and race environment";
+}
+
+function getPresetLibraryTitle(chamber: LegislativeChamber) {
+  return chamber === "house" ? "House preset library" : "Senate preset library";
+}
+
+function getPresetsForChamber(chamber: LegislativeChamber) {
+  return chamber === "house" ? housePresets : senatePresets;
 }
 
 function formatSliderValue(value: number) {
@@ -187,7 +237,6 @@ function LegislativeHeuristicSlider({
           max={legislativeSliderBounds.max}
           min={legislativeSliderBounds.min}
           onChange={(event) => onChange(Number(event.target.value))}
-          onInput={(event) => onChange(Number(event.currentTarget.value))}
           step={legislativeSliderBounds.step}
           style={
             { "--slider-position": `${getSliderPosition(value)}%` } as CSSProperties
@@ -230,11 +279,18 @@ export function LegislativeControls({
     ...defaultLegislativeSliderAssumptions,
     ...assumptions.sliders,
   };
-  const isAtDefault = Math.abs(assumptions.nationalSwing) < 0.05 &&
-    Object.values(sliderAssumptions).every((value) => Math.abs(value) < 0.05);
   const chamberTitle = getChamberTitle(chamber);
-  const showHouseSliders = chamber === "house" && onSliderChange;
-  const showHousePresets = chamber === "house" && onApplyAssumptions;
+  const chamberSliderConfigs = getLegislativeSliderConfigsForChamber(chamber);
+  const hasChamberOverrides = chamber === "house"
+    ? Object.keys(assumptions.overrides.districts).length > 0
+    : Object.keys(assumptions.overrides.races).length > 0;
+  const isAtDefault = Math.abs(assumptions.nationalSwing) < 0.05 &&
+    chamberSliderConfigs.every(
+      (config) => Math.abs(sliderAssumptions[config.id]) < 0.05,
+    ) && !hasChamberOverrides;
+  const showChamberSliders = Boolean(onSliderChange && chamberSliderConfigs.length);
+  const showPresetLibrary = Boolean(onApplyAssumptions);
+  const chamberPresetsForLibrary = getPresetsForChamber(chamber);
 
   useEffect(() => {
     return () => {
@@ -308,21 +364,21 @@ export function LegislativeControls({
         onChange={onNationalSwingChange}
       />
 
-      {showHouseSliders ? (
+      {showChamberSliders ? (
         <details className={styles.optionDisclosure}>
           <summary>
             <div>
-              <p className={styles.sectionKicker}>House heuristic sliders</p>
-              <h3>District environment</h3>
+              <p className={styles.sectionKicker}>{chamberTitle} heuristic sliders</p>
+              <h3>{getChamberEnvironmentLabel(chamber)}</h3>
             </div>
-            <span>{legislativeSliderConfigs.length} inputs</span>
+            <span>{chamberSliderConfigs.length} inputs</span>
           </summary>
 
           <div className={styles.optionDisclosureBody}>
             <div className={styles.demographicControls}>
               {presidentialAssumptions && onApplyPresidentAssumptions ? (
                 <button
-                  aria-label="Apply President tab demographic assumptions to House sliders"
+                  aria-label={`Apply President tab demographic assumptions to ${chamberTitle} sliders`}
                   className={styles.presetButton}
                   onClick={onApplyPresidentAssumptions}
                   type="button"
@@ -331,8 +387,8 @@ export function LegislativeControls({
                   <span>
                     <b>Use President demographics</b>
                     <small>
-                      Copy turnout, suburban, rural, college, non-college, and
-                      coattail assumptions into House heuristics
+                      Copy turnout, suburban, rural, independent, and coattail
+                      assumptions into {chamberTitle} heuristics
                     </small>
                   </span>
                 </button>
@@ -341,19 +397,19 @@ export function LegislativeControls({
               <div className={styles.simulationDisclaimer}>
                 <Info size={14} strokeWidth={2.2} />
                 <p>
-                  House heuristic sliders are not sourced forecasts. They apply
-                  transparent state and district weights to the sourced election
-                  baseline so similarly sized slider moves can affect districts
-                  differently.
+                  {chamberTitle} heuristic sliders are not sourced forecasts.
+                  They apply transparent state and race weights to the sourced
+                  election baseline so similarly sized slider moves can affect
+                  seats differently.
                 </p>
               </div>
 
-              {legislativeSliderConfigs.map((config) => (
+              {chamberSliderConfigs.map((config) => (
                 <LegislativeHeuristicSlider
                   config={config}
                   key={config.id}
                   value={sliderAssumptions[config.id]}
-                  onChange={(value) => onSliderChange(config.id, value)}
+                  onChange={(value) => onSliderChange?.(config.id, value)}
                 />
               ))}
             </div>
@@ -365,20 +421,31 @@ export function LegislativeControls({
         <summary>
           <div>
             <p className={styles.sectionKicker}>Scenario presets</p>
-            <h3>{showHousePresets ? "House preset library" : "Chamber stress tests"}</h3>
+            <h3>{showPresetLibrary ? getPresetLibraryTitle(chamber) : "Chamber stress tests"}</h3>
           </div>
           <span>{formatSwing(assumptions.nationalSwing)}</span>
         </summary>
 
         <div className={styles.optionDisclosureBody}>
           <div className={styles.presetGrid}>
-            {showHousePresets
-              ? housePresets.map((preset) => (
+            {showPresetLibrary
+              ? chamberPresetsForLibrary.map((preset) => (
                   <button
                     aria-label={`Apply ${preset.label} preset`}
                     className={styles.presetButton}
                     key={preset.label}
-                    onClick={() => onApplyAssumptions(preset.assumptions)}
+                    onClick={() =>
+                      onApplyAssumptions?.({
+                        ...preset.assumptions,
+                        overrides: preset.label === "Reset to baseline"
+                          ? {
+                              states: assumptions.overrides.states,
+                              districts: {},
+                              races: {},
+                            }
+                          : assumptions.overrides,
+                      })
+                    }
                     type="button"
                   >
                     {preset.label === "Reset to baseline" ? (
@@ -407,7 +474,7 @@ export function LegislativeControls({
                     </span>
                   </button>
                 ))}
-            {!showHousePresets ? (
+            {!showPresetLibrary ? (
               <button
                 aria-label={`Reset ${chamberTitle} chamber swing`}
                 className={styles.presetButton}

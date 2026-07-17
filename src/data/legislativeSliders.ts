@@ -1,5 +1,6 @@
 import type {
   DemographicAssumptions,
+  LegislativeChamber,
   LegislativeSeatBaseline,
   LegislativeSliderAssumptions,
   LegislativeSliderConfig,
@@ -18,6 +19,8 @@ export const legislativeSliderIds = [
   "collegeEducatedDistrictShift",
   "nonCollegeDistrictShift",
   "presidentialCoattails",
+  "statePartisanshipElasticity",
+  "independentVoteShift",
   "antiIncumbentWave",
 ] as const satisfies readonly LegislativeSliderId[];
 
@@ -34,6 +37,7 @@ export const legislativeSliderBounds = {
 export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   {
     id: "genericTurnout",
+    chambers: ["house", "senate"],
     label: "Generic turnout",
     lowLabel: "R-leaning turnout",
     neutralLabel: "Neutral turnout",
@@ -44,6 +48,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "incumbencyAdvantage",
+    chambers: ["house", "senate"],
     label: "Incumbency advantage",
     lowLabel: "Weaker incumbents",
     neutralLabel: "No incumbency shift",
@@ -54,6 +59,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "openSeatPenalty",
+    chambers: ["house", "senate"],
     label: "Open-seat penalty",
     lowLabel: "Open seats protected",
     neutralLabel: "No open-seat shift",
@@ -64,6 +70,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "candidateQuality",
+    chambers: ["house", "senate"],
     label: "Candidate quality",
     lowLabel: "R candidate edge",
     neutralLabel: "No quality edge",
@@ -74,6 +81,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "suburbanDistrictShift",
+    chambers: ["house", "senate"],
     label: "Suburban district shift",
     lowLabel: "Suburbs shift R",
     neutralLabel: "No suburban shift",
@@ -84,6 +92,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "ruralDistrictShift",
+    chambers: ["house", "senate"],
     label: "Rural district shift",
     lowLabel: "Rural shift R",
     neutralLabel: "No rural shift",
@@ -94,6 +103,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "collegeEducatedDistrictShift",
+    chambers: ["house"],
     label: "College-educated district shift",
     lowLabel: "College districts shift R",
     neutralLabel: "No college shift",
@@ -104,6 +114,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "nonCollegeDistrictShift",
+    chambers: ["house"],
     label: "Non-college district shift",
     lowLabel: "Non-college shift R",
     neutralLabel: "No non-college shift",
@@ -114,6 +125,7 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
   },
   {
     id: "presidentialCoattails",
+    chambers: ["house", "senate"],
     label: "Presidential coattails",
     lowLabel: "R coattails",
     neutralLabel: "No coattails",
@@ -123,7 +135,30 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
     helperText: "A heuristic downballot coattail effect weighted by competitiveness.",
   },
   {
+    id: "statePartisanshipElasticity",
+    chambers: ["senate"],
+    label: "State partisanship elasticity",
+    lowLabel: "State lean R",
+    neutralLabel: "No state shift",
+    highLabel: "State lean D",
+    lowReadout: "State baseline shifts Republican",
+    highReadout: "State baseline shifts Democratic",
+    helperText: "Senate-specific state baseline stress test, strongest in competitive states.",
+  },
+  {
+    id: "independentVoteShift",
+    chambers: ["senate"],
+    label: "Independent vote shift",
+    lowLabel: "Independents shift R",
+    neutralLabel: "No independent shift",
+    highLabel: "Independents shift D",
+    lowReadout: "Independent vote shifts Republican",
+    highReadout: "Independent vote shifts Democratic",
+    helperText: "A Senate race stress test weighted by competitiveness and active-cycle status.",
+  },
+  {
     id: "antiIncumbentWave",
+    chambers: ["house", "senate"],
     label: "Anti-incumbent wave",
     lowLabel: "Incumbents protected",
     neutralLabel: "No wave",
@@ -133,6 +168,54 @@ export const legislativeSliderConfigs: LegislativeSliderConfig[] = [
     helperText: "Moves against current incumbents and has no effect in vacant seats.",
   },
 ];
+
+const senateSliderCopy: Partial<Record<LegislativeSliderId, LegislativeSliderConfig>> = {
+  genericTurnout: {
+    ...legislativeSliderConfigs[0],
+    label: "Turnout environment",
+    lowLabel: "R turnout edge",
+    neutralLabel: "Neutral turnout",
+    highLabel: "D turnout edge",
+    lowReadout: "Turnout environment tilts Republican",
+    highReadout: "Turnout environment tilts Democratic",
+    helperText: "Weighted by statewide vote volume, competitiveness, and low-data status.",
+  },
+  candidateQuality: {
+    ...legislativeSliderConfigs[3],
+    helperText: "Generic Senate candidate-quality stress test, strongest in competitive races.",
+  },
+  suburbanDistrictShift: {
+    ...legislativeSliderConfigs[4],
+    label: "Suburban shift",
+    lowReadout: "Suburban-heavy states shift Republican",
+    highReadout: "Suburban-heavy states shift Democratic",
+    helperText: "Uses state exposure plus race competitiveness as a rough Senate weight.",
+  },
+  ruralDistrictShift: {
+    ...legislativeSliderConfigs[5],
+    label: "Rural turnout",
+    lowReadout: "Rural-heavy states shift Republican",
+    highReadout: "Rural-heavy states shift Democratic",
+    helperText: "Uses rural-state exposure and Senate race competitiveness.",
+  },
+  antiIncumbentWave: {
+    ...legislativeSliderConfigs[11],
+    helperText: "Moves against current Senate incumbents and has no effect in vacant seats.",
+  },
+};
+
+export function getLegislativeSliderConfigsForChamber(
+  chamber: LegislativeChamber,
+): LegislativeSliderConfig[] {
+  return legislativeSliderConfigs
+    .filter((config) => config.chambers.includes(chamber))
+    .map((config) => {
+      const senateConfig =
+        chamber === "senate" ? senateSliderCopy[config.id] : undefined;
+
+      return senateConfig ?? config;
+    });
+}
 
 const highSuburbanStates = new Set<StateCode>([
   "AZ",
@@ -355,6 +438,17 @@ export function getLegislativeSliderWeight(
     return roundWeight(0.5 * competitive * lowData);
   }
 
+  if (id === "statePartisanshipElasticity") {
+    return roundWeight(0.46 * competitive * lowData);
+  }
+
+  if (id === "independentVoteShift") {
+    const activeCycleMultiplier =
+      "upNextCycle" in seat && !seat.upNextCycle ? 0.62 : 1;
+
+    return roundWeight(0.44 * competitive * lowData * activeCycleMultiplier);
+  }
+
   if (id === "antiIncumbentWave") {
     return roundWeight(-incumbentSign * 0.55 * competitive * lowData);
   }
@@ -387,6 +481,8 @@ export function getLegislativeAssumptionsFromPresident(
     ),
     nonCollegeDistrictShift: normalizeCopyValue(demographics.nonCollegeVoteShift),
     presidentialCoattails: normalizeCopyValue(presidentialSwing),
+    statePartisanshipElasticity: normalizeCopyValue(presidentialSwing / 2),
+    independentVoteShift: normalizeCopyValue(demographics.independentVoteShift),
     antiIncumbentWave: 0,
   };
 }
