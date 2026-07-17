@@ -16,7 +16,7 @@ Use the most official source that is still repeatable and machine-readable. When
 | Current Senate roster | Senate current senators page, Congress.gov, Bioguide | `unitedstates/congress-legislators` | Uses `legislators-current.yaml`; validate counts against Senate party division |
 | House election results | Clerk election statistics and state certifications | MIT House 1976-2024 | Uses MIT 2024 district returns |
 | Senate election results | Clerk election statistics, FEC/state certifications | MIT Senate statewide 1976-2024 | Uses MIT latest completed races by seat class |
-| House boundaries | Census TIGER/Line `cd119` and 119th block equivalency files | Census district maps, relationship files | Not ingested yet; current House map is a seat matrix |
+| House boundaries | Census cartographic boundary file for 119th Congressional Districts | Census TIGER/Line `cd119`, block equivalency, relationship files | Uses generated 1:20m 119th district map asset for all 435 voting districts |
 | Senate boundaries | Census state boundaries | Existing state TopoJSON | Current Senate map uses local state shapes |
 | District partisan baseline | The Downballot presidential-by-CD data or computed presidential returns by current CD | Cook PVI as a labeled external index | Not ingested yet |
 | State partisan baseline | MIT presidential state returns, FEC certified presidential results | Cook PVI state index | Presidential state baselines exist elsewhere in app; not wired into Senate seats yet |
@@ -30,6 +30,7 @@ Use the most official source that is still repeatable and machine-readable. When
 - Congress.gov API: `https://api.congress.gov/`
 - Biographical Directory of the U.S. Congress: `https://bioguide.congress.gov/`
 - Census congressional district files and maps: `https://www.census.gov/programs-surveys/decennial-census/about/rdo/congressional-districts.html`
+- Census 2025 cartographic boundary file, 119th Congressional Districts, 1:20m: `https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_cd119_20m.zip`
 - FEC election results and voting information: `https://www.fec.gov/introduction-campaign-finance/election-results-and-voting-information/`
 - MIT House 1976-2024: `https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2`
 - MIT Senate statewide 1976-2024: `https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PEJ5QU`
@@ -64,7 +65,10 @@ Validation:
 
 Current status:
 
-- Required but not complete. The app currently renders a House district matrix, not true district geography.
+- Complete for current 119th Congress rendering. `scripts/build-house-district-map.mjs` downloads the Census 2025 cartographic boundary shapefile, filters to the 435 voting districts, projects each district to SVG path data, and writes `public/us-house-districts-119-20m.json`.
+- Non-voting delegate districts are not rendered in the House control map; the generated asset records DC-AL and PR-AL separately under `nonVotingDelegateDistricts`.
+- `npm run validate:house-map` verifies source metadata, 435 voting paths, no duplicate IDs, no delegate districts in the voting map, finite path bounds/labels, and exact ID alignment with `houseDistrictBaselines`.
+- Still incomplete for cross-cycle district comparison. Block equivalency and redistricting relationship files are required before comparing district results across district plans.
 
 ### 2. Current Senate State Boundaries
 
@@ -385,7 +389,7 @@ A legislative dataset is calculation-ready only after these checks pass:
 
 Highest priority:
 
-- Add Census `cd119` boundary ingestion and validation for all 435 House districts.
+- Add Census block equivalency and district-plan relationship files for cross-cycle House comparisons.
 - Add explicit `incumbencyStatus`, `openSeat`, `incumbentRunning`, and `isIncumbent` candidate flags.
 - Add official-source validation against House Clerk and Senate party totals.
 - Add House `specialElection` fields instead of filtering specials out without downstream metadata.

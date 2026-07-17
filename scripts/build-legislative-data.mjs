@@ -1166,7 +1166,7 @@ export const senateSeatBaselines = ${formatAsConstObject(senateSeatBaselines)} s
     },
     limitations: [
       "The trusted-source reconciliation currently checks against MIT totalvotes, not a second official Clerk/state source.",
-      "True House district geometry and cross-cycle redistricting relationship files are not yet ingested.",
+      "Current 119th House district geometry is generated separately from Census cartographic boundaries; cross-cycle redistricting relationship files are not yet ingested.",
       "Open-seat and incumbent-running status for future races remain blocked until a sourced candidate filing or retirement dataset is added.",
     ],
   };

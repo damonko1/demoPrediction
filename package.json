@@ -8,7 +8,9 @@
     "start": "python3 -m http.server 3000 -d out",
     "typecheck": "tsc --noEmit",
     "build:historical-data": "node scripts/build-historical-data.mjs",
+    "build:house-map": "node scripts/build-house-district-map.mjs",
     "build:legislative-data": "node scripts/build-legislative-data.mjs",
+    "validate:house-map": "node scripts/validate-house-district-map.mjs",
     "validate:legislative-data": "node scripts/validate-legislative-data.mjs"
   },
   "dependencies": {
@@ -21,6 +23,8 @@
     "@types/node": "26.0.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
+    "d3-geo": "^3.1.1",
+    "shapefile": "^0.6.6",
     "typescript": "6.0.3"
   },
   "overrides": {
