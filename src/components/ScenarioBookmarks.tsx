@@ -56,15 +56,19 @@ export function ScenarioBookmarks({
   );
 
   useEffect(() => {
-    const storage = getBrowserStorage();
-    if (!storage) {
-      setStorageAvailable(false);
-      return;
-    }
+    const restoreFrame = window.requestAnimationFrame(() => {
+      const storage = getBrowserStorage();
+      if (!storage) {
+        setStorageAvailable(false);
+        return;
+      }
 
-    const savedBookmarks = readScenarioBookmarks(storage, storageKey);
-    setBookmarks(savedBookmarks);
-    setSelectedId(savedBookmarks[0]?.id ?? "");
+      const savedBookmarks = readScenarioBookmarks(storage, storageKey);
+      setBookmarks(savedBookmarks);
+      setSelectedId(savedBookmarks[0]?.id ?? "");
+    });
+
+    return () => window.cancelAnimationFrame(restoreFrame);
   }, [storageKey]);
 
   useEffect(() => {

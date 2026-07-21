@@ -23,6 +23,41 @@
     linear-gradient(250deg, rgba(104, 214, 142, 0.2), transparent 54%);
 }
 
+.skipLink {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border: 2px solid var(--accent, #087f68);
+  border-radius: 8px;
+  color: var(--ink, #123442);
+  background: var(--surface-raised, #ffffff);
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.18);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 24px));
+  transition: transform 140ms ease;
+}
+
+.skipLink:focus-visible {
+  outline: 3px solid var(--accent, #087f68);
+  outline-offset: 3px;
+  transform: translateY(0);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -796,10 +831,17 @@
 .presetButton:focus-visible,
 .mapSelectControl select:focus-visible,
 .themeSwitch button:focus-visible,
+.focusToggle:focus-visible,
+.simulationDockActions button:focus-visible,
+.houseZoomToolbar button:focus-visible,
+.optionDisclosure summary:focus-visible,
+.scenarioBookmarkDisclosure summary:focus-visible,
+.summaryDeepDive summary:focus-visible,
+.detailDisclosure summary:focus-visible,
 .modelDisclosure summary:focus-visible,
 .compactDisclosure summary:focus-visible,
 .swingSlider:focus-visible {
-  outline: 2px solid rgba(0, 127, 112, 0.36);
+  outline: 3px solid var(--accent, #087f68);
   outline-offset: 3px;
 }
 
@@ -967,11 +1009,15 @@
 .mapLoading {
   position: absolute;
   inset: 0;
+  z-index: 3;
   display: grid;
   place-items: center;
+  min-height: 140px;
+  padding: 18px;
   color: #55717b;
   font-size: 12px;
   font-weight: 850;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -1767,6 +1813,7 @@
   display: grid;
   align-items: center;
   min-height: 34px;
+  touch-action: pan-y;
 }
 
 .sliderNeutralMarker {
@@ -1788,10 +1835,11 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 28px;
+  min-height: 36px;
   margin: 0;
   appearance: none;
   background: transparent;
+  cursor: ew-resize;
 }
 
 .swingSlider::-webkit-slider-runnable-track {
@@ -4298,11 +4346,15 @@
 }
 
 .legend {
+  align-items: center;
   gap: 8px;
+  row-gap: 7px;
 }
 
 .legend span {
+  min-height: 20px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .legend b {
@@ -4323,10 +4375,13 @@
     rgba(238, 244, 247, 0.68);
   scrollbar-width: thin;
   scrollbar-color: rgba(8, 127, 104, 0.34) transparent;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .mapCanvas,
 .houseBoundaryCanvas {
+  isolation: isolate;
   min-height: 450px;
   border-radius: 8px;
   background:
@@ -4405,10 +4460,12 @@
 }
 
 .stateTooltip {
+  max-width: min(240px, calc(100% - 24px));
   border: 1px solid rgba(8, 127, 104, 0.18);
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   box-shadow: 0 18px 42px rgba(20, 34, 48, 0.16);
+  pointer-events: none;
 }
 
 .modelDisclosure summary,
@@ -4680,9 +4737,11 @@
   --muted: #63707f;
   --muted-strong: #344455;
   --line: rgba(17, 24, 39, 0.14);
-  --accent: #f05f3b;
-  --accent-soft: rgba(240, 95, 59, 0.12);
+  --accent: #c34022;
+  --accent-soft: rgba(195, 64, 34, 0.12);
   --aero-green: #00a878;
+  color-scheme: light;
+  accent-color: var(--accent);
   font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
   background:
     linear-gradient(135deg, rgba(240, 95, 59, 0.08), transparent 36%),
@@ -4695,6 +4754,7 @@
 .panelHeader h2,
 .unifiedSummaryHeader h2 {
   font-weight: 800;
+  text-wrap: balance;
 }
 
 .header h2 {
@@ -4737,6 +4797,14 @@
   box-shadow:
     0 20px 54px rgba(17, 24, 39, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.unifiedSummary,
+.counter,
+.mapPanel,
+.panel,
+.modelNote {
+  scroll-margin-top: 12px;
 }
 
 .brandMark {
@@ -4946,9 +5014,10 @@
 }
 
 .shell[data-theme="dark"] {
-  --accent: #ff7b52;
-  --accent-soft: rgba(255, 123, 82, 0.13);
+  --accent: #8ad7bd;
+  --accent-soft: rgba(138, 215, 189, 0.12);
   --aero-green: #8ad7bd;
+  color-scheme: dark;
 }
 
 .shell[data-theme="dark"] .stateShape[data-selected="true"],
@@ -5045,6 +5114,10 @@
 
 .contentShell {
   gap: 10px;
+}
+
+.contentShell:focus {
+  outline: none;
 }
 
 .unifiedSummary {
@@ -5378,6 +5451,24 @@
   padding: 0 8px 8px;
 }
 
+.optionDisclosure > summary,
+.modelDisclosure > summary,
+.compactDisclosure > summary,
+.scenarioBookmarkDisclosure > summary,
+.summaryDeepDive > summary,
+.detailDisclosure > summary {
+  border-radius: inherit;
+}
+
+.optionDisclosure[open] > summary,
+.modelDisclosure[open] > summary,
+.compactDisclosure[open] > summary,
+.scenarioBookmarkDisclosure[open] > summary,
+.summaryDeepDive[open] > summary,
+.detailDisclosure[open] > summary {
+  background: color-mix(in srgb, var(--accent-soft) 60%, transparent);
+}
+
 .sensitivityDeepDiveGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5552,7 +5643,133 @@
   }
 }
 
+@media (min-width: 761px) and (max-width: 900px) {
+  .appSidebar {
+    grid-template-columns: minmax(190px, 0.8fr) minmax(330px, 1.4fr) minmax(180px, 0.75fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .tabBar {
+    gap: 5px;
+  }
+
+  .tabBar button {
+    min-height: 62px;
+    padding: 7px;
+  }
+
+  .sidebarFooter {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .themeSwitch,
+  .focusToggle {
+    min-height: 36px;
+  }
+}
+
 @media (max-width: 760px) {
+  .shell {
+    padding: 8px;
+  }
+
+  .appFrame,
+  .contentShell {
+    gap: 10px;
+  }
+
+  .appSidebar {
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .brandLockup {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .brandMark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brandText h1 {
+    font-size: 16px;
+  }
+
+  .brandText .eyebrow {
+    margin-bottom: 4px;
+    font-size: 9px;
+  }
+
+  .tabBar {
+    gap: 4px;
+  }
+
+  .tabBar button {
+    min-height: 56px;
+    padding: 7px 4px;
+  }
+
+  .tabBar button > svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .tabBar span {
+    font-size: 11px;
+  }
+
+  .tabBar small {
+    display: none;
+  }
+
+  .sidebarFooter {
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 0.66fr);
+    gap: 7px;
+  }
+
+  .themeSwitch {
+    min-height: 44px;
+    padding: 3px;
+  }
+
+  .themeSwitch button,
+  .focusToggle {
+    min-height: 38px;
+  }
+
+  .header {
+    gap: 6px;
+    padding: 5px 2px 2px;
+  }
+
+  .header h2 {
+    font-size: clamp(24px, 7vw, 28px);
+  }
+
+  .headerMeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .headerMeta span {
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .headerMeta strong {
+    white-space: nowrap;
+  }
+
   .unifiedSummary {
     display: block;
   }
@@ -5621,9 +5838,147 @@
   }
 
   .mapCanvas,
-  .focusWorkspace .mapCanvas,
+  .focusWorkspace .mapCanvas {
+    min-height: 300px;
+  }
+
+  .usMap {
+    min-height: 300px;
+  }
+
   .houseBoundaryCanvas,
   .focusWorkspace .houseBoundaryCanvas {
     min-height: 330px;
+  }
+
+  .unifiedSummary,
+  .counter,
+  .mapPanel,
+  .panel {
+    padding: 10px;
+  }
+
+  .panelHeader {
+    gap: 8px;
+  }
+
+  .mapHeaderTools {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .legend {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .mapViewport,
+  .houseBoundaryViewport,
+  .houseMapViewport {
+    padding: 5px;
+  }
+
+  .smallStateDock {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    grid-template-columns: none;
+    grid-auto-columns: 42px;
+    grid-auto-flow: column;
+    justify-content: start;
+    max-width: calc(100% - 16px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .smallStateButton {
+    height: 40px;
+  }
+
+  .simulationDockActions button,
+  .nationalShareCard button,
+  .houseZoomToolbar button,
+  .senateSeatButton,
+  .houseFocusButton,
+  .localOverridePanel > button {
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 420px) {
+  .themeSwitch button span {
+    display: none;
+  }
+
+  .themeSwitch button {
+    min-width: 42px;
+  }
+
+  .headerMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .headerMeta strong {
+    justify-self: start;
+  }
+
+  .counterMetaGrid,
+  .chamberCounterMetaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .tabBar button,
+  .focusToggle,
+  .iconButton,
+  .shareButton,
+  .smallStateButton,
+  .houseFocusButton,
+  .senateSeatButton,
+  .baselineYearGrid button,
+  .simulationDockActions button {
+    min-height: 44px;
+  }
+
+  .swingSlider {
+    min-height: 44px;
+  }
+
+  .swingSlider::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    margin-top: -7px;
+  }
+
+  .swingSlider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .shell {
+    --line: rgba(17, 24, 39, 0.34);
+    --line-strong: rgba(17, 24, 39, 0.52);
+    --muted: #46515f;
+    --muted-strong: #263544;
+  }
+
+  .shell[data-theme="dark"] {
+    --line: rgba(237, 244, 248, 0.34);
+    --line-strong: rgba(237, 244, 248, 0.54);
+    --muted: #c0cad4;
+    --muted-strong: #dae2e9;
+  }
+
+  .panel,
+  .mapPanel,
+  .counter,
+  .unifiedSummary,
+  .modelNote,
+  .appSidebar {
+    border-width: 2px;
   }
 }

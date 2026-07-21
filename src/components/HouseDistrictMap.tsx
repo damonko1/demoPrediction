@@ -4,6 +4,7 @@ import { Crosshair, Map as MapIcon, MapPinned } from "lucide-react";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type KeyboardEvent,
@@ -242,6 +243,7 @@ export function HouseDistrictMap({
   customSeatIds = new Set<string>(),
   onSelectSeat,
 }: HouseDistrictMapProps) {
+  const districtPathRefs = useRef(new Map<string, SVGPathElement>());
   const [mapAsset, setMapAsset] = useState<HouseDistrictMapAsset | null>(null);
   const [hasMapError, setHasMapError] = useState(false);
   const [focusedStateCode, setFocusedStateCode] = useState<string | null>(null);
@@ -297,6 +299,13 @@ export function HouseDistrictMap({
     : null;
   const renderedDistrictCount =
     mapAsset?.districts.filter((district) => resultById.has(district.id)).length ?? 0;
+  const interactiveDistrictIds = useMemo(
+    () =>
+      mapAsset?.districts
+        .filter((district) => resultById.has(district.id))
+        .map((district) => district.id) ?? [],
+    [mapAsset, resultById],
+  );
   const flaggedDistrictCount = results.filter(
     (result) => result.seat.lowData || result.seat.uncontested,
   ).length;
@@ -348,7 +357,46 @@ export function HouseDistrictMap({
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       selectDistrict(result);
+      return;
     }
+
+    const currentIndex = interactiveDistrictIds.indexOf(result.seat.id);
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % interactiveDistrictIds.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex =
+        (currentIndex - 1 + interactiveDistrictIds.length) %
+        interactiveDistrictIds.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = interactiveDistrictIds.length - 1;
+    }
+
+    if (nextIndex === null || interactiveDistrictIds.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const nextSeatId = interactiveDistrictIds[nextIndex];
+    const nextResult = resultById.get(nextSeatId);
+
+    if (!nextResult) {
+      return;
+    }
+
+    onSelectSeat(nextSeatId);
+    setHoveredSeatId(nextSeatId);
+
+    if (zoomMode !== "national") {
+      setFocusedStateCode(nextResult.seat.stateCode);
+    }
+
+    window.requestAnimationFrame(() => {
+      districtPathRefs.current.get(nextSeatId)?.focus();
+    });
   }
 
   return (
@@ -409,7 +457,11 @@ export function HouseDistrictMap({
         </label>
       </div>
 
-      <div className={styles.houseZoomToolbar} aria-label="House map zoom controls">
+      <div
+        className={styles.houseZoomToolbar}
+        aria-label="House map zoom controls"
+        role="group"
+      >
         <button
           aria-pressed={zoomMode === "national"}
           className={zoomMode === "national" ? styles.activeZoomButton : ""}
@@ -454,7 +506,11 @@ export function HouseDistrictMap({
         </button>
       </div>
 
-      <div className={styles.houseMapStatus} aria-label="House map data status">
+      <div
+        className={styles.houseMapStatus}
+        aria-label="House map data status"
+        aria-live="polite"
+      >
         <div>
           <span>Rendered</span>
           <strong>
@@ -480,22 +536,31 @@ export function HouseDistrictMap({
       </div>
 
       <div className={styles.houseBoundaryViewport}>
+        <p className={styles.srOnly} id="house-map-keyboard-help">
+          Use the arrow keys to move between districts, Home or End to jump to
+          the first or last district, and Enter or Space to zoom into a district.
+        </p>
         <div
           className={styles.houseBoundaryCanvas}
           onPointerLeave={() => setHoveredSeatId(null)}
         >
           {hasMapError ? (
-            <div className={styles.mapLoading}>House district map unavailable</div>
+            <div className={styles.mapLoading} role="alert">
+              House district map unavailable
+            </div>
           ) : null}
           {!mapAsset && !hasMapError ? (
-            <div className={styles.mapLoading}>Loading House districts</div>
+            <div className={styles.mapLoading} role="status">
+              Loading House districts
+            </div>
           ) : null}
           {mapAsset ? (
             <svg
+              aria-describedby="house-map-keyboard-help"
               aria-label="House districts colored by simulated winner and margin"
               className={styles.houseDistrictMap}
               data-zoom-mode={zoomMode}
-              role="img"
+              role="group"
               viewBox={formatViewBox(viewBox)}
             >
               <g className={styles.houseDistrictLayer}>
@@ -534,9 +599,16 @@ export function HouseDistrictMap({
                       onClick={() => selectDistrict(result)}
                       onKeyDown={(event) => handleDistrictKeyDown(event, result)}
                       onPointerEnter={() => setHoveredSeatId(result.seat.id)}
+                      ref={(element) => {
+                        if (element) {
+                          districtPathRefs.current.set(result.seat.id, element);
+                        } else {
+                          districtPathRefs.current.delete(result.seat.id);
+                        }
+                      }}
                       role="button"
                       style={getSeatStyle(result)}
-                      tabIndex={0}
+                      tabIndex={result.seat.id === selectedSeatId ? 0 : -1}
                     >
                       <title>{getDistrictSelectLabel(result)}</title>
                     </path>
@@ -620,7 +692,11 @@ export function HouseDistrictMap({
               {selectorGroup.flaggedSeats ? ` / ${selectorGroup.flaggedSeats} flagged` : ""}
             </small>
           </div>
-          <div className={styles.houseFocusGrid}>
+          <div
+            className={styles.houseFocusGrid}
+            aria-label={`${selectorGroup.stateName} districts`}
+            role="group"
+          >
             {selectorGroup.results.map((result) => (
               <button
                 aria-label={getDistrictAriaLabel(result)}

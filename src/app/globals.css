@@ -18,6 +18,7 @@
 
 html {
   min-height: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -40,14 +41,164 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
 button {
   cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 a {
   color: inherit;
+}
+
+::selection {
+  color: #ffffff;
+  background: #087f68;
+}
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid #087f68;
+  outline-offset: 3px;
+}
+
+summary {
+  touch-action: manipulation;
+}
+
+@media (max-width: 760px) {
+  input:not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 3px solid CanvasText;
+  }
+}
+
+.fatal-error-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(circle at 18% 15%, rgba(33, 185, 202, 0.16), transparent 32%),
+    #071019;
+  color: #f2f8fb;
+}
+
+.fatal-error-card {
+  width: min(100%, 580px);
+  padding: clamp(28px, 6vw, 52px);
+  border: 1px solid rgba(149, 213, 224, 0.22);
+  border-radius: 24px;
+  background: rgba(13, 28, 40, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+}
+
+.fatal-error-mark {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: #baf4f2;
+  color: #06353e;
+}
+
+.fatal-error-eyebrow {
+  margin: 28px 0 8px;
+  color: #8fdce1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.fatal-error-card h1 {
+  margin: 0;
+  max-width: 15ch;
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.fatal-error-card > p:not(.fatal-error-eyebrow) {
+  margin: 20px 0 0;
+  max-width: 52ch;
+  color: #bdd0d8;
+  line-height: 1.65;
+}
+
+.fatal-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.fatal-error-actions button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 1px solid #9be8e8;
+  border-radius: 999px;
+  background: #baf4f2;
+  color: #06313a;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fatal-error-actions button + button {
+  border-color: rgba(175, 210, 218, 0.3);
+  background: transparent;
+  color: #e8f4f6;
+}
+
+.fatal-error-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.fatal-error-actions button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.fatal-error-card small {
+  display: block;
+  margin-top: 24px;
+  color: #7996a3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fatal-error-actions button:hover {
+    transform: none;
+  }
 }

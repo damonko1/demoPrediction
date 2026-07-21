@@ -325,8 +325,11 @@ export function SenateMap({
       return [];
     }
 
-    return buildStateShapes(topology).filter((shape) => resultsByState.has(shape.code));
-  }, [resultsByState, topology]);
+    // Keep decoded geometry stable while assumptions update. The render loop
+    // already skips shapes without a matching result, so rebuilding every SVG
+    // path for each slider event only adds interaction latency.
+    return buildStateShapes(topology);
+  }, [topology]);
   const hoveredResults = hoveredStateCode
     ? resultsByState.get(hoveredStateCode) ?? []
     : [];

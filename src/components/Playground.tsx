@@ -9,7 +9,14 @@ import {
   Sun,
   Vote,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 import { ElectoralCounter } from "@/components/ElectoralCounter";
 import { ElectoralMap } from "@/components/ElectoralMap";
 import { LegislativeWorkspace } from "@/components/LegislativeWorkspace";
@@ -74,6 +81,11 @@ const tabs = [
 ] as const;
 
 export function Playground() {
+  const tabRefs = useRef<Record<SimulationTab, HTMLButtonElement | null>>({
+    president: null,
+    house: null,
+    senate: null,
+  });
   const [activeTab, setActiveTab] = useState<SimulationTab>("president");
   const [nationalSwing, setNationalSwing] = useState(0);
   const [demographicAssumptions, setDemographicAssumptions] =
@@ -229,11 +241,14 @@ export function Playground() {
       }
     }
 
-    restoreScenarioFromUrl();
-    setUrlReady(true);
+    const restoreFrame = window.requestAnimationFrame(() => {
+      restoreScenarioFromUrl();
+      setUrlReady(true);
+    });
     window.addEventListener("popstate", restoreScenarioFromUrl);
 
     return () => {
+      window.cancelAnimationFrame(restoreFrame);
       window.removeEventListener("popstate", restoreScenarioFromUrl);
     };
   }, []);
@@ -542,6 +557,33 @@ export function Playground() {
     setSelectedSenateSeatId(initialSelectedSenateSeat);
   }
 
+  function handleTabKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentTab: SimulationTab,
+  ) {
+    const currentIndex = tabs.findIndex((tab) => tab.id === currentTab);
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = tabs.length - 1;
+    }
+
+    if (nextIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    const nextTab = tabs[nextIndex].id;
+    setActiveTab(nextTab);
+    tabRefs.current[nextTab]?.focus();
+  }
+
   const isEverythingAtDefault =
     baselineYear === defaultHistoricalElectionYear &&
     Math.abs(nationalSwing) < 0.05 &&
@@ -559,6 +601,9 @@ export function Playground() {
       className={`${styles.shell} ${isFocusMode ? styles.focusShell : ""}`}
       data-theme={themeMode}
     >
+      <a className={styles.skipLink} href="#simulation-workspace">
+        Skip to simulation workspace
+      </a>
       <div className={styles.appFrame}>
         <aside className={styles.appSidebar} aria-label="Application controls">
           <div className={styles.brandLockup}>
@@ -574,14 +619,18 @@ export function Playground() {
           <nav className={styles.tabBar} aria-label="Simulation modes" role="tablist">
             {tabs.map(({ Icon, detail, id, label }) => (
               <button
-                aria-current={activeTab === id ? "page" : undefined}
                 aria-controls={`${id}-panel`}
                 aria-selected={activeTab === id}
                 className={activeTab === id ? styles.activeTab : ""}
                 id={`${id}-tab`}
                 key={id}
                 onClick={() => setActiveTab(id)}
+                onKeyDown={(event) => handleTabKeyDown(event, id)}
+                ref={(element) => {
+                  tabRefs.current[id] = element;
+                }}
                 role="tab"
+                tabIndex={activeTab === id ? 0 : -1}
                 type="button"
               >
                 <Icon size={18} strokeWidth={2.2} />
@@ -592,7 +641,11 @@ export function Playground() {
           </nav>
 
           <div className={styles.sidebarFooter}>
-            <div className={styles.themeSwitch} aria-label="Display mode">
+            <div
+              className={styles.themeSwitch}
+              aria-label="Display mode"
+              role="group"
+            >
               <button
                 aria-label="Use light mode"
                 aria-pressed={themeMode === "light"}
@@ -618,6 +671,7 @@ export function Playground() {
             </div>
 
             <button
+              aria-label={isFocusMode ? "Return to balanced view" : "Focus the map"}
               aria-pressed={isFocusMode}
               className={`${styles.focusToggle} ${
                 isFocusMode ? styles.activeFocusToggle : ""
@@ -636,7 +690,11 @@ export function Playground() {
           </div>
         </aside>
 
-        <div className={styles.contentShell}>
+        <div
+          className={styles.contentShell}
+          id="simulation-workspace"
+          tabIndex={-1}
+        >
           <header className={styles.header}>
             <div>
               <p className={styles.eyebrow}>Interactive election scenarios</p>

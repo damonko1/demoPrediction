@@ -253,8 +253,12 @@ export function ElectoralMap({
       return [];
     }
 
-    return buildStateShapes(topology).filter((shape) => resultByCode.has(shape.code));
-  }, [resultByCode, topology]);
+    // Topology decoding and SVG path construction are the expensive part of a
+    // map render. Results change continuously while a slider is moving, but
+    // the underlying geometry does not, so keep the paths stable until the
+    // asset itself changes. Missing result rows are still ignored below.
+    return buildStateShapes(topology);
+  }, [topology]);
 
   const hoveredResult = hoveredStateCode ? resultByCode.get(hoveredStateCode) : null;
   const tooltipResult = hoveredResult;
