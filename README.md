@@ -1,80 +1,146 @@
 # Election Forecast Playground
 
-Election Forecast Playground is an interactive election simulation tool. It lets users adjust national swing and demographic-style assumptions, watch state colors and electoral vote totals update instantly, and inspect individual state results.
+[![Quality gate](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml/badge.svg)](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml)
 
-This is a simulation playground, not a prediction model. The goal is to make electoral mechanics easier to explore by turning assumptions into visual, clickable maps. President, House, and Senate are full simulation workspaces powered by public-result baselines, transparent stress-test assumptions, and shareable local overrides.
+An interactive, browser-based lab for exploring how election assumptions can change the presidential, House, and Senate map.
 
-## Features
+Election Forecast Playground turns national swing, demographic-style inputs, and local race overrides into immediate visual results. Start from a sourced historical baseline, apply a preset or build a custom scenario, then inspect which states and seats move—and why. Scenarios are encoded in the URL, so an interesting map can be shared without creating an account.
 
-- State-level U.S. electoral map with margin-based color intensity
-- Electoral vote counter with the 270 threshold
-- National swing slider with instant recalculation
-- Seven demographic-style sliders with state-specific sensitivity weights
-- Scenario presets for youth turnout, suburban shift, rural surge, low turnout, and split-style stress tests
-- Visible selected-preset state plus a compact active-settings overview
-- Complete cross-chamber reset for national, state, district, and Senate-race assumptions
-- Clickable and hoverable state details
-- State detail panel showing the largest assumption effects for the selected state
-- Small-state selector for compact Northeast states and DC
-- Light aero mode and dark tactical mode
-- Scenario summary showing flipped states and EV shifts
-- Current-vs-baseline scenario comparison
-- Deterministic Monte Carlo uncertainty stress test
-- Sensitivity view for closest states, tipping points, and path-to-270 pressure
-- Exportable state map PNG
-- Embed/share card preview with copyable iframe markup
-- Named local scenario bookmarks backed by shareable URLs
-- Official-source presidential and congressional portraits with accessible fallbacks
-- Split electoral vote handling for Maine and Nebraska
-- Full House and Senate simulation tabs with chamber counters, maps, local overrides, focused presets, member details, and control-path summaries
+> [!IMPORTANT]
+> This is an educational scenario simulator, not a polling average, election forecast, or statement about voter behavior. Presets and demographic weights are transparent stress-test assumptions. Read the [data accuracy policy](docs/data-accuracy.md) before interpreting or extending the model.
 
-## Tech Stack
+## Highlights
 
-- Next.js
-- React
-- TypeScript
-- CSS Modules
-- SVG map rendering from local state boundary data
+- **Three connected workspaces:** Explore presidential, House, and Senate outcomes from one responsive interface.
+- **Historical replay:** Use calculation-ready state presidential baselines for every election from 2000 through 2024.
+- **Interactive election maps:** Inspect all 538 electoral votes, 435 voting House districts, and 100 Senate seats with margin-based color intensity.
+- **Real-time scenario controls:** Adjust national swing and demographic-style assumptions and see the map, counters, summaries, and pressure points update immediately.
+- **One-click stress tests:** Try youth-turnout, suburban-shift, rural-surge, low-turnout, and popular-vote/Electoral College split scenarios.
+- **Local overrides:** Apply state, district, or Senate-race adjustments to explore outcomes that a national model cannot capture.
+- **Decision context:** Review flipped states, tipping-point rankings, paths to 270, largest assumption effects, and a deterministic Monte Carlo uncertainty stress test.
+- **Save and share:** Copy a scenario URL, bookmark named scenarios locally, preview an embed card, or export the presidential map as a PNG.
+- **Accessible controls:** Keyboard-friendly native inputs, visible focus states, descriptive labels, and light and dark themes.
+- **Transparent data notes:** Model explanations and dataset readiness labels distinguish sourced baselines from illustrative assumptions.
 
-## Getting Started
+## Quick Start
 
-Install dependencies:
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 20.9 or newer (required by Next.js 16)
+- npm
+- Python 3 only if you plan to use the included `npm run start` static-file server
+
+### Install and run
 
 ```bash
-npm install
-```
-
-Run the development server:
-
-```bash
+git clone https://github.com/damonko1/demoPrediction.git
+cd demoPrediction
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+### Production build
 
 ```bash
-npm run dev
 npm run typecheck
+npm run lint
+npm test
 npm run build
 npm run start
 ```
 
-## Public Deployment
+The project uses Next.js static export. `npm run build` writes the deployable site to `out/`; `npm run start` serves that generated directory at [http://localhost:3000](http://localhost:3000). The `out/` directory can be deployed to a static host.
 
-The app is configured for static export. `npm run build` writes the deployable site to `out/`, and `npm run start` serves that static folder locally after a build. Deploy the `out/` directory to any static host.
+## User Guide
 
-## Model Note
+1. **Choose a chamber.** Use the President, House, and Senate tabs to switch workspaces. Each chamber has its own map, seat counter, controls, and detail panel.
+2. **Pick a baseline.** In the presidential workspace, choose a historical election year from 2000–2024. The 2024 baseline is selected by default.
+3. **Set the broad environment.** Move the national swing control toward Democrats or Republicans. Results and margins update as you drag.
+4. **Try a preset or tune the electorate.** Open the scenario presets for a quick stress test, or expand the demographic-style controls to adjust individual inputs. Vote-shift controls label their partisan direction; turnout controls show higher or lower participation and use the model's state-specific sensitivities.
+5. **Inspect the map.** Select a state, House district, or Senate seat to see its baseline, simulated margin, major drivers, and available local overrides. Darker fills indicate larger modeled margins, not greater certainty.
+6. **Read the analysis.** The counters show chamber control; summaries surface flips and seat changes; pressure points show close states, tipping points, and paths to 270. Monte Carlo output is an uncertainty exercise built around the current scenario—not a win probability forecast.
+7. **Save or share.** Copy the current link to preserve scenario inputs, save named bookmarks in the current browser, or export the presidential map. Anyone opening a shared URL receives the encoded scenario state.
+8. **Reset when needed.** Reset controls return the relevant assumptions and overrides to their neutral baseline.
 
-The current model combines national swing with illustrative state-weighted demographic assumptions:
+## How the Model Works
+
+At a high level, the presidential simulation applies national and state-weighted adjustments to a selected historical margin:
 
 ```text
-simulated_margin = baseline_margin + national_swing + sum(demographic_slider_value * state_weight)
+simulated margin = baseline margin
+                 + national swing
+                 + sum(demographic input × state sensitivity)
+                 + local override
 ```
 
-Starter margins and demographic weights are rounded and illustrative. The +/-15 controls and presets are stress tests, not real forecast claims. Maine and Nebraska now allocate statewide and congressional-district electoral votes as separate units.
+House and Senate workspaces use analogous chamber-specific swing, structural sliders, and state/seat overrides. Maine and Nebraska are modeled with separate statewide and congressional-district electoral-vote units.
 
-## Data Accuracy
+The historical presidential baselines are generated from MIT Election Data and Science Lab state returns. Current legislative baselines use MIT Election Data and Science Lab House and Senate returns plus the `unitedstates/congress-legislators` roster. Map geometry comes from local state and Census congressional-district assets. See [data accuracy](docs/data-accuracy.md) and the [legislative data foundation](docs/legislative-data-foundation.md) for sources, readiness, and known limitations.
 
-The data accuracy rules are documented in [docs/data-accuracy.md](docs/data-accuracy.md). Historical presidential and current legislative baselines record source metadata and validation status; demographic weights and preset values remain clearly labeled illustrative stress-test assumptions.
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Application | Next.js 16 with static export |
+| UI | React 19, TypeScript, CSS Modules, global CSS |
+| Icons | Lucide React |
+| Maps | React-rendered SVG using local state and congressional-district geometry |
+| Data tooling | Node.js scripts, `d3-geo`, and `shapefile` for build-time map/data preparation |
+| Quality | Vitest, ESLint, and TypeScript type checking |
+
+The runtime has no API server or database. Scenario links use URL parameters, while named bookmarks are stored in the browser.
+
+## Available Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server |
+| `npm run lint` | Run ESLint with zero warnings allowed |
+| `npm run typecheck` | Run TypeScript without emitting files |
+| `npm test` | Run the Vitest suite once |
+| `npm run build` | Create the static production export in `out/` |
+| `npm run start` | Serve the built `out/` directory on port 3000 |
+| `npm run build:historical-data` | Regenerate historical presidential data |
+| `npm run build:house-map` | Regenerate the House district map asset |
+| `npm run build:legislative-data` | Regenerate House and Senate baseline data |
+| `npm run validate:state-map` | Validate state/DC map coverage and related records |
+| `npm run validate:house-map` | Validate House district geometry coverage |
+| `npm run validate:legislative-data` | Validate legislative records and source metadata |
+
+## Repository Guide
+
+```text
+src/app/          Next.js entry point and global styles
+src/components/   Simulation workspaces, maps, controls, and analysis panels
+src/data/         Generated baselines, presets, and data-readiness metadata
+src/lib/          Scenario calculations, sensitivity, sharing, and persistence
+public/           Static state and House map geometry plus brand assets
+scripts/          Dataset/map build and validation tools
+docs/             Methodology, accuracy, and implementation notes
+```
+
+## Data and Interpretation
+
+- Treat large slider values as counterfactual stress tests, not plausible forecasts.
+- A simulated margin measures the model output under selected assumptions; it does not express confidence.
+- Demographic-style sliders use aggregate sensitivity assumptions and must not be interpreted as claims about individual voters.
+- County-level and additional demographic datasets remain excluded from calculations until their source and reconciliation requirements are met.
+- Before publishing analysis made with this tool, disclose the baseline year, assumptions, and any local overrides.
+
+## Contributing
+
+Issues and focused pull requests are welcome. For changes to source data or model behavior, include source metadata, validation notes, and tests. Before opening a pull request, run:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run validate:state-map
+npm run validate:house-map
+npm run validate:legislative-data
+```
+
+For launch positioning and channel-specific sharing guidance, see [LAUNCH_AND_COMMUNITIES.md](LAUNCH_AND_COMMUNITIES.md).
