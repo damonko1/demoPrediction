@@ -45,4 +45,4 @@ See `docs/legislative-data-validation.generated.json` for the current legislativ
 
 ## Later Data Checklist Rule
 
-Do not check off a Later Data item in `feature-checklist.md` until the cleaned data exists in the project, source metadata is recorded, and a validation pass confirms the dataset against its stated source.
+Do not present a Later Data item as complete until the cleaned data exists in the project, source metadata is recorded, and a validation pass confirms the dataset against its stated source.

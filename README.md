@@ -142,5 +142,3 @@ npm run validate:state-map
 npm run validate:house-map
 npm run validate:legislative-data
 ```
-
-For launch positioning and channel-specific sharing guidance, see [LAUNCH_AND_COMMUNITIES.md](LAUNCH_AND_COMMUNITIES.md).

@@ -36,3 +36,12 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Private product planning and launch operations (local only)
+.private/
+LAUNCH_AND_COMMUNITIES.md
+feature-checklist.md
+legislative-features.md
+project-plan.md
+docs/stakeholder-progress-status.md
+docs/unchecked-feature-implementation-prompt.md
