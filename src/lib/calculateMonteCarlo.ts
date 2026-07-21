@@ -1,4 +1,8 @@
 import type { ElectoralTotals, ScenarioResult } from "@/types/election";
+import {
+  finiteOrZero,
+  normalizeElectoralVotes,
+} from "@/lib/simulationNormalization";
 
 export type MonteCarloSummary = {
   sampleCount: number;
@@ -17,6 +21,8 @@ export type MonteCarloSummary = {
 
 const defaultSampleCount = 750;
 const defaultMarginStdDev = 3.5;
+const maxSampleCount = 10_000;
+const maxMarginStdDev = 100;
 
 function createSeededRandom(seed: number) {
   let state = seed >>> 0;
@@ -35,11 +41,13 @@ function randomNormal(random: () => number) {
 }
 
 function getScenarioSeed(scenario: ScenarioResult) {
-  const assumptionSeed = Object.entries(scenario.assumptions.demographics)
+  const assumptionSeed = Object.entries(scenario.assumptions?.demographics ?? {})
+    .sort(([left], [right]) => left.localeCompare(right))
     .reduce((seed, [id, value]) => {
-      return seed + id.length * 97 + Math.round((value + 20) * 31);
-    }, Math.round((scenario.assumptions.nationalSwing + 20) * 100));
-  const yearSeed = scenario.states[0]?.state.baselineYear ?? 2024;
+      return seed + id.length * 97 + Math.round((finiteOrZero(value) + 20) * 31);
+    }, Math.round((finiteOrZero(scenario.assumptions?.nationalSwing) + 20) * 100));
+  const rawYearSeed = scenario.states[0]?.state.baselineYear;
+  const yearSeed = Number.isFinite(rawYearSeed) ? rawYearSeed : 2024;
 
   return yearSeed * 1009 + assumptionSeed;
 }
@@ -74,22 +82,29 @@ export function calculateMonteCarloSummary(
     sampleCount?: number;
   } = {},
 ): MonteCarloSummary {
+  const normalizedSampleCount = Number.isFinite(sampleCount)
+    ? Math.min(maxSampleCount, Math.max(1, Math.floor(sampleCount)))
+    : defaultSampleCount;
+  const normalizedMarginStdDev = Number.isFinite(marginStdDev)
+    ? Math.min(maxMarginStdDev, Math.max(0, marginStdDev))
+    : defaultMarginStdDev;
   const random = createSeededRandom(getScenarioSeed(scenario));
   const democraticEvSamples: number[] = [];
   let democraticWins = 0;
   let republicanWins = 0;
   let ties = 0;
 
-  for (let sampleIndex = 0; sampleIndex < sampleCount; sampleIndex += 1) {
+  for (let sampleIndex = 0; sampleIndex < normalizedSampleCount; sampleIndex += 1) {
     const totals = emptyTotals();
 
     scenario.states.forEach((stateResult) => {
-      stateResult.splitElectoralVotes.forEach((unit) => {
+      (stateResult.splitElectoralVotes ?? []).forEach((unit) => {
         const sampledMargin =
-          unit.simulatedMargin + randomNormal(random) * marginStdDev;
+          finiteOrZero(unit.simulatedMargin) +
+          randomNormal(random) * normalizedMarginStdDev;
         const winner = sampledMargin >= 0 ? "democratic" : "republican";
 
-        totals[winner] += unit.electoralVotes;
+        totals[winner] += normalizeElectoralVotes(unit.electoralVotes);
       });
     });
 
@@ -107,13 +122,13 @@ export function calculateMonteCarloSummary(
   democraticEvSamples.sort((a, b) => a - b);
 
   return {
-    sampleCount,
+    sampleCount: normalizedSampleCount,
     democraticWins,
     republicanWins,
     ties,
-    democraticWinShare: democraticWins / sampleCount,
-    republicanWinShare: republicanWins / sampleCount,
-    tieShare: ties / sampleCount,
+    democraticWinShare: democraticWins / normalizedSampleCount,
+    republicanWinShare: republicanWins / normalizedSampleCount,
+    tieShare: ties / normalizedSampleCount,
     medianDemocraticEv: percentile(democraticEvSamples, 0.5),
     democraticEvRange: {
       low: percentile(democraticEvSamples, 0.1),

@@ -174,4 +174,41 @@ describe("calculateLegislativeScenario", () => {
     expect(driver?.weight).not.toBe(0);
     expect(driver?.delta).not.toBe(0);
   });
+
+  it("clamps extreme assumptions and neutralizes malformed values", () => {
+    const assumptions = getDefaultLegislativeAssumptions();
+    assumptions.nationalSwing = 1_000;
+    assumptions.sliders.genericTurnout = -1_000;
+    assumptions.sliders.candidateQuality = Number.NaN;
+    assumptions.overrides.states.AL = {
+      turnout: Number.POSITIVE_INFINITY,
+      partisanShift: Number.NaN,
+      candidateQuality: Number.NEGATIVE_INFINITY,
+    };
+    const result = calculateLegislativeScenario(
+      "house",
+      [houseDistrictBaselines[0]],
+      assumptions,
+    ).seats[0];
+
+    expect(result.assumptionDrivers.find(({ id }) => id === "nationalSwing")).toMatchObject({
+      value: 15,
+      delta: 15,
+    });
+    expect(result.assumptionDrivers.find(({ id }) => id === "genericTurnout")?.value).toBe(-10);
+    expect(result.assumptionDrivers.find(({ id }) => id === "candidateQuality")?.value).toBe(0);
+    expect(result.overrideAdjustment).toBe(0);
+    expect(Number.isFinite(result.simulatedMargin)).toBe(true);
+  });
+
+  it("tolerates missing runtime override containers", () => {
+    const assumptions = {
+      ...getDefaultLegislativeAssumptions(),
+      overrides: undefined,
+    } as unknown as ReturnType<typeof getDefaultLegislativeAssumptions>;
+
+    expect(() =>
+      calculateLegislativeScenario("house", [houseDistrictBaselines[0]], assumptions),
+    ).not.toThrow();
+  });
 });

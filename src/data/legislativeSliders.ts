@@ -325,7 +325,7 @@ const mediumNonCollegeStates = new Set<StateCode>([
 ]);
 
 function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+  return Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 }
 
 function roundWeight(value: number) {
@@ -457,6 +457,10 @@ export function getLegislativeSliderWeight(
 }
 
 function normalizeCopyValue(value: number) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
   return Number(
     clamp(value, legislativeSliderBounds.min, legislativeSliderBounds.max).toFixed(1),
   );

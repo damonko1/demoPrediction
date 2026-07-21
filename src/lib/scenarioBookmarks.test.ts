@@ -28,6 +28,14 @@ describe("scenario bookmarks", () => {
   it("normalizes names and rejects blank names", () => {
     expect(normalizeScenarioBookmarkName("  Midterm   wave  ")).toBe("Midterm wave");
     expect(saveScenarioBookmark({ bookmarks: [], name: "   ", url: "/", now: 1 })).toBeNull();
+    expect(
+      saveScenarioBookmark({
+        bookmarks: [],
+        name: "Unsafe",
+        url: "//unrelated.test/scenario",
+        now: 1,
+      }),
+    ).toBeNull();
   });
 
   it("stores only same-origin scenario paths", () => {

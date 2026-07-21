@@ -132,25 +132,28 @@ export function saveScenarioBookmark({
   now?: number;
 }): SaveScenarioBookmarkResult | null {
   const normalizedName = normalizeScenarioBookmarkName(name);
-  if (!normalizedName || !url.startsWith("/")) {
+  const normalizedUrl = normalizeScenarioBookmarkUrl(url);
+  if (!normalizedName || !normalizedUrl) {
     return null;
   }
 
-  const existing = bookmarks.find(
+  const validBookmarks = bookmarks.filter(isScenarioBookmark);
+  const existing = validBookmarks.find(
     (bookmark) => bookmark.name.toLocaleLowerCase() === normalizedName.toLocaleLowerCase(),
   );
+  const savedAt = Number.isFinite(now) ? now : Date.now();
   const saved: ScenarioBookmark = {
-    id: existing?.id ?? createBookmarkId(now),
+    id: existing?.id ?? createBookmarkId(savedAt),
     name: normalizedName,
-    url,
-    savedAt: now,
+    url: normalizedUrl,
+    savedAt,
   };
   const safeLimit = Number.isFinite(maxItems)
     ? Math.max(1, Math.floor(maxItems))
     : DEFAULT_SCENARIO_BOOKMARK_LIMIT;
   const nextBookmarks = [
     saved,
-    ...bookmarks.filter((bookmark) => bookmark.id !== existing?.id),
+    ...validBookmarks.filter((bookmark) => bookmark.id !== existing?.id),
   ]
     .sort((left, right) => right.savedAt - left.savedAt)
     .slice(0, safeLimit);

@@ -2,9 +2,20 @@ import {
   defaultLegislativeSliderAssumptions,
   getLegislativeSliderConfigsForChamber,
   getLegislativeSliderWeight,
+  legislativeSliderBounds,
+  legislativeSliderIds,
 } from "@/data/legislativeSliders";
 import { getPartyFromMargin, isTiedMargin } from "@/lib/format";
-import { getSeatStatusOverrideDelta } from "@/lib/localOverrides";
+import {
+  getSeatStatusOverrideDelta,
+  normalizeSeatOverride,
+  normalizeStateOverride,
+} from "@/lib/localOverrides";
+import {
+  finiteOrZero,
+  normalizeBoundedNumber,
+  normalizeSwing,
+} from "@/lib/simulationNormalization";
 import type {
   LegislativeAssumptions,
   LegislativeAssumptionDriver,
@@ -62,10 +73,11 @@ function calculateOverrideDrivers(
   seat: LegislativeSeatBaseline,
   overrides: LegislativeOverrides,
 ): LegislativeAssumptionDriver[] {
-  const stateOverride = overrides.states[seat.overrideKeys.state];
-  const seatOverride = seat.chamber === "house"
-    ? overrides.districts[seat.overrideKeys.district]
-    : overrides.races[seat.overrideKeys.race];
+  const rawStateOverride = overrides.states[seat.overrideKeys.state];
+  const stateOverride = rawStateOverride
+    ? normalizeStateOverride(rawStateOverride)
+    : undefined;
+  const seatOverride = getSeatOverride(seat, overrides);
   const seatStatusDelta = seatOverride
     ? getSeatStatusOverrideDelta(seat, seatOverride.seatStatus)
     : 0;
@@ -135,9 +147,26 @@ function calculateOverrideDrivers(
 }
 
 function getScenarioSliders(assumptions: LegislativeAssumptions) {
-  return {
+  const sliders = {
     ...defaultLegislativeSliderAssumptions,
     ...assumptions.sliders,
+  };
+
+  return Object.fromEntries(
+    legislativeSliderIds.map((id) => [
+      id,
+      normalizeBoundedNumber(sliders[id], legislativeSliderBounds),
+    ]),
+  ) as typeof sliders;
+}
+
+function getScenarioOverrides(
+  assumptions: LegislativeAssumptions,
+): LegislativeOverrides {
+  return {
+    states: assumptions.overrides?.states ?? {},
+    districts: assumptions.overrides?.districts ?? {},
+    races: assumptions.overrides?.races ?? {},
   };
 }
 
@@ -145,9 +174,11 @@ function getSeatOverride(
   seat: LegislativeSeatBaseline,
   overrides: LegislativeOverrides,
 ): SeatOverride | undefined {
-  return seat.chamber === "house"
+  const override = seat.chamber === "house"
     ? overrides.districts[seat.overrideKeys.district]
     : overrides.races[seat.overrideKeys.race];
+
+  return override ? normalizeSeatOverride(override) : undefined;
 }
 
 function getScenarioSliderWeight(
@@ -189,13 +220,14 @@ function calculateAssumptionDrivers(
   assumptions: LegislativeAssumptions,
 ): LegislativeAssumptionDriver[] {
   const sliders = getScenarioSliders(assumptions);
+  const overrides = getScenarioOverrides(assumptions);
   const drivers: LegislativeAssumptionDriver[] = [
     {
       id: "nationalSwing",
       label: "National chamber swing",
-      value: assumptions.nationalSwing,
+      value: normalizeSwing(assumptions.nationalSwing),
       weight: 1,
-      delta: assumptions.nationalSwing,
+      delta: normalizeSwing(assumptions.nationalSwing),
       heuristic: false,
     },
     ...getLegislativeSliderConfigsForChamber(seat.chamber).map((config) => {
@@ -203,7 +235,7 @@ function calculateAssumptionDrivers(
       const weight = getScenarioSliderWeight(
         seat,
         config.id,
-        assumptions.overrides,
+        overrides,
       );
 
       return {
@@ -215,7 +247,7 @@ function calculateAssumptionDrivers(
         heuristic: true,
       };
     }),
-    ...calculateOverrideDrivers(seat, assumptions.overrides),
+    ...calculateOverrideDrivers(seat, overrides),
   ];
 
   return drivers;
@@ -260,7 +292,7 @@ function calculateSeatResult(
   const overrideAdjustment = assumptionDrivers
     .filter((driver) => driver.id.startsWith("state") || driver.id.startsWith("local"))
     .reduce((total, driver) => total + driver.delta, 0);
-  const simulatedMargin = seat.baselineMargin + totalAdjustment;
+  const simulatedMargin = finiteOrZero(seat.baselineMargin) + totalAdjustment;
   const simulatedControlParty = isTiedMargin(simulatedMargin)
     ? seat.baselineControlParty
     : getPartyFromMargin(simulatedMargin);

@@ -35,8 +35,14 @@ import {
   hasSeatOverride,
   hasStateOverride,
   isSeatStatusOverride,
-  normalizeLocalOverrideValue,
+  normalizeSeatOverride,
+  normalizeStateOverride,
 } from "@/lib/localOverrides";
+import {
+  normalizeBoundedNumber,
+  normalizeSwing,
+  scenarioSwingBounds,
+} from "@/lib/simulationNormalization";
 
 const swingParam = "swing";
 const baselineYearParam = "year";
@@ -49,13 +55,14 @@ const senateSeatParam = "senateSeat";
 const stateOverridesParam = "stateOverrides";
 const districtOverridesParam = "districtOverrides";
 const senateRaceOverridesParam = "senateRaceOverrides";
-const validStateCodes = new Set(
+const validStateCodes = new Set<string>(
   getStateBaselinesForYear(defaultHistoricalElectionYear).map((state) => state.code),
 );
-const validHouseSeatIds = new Set(houseDistrictBaselines.map((seat) => seat.id));
-const validSenateSeatIds = new Set(
+const validHouseSeatIds = new Set<string>(houseDistrictBaselines.map((seat) => seat.id));
+const validSenateOverrideIds = new Set<string>(
   senateSeatBaselines.filter((seat) => seat.upNextCycle).map((seat) => seat.id),
 );
+const validSenateSeatIds = new Set<string>(senateSeatBaselines.map((seat) => seat.id));
 const houseSliderParams: Record<LegislativeSliderId, string> = {
   genericTurnout: "hTurnout",
   incumbencyAdvantage: "hIncumb",
@@ -94,67 +101,46 @@ const demographicParams: Record<DemographicSliderId, string> = {
   nonCollegeVoteShift: "noncollege",
 };
 
-export const scenarioSwingBounds = {
-  min: -15,
-  max: 15,
-} as const;
-
-function clampSwing(value: number) {
-  return Math.min(
-    scenarioSwingBounds.max,
-    Math.max(scenarioSwingBounds.min, value),
-  );
-}
-
-function clampDemographicValue(value: number) {
-  return Math.min(
-    demographicSliderBounds.max,
-    Math.max(demographicSliderBounds.min, value),
-  );
-}
-
-function clampLegislativeSliderValue(value: number) {
-  return Math.min(
-    legislativeSliderBounds.max,
-    Math.max(legislativeSliderBounds.min, value),
-  );
-}
-
-export function normalizeSwing(value: number) {
-  return Number(clampSwing(value).toFixed(1));
-}
+export { normalizeSwing, scenarioSwingBounds };
 
 function normalizeDemographicValue(value: number) {
-  return Number(clampDemographicValue(value).toFixed(1));
+  return normalizeBoundedNumber(value, demographicSliderBounds);
 }
 
 function normalizeLegislativeSliderValue(value: number) {
-  return Number(clampLegislativeSliderValue(value).toFixed(1));
+  return normalizeBoundedNumber(value, legislativeSliderBounds);
 }
 
 function serializeStateOverrides(overrides: StateOverrides) {
   const entries = Object.entries(overrides)
+    .filter(([id]) => validStateCodes.has(id))
+    .map(([id, override]) => [id, normalizeStateOverride(override)] as const)
     .filter((entry) => hasStateOverride(entry[1]))
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([id, override]) => [
       id,
-      normalizeLocalOverrideValue(override?.turnout ?? 0),
-      normalizeLocalOverrideValue(override?.partisanShift ?? 0),
-      normalizeLocalOverrideValue(override?.candidateQuality ?? 0),
+      override.turnout,
+      override.partisanShift,
+      override.candidateQuality,
     ]);
 
   return entries.length ? JSON.stringify(entries) : "";
 }
 
-function serializeSeatOverrides(overrides: Partial<Record<string, SeatOverride>>) {
+function serializeSeatOverrides(
+  overrides: Partial<Record<string, SeatOverride>>,
+  validIds: ReadonlySet<string>,
+) {
   const entries = Object.entries(overrides)
+    .filter(([id]) => validIds.has(id))
+    .map(([id, override]) => [id, normalizeSeatOverride(override)] as const)
     .filter((entry) => hasSeatOverride(entry[1]))
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([id, override]) => [
       id,
-      normalizeLocalOverrideValue(override?.turnout ?? 0),
-      normalizeLocalOverrideValue(override?.candidateQuality ?? 0),
-      override?.seatStatus ?? "baseline",
+      override.turnout,
+      override.candidateQuality,
+      override.seatStatus,
     ]);
 
   return entries.length ? JSON.stringify(entries) : "";
@@ -181,15 +167,23 @@ export function stateOverridesFromSearchParams(params: URLSearchParams): StateOv
       }
 
       const [id, turnout, partisanShift, candidateQuality] = entry;
-      if (!validStateCodes.has(id)) {
+      if (
+        !validStateCodes.has(id) ||
+        typeof turnout !== "number" ||
+        !Number.isFinite(turnout) ||
+        typeof partisanShift !== "number" ||
+        !Number.isFinite(partisanShift) ||
+        typeof candidateQuality !== "number" ||
+        !Number.isFinite(candidateQuality)
+      ) {
         return overrides;
       }
 
-      const normalizedOverride = {
-        turnout: normalizeLocalOverrideValue(Number(turnout)),
-        partisanShift: normalizeLocalOverrideValue(Number(partisanShift)),
-        candidateQuality: normalizeLocalOverrideValue(Number(candidateQuality)),
-      };
+      const normalizedOverride = normalizeStateOverride({
+        turnout,
+        partisanShift,
+        candidateQuality,
+      });
 
       if (hasStateOverride(normalizedOverride)) {
         overrides[id] = normalizedOverride;
@@ -213,15 +207,22 @@ function seatOverridesFromSearchParams(
       }
 
       const [id, turnout, candidateQuality, seatStatus] = entry;
-      if (!validIds.has(id) || !isSeatStatusOverride(seatStatus)) {
+      if (
+        !validIds.has(id) ||
+        typeof turnout !== "number" ||
+        !Number.isFinite(turnout) ||
+        typeof candidateQuality !== "number" ||
+        !Number.isFinite(candidateQuality) ||
+        !isSeatStatusOverride(seatStatus)
+      ) {
         return overrides;
       }
 
-      const normalizedOverride: SeatOverride = {
-        turnout: normalizeLocalOverrideValue(Number(turnout)),
-        candidateQuality: normalizeLocalOverrideValue(Number(candidateQuality)),
+      const normalizedOverride = normalizeSeatOverride({
+        turnout,
+        candidateQuality,
         seatStatus,
-      };
+      });
 
       if (hasSeatOverride(normalizedOverride)) {
         overrides[id] = normalizedOverride;
@@ -250,7 +251,7 @@ export function legislativeOverridesFromSearchParams(
       ? seatOverridesFromSearchParams(
           params,
           senateRaceOverridesParam,
-          validSenateSeatIds,
+          validSenateOverrideIds,
         )
       : {},
   };
@@ -281,6 +282,7 @@ export function scenarioToSearchParams(
 ) {
   const params = new URLSearchParams();
   const nationalSwing = normalizeSwing(assumptions.nationalSwing);
+  const normalizedBaselineYear = normalizeHistoricalElectionYear(Number(baselineYear));
   const demographics = {
     ...defaultDemographicAssumptions,
     ...assumptions.demographics,
@@ -290,8 +292,8 @@ export function scenarioToSearchParams(
     params.set(swingParam, nationalSwing.toFixed(1));
   }
 
-  if (baselineYear !== defaultHistoricalElectionYear) {
-    params.set(baselineYearParam, String(baselineYear));
+  if (normalizedBaselineYear !== defaultHistoricalElectionYear) {
+    params.set(baselineYearParam, String(normalizedBaselineYear));
   }
 
   demographicSliderIds.forEach((id) => {
@@ -348,7 +350,10 @@ export function legislativeSeatFromSearchParams(
   params: URLSearchParams,
   chamber: LegislativeChamber,
 ) {
-  return params.get(chamber === "house" ? houseSeatParam : senateSeatParam);
+  const seatId = params.get(chamber === "house" ? houseSeatParam : senateSeatParam);
+  const validIds = chamber === "house" ? validHouseSeatIds : validSenateSeatIds;
+
+  return seatId && validIds.has(seatId) ? seatId : null;
 }
 
 export function legislativeSlidersFromSearchParams(
@@ -373,7 +378,8 @@ export function legislativeSlidersFromSearchParams(
 }
 
 export function selectedStateFromSearchParams(params: URLSearchParams) {
-  return params.get(selectedStateParam);
+  const stateCode = params.get(selectedStateParam);
+  return stateCode && validStateCodes.has(stateCode) ? stateCode : null;
 }
 
 export function appScenarioToUrl({
@@ -409,11 +415,11 @@ export function appScenarioToUrl({
   const normalizedHouseSwing = normalizeSwing(houseSwing);
   const normalizedSenateSwing = normalizeSwing(senateSwing);
 
-  if (activeTab !== "president") {
+  if (activeTab === "house" || activeTab === "senate") {
     params.set(tabParam, activeTab);
   }
 
-  if (selectedStateCode) {
+  if (validStateCodes.has(selectedStateCode)) {
     params.set(selectedStateParam, selectedStateCode);
   }
 
@@ -433,6 +439,7 @@ export function appScenarioToUrl({
 
   const serializedDistrictOverrides = serializeSeatOverrides(
     houseOverrides?.districts ?? {},
+    validHouseSeatIds,
   );
   if (serializedDistrictOverrides) {
     params.set(districtOverridesParam, serializedDistrictOverrides);
@@ -454,16 +461,17 @@ export function appScenarioToUrl({
 
   const serializedSenateRaceOverrides = serializeSeatOverrides(
     senateOverrides?.races ?? {},
+    validSenateOverrideIds,
   );
   if (serializedSenateRaceOverrides) {
     params.set(senateRaceOverridesParam, serializedSenateRaceOverrides);
   }
 
-  if (houseSeatId) {
+  if (validHouseSeatIds.has(houseSeatId)) {
     params.set(houseSeatParam, houseSeatId);
   }
 
-  if (senateSeatId) {
+  if (validSenateSeatIds.has(senateSeatId)) {
     params.set(senateSeatParam, senateSeatId);
   }
 

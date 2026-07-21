@@ -22,6 +22,14 @@ export const emptySeatOverride: SeatOverride = {
   seatStatus: "baseline",
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object");
+}
+
+function normalizeUnknownLocalOverrideValue(value: unknown) {
+  return normalizeLocalOverrideValue(typeof value === "number" ? value : Number.NaN);
+}
+
 export function normalizeLocalOverrideValue(value: number) {
   const finiteValue = Number.isFinite(value) ? value : 0;
   return Number(
@@ -30,6 +38,28 @@ export function normalizeLocalOverrideValue(value: number) {
       Math.max(localOverrideBounds.min, finiteValue),
     ).toFixed(1),
   );
+}
+
+export function normalizeStateOverride(value: unknown): StateOverride {
+  const override = isRecord(value) ? value : {};
+
+  return {
+    turnout: normalizeUnknownLocalOverrideValue(override.turnout),
+    partisanShift: normalizeUnknownLocalOverrideValue(override.partisanShift),
+    candidateQuality: normalizeUnknownLocalOverrideValue(override.candidateQuality),
+  };
+}
+
+export function normalizeSeatOverride(value: unknown): SeatOverride {
+  const override = isRecord(value) ? value : {};
+
+  return {
+    turnout: normalizeUnknownLocalOverrideValue(override.turnout),
+    candidateQuality: normalizeUnknownLocalOverrideValue(override.candidateQuality),
+    seatStatus: isSeatStatusOverride(override.seatStatus)
+      ? override.seatStatus
+      : "baseline",
+  };
 }
 
 export function isSeatStatusOverride(value: unknown): value is SeatStatusOverride {
@@ -42,20 +72,28 @@ export function isSeatStatusOverride(value: unknown): value is SeatStatusOverrid
 }
 
 export function hasStateOverride(override?: StateOverride) {
-  return Boolean(
-    override &&
-      (Math.abs(override.turnout) >= 0.05 ||
-        Math.abs(override.partisanShift) >= 0.05 ||
-        Math.abs(override.candidateQuality) >= 0.05),
+  if (!override) {
+    return false;
+  }
+
+  const normalizedOverride = normalizeStateOverride(override);
+  return (
+    Math.abs(normalizedOverride.turnout) >= 0.05 ||
+    Math.abs(normalizedOverride.partisanShift) >= 0.05 ||
+    Math.abs(normalizedOverride.candidateQuality) >= 0.05
   );
 }
 
 export function hasSeatOverride(override?: SeatOverride) {
-  return Boolean(
-    override &&
-      (Math.abs(override.turnout) >= 0.05 ||
-        Math.abs(override.candidateQuality) >= 0.05 ||
-        override.seatStatus !== "baseline"),
+  if (!override) {
+    return false;
+  }
+
+  const normalizedOverride = normalizeSeatOverride(override);
+  return (
+    Math.abs(normalizedOverride.turnout) >= 0.05 ||
+    Math.abs(normalizedOverride.candidateQuality) >= 0.05 ||
+    normalizedOverride.seatStatus !== "baseline"
   );
 }
 
@@ -63,7 +101,7 @@ export function getSeatStatusOverrideDelta(
   seat: LegislativeSeatBaseline,
   status: SeatStatusOverride,
 ) {
-  if (status === "baseline") {
+  if (!isSeatStatusOverride(status) || status === "baseline") {
     return 0;
   }
 
