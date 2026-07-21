@@ -11,8 +11,9 @@ import type {
   Party,
   StateBaseline,
 } from "@/types/election";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 
-export const stateMapShapeAssetPath = "/us-states-albers-10m.json";
+export const stateMapShapeAssetPath = publicAssetPath("us-states-albers-10m.json");
 export const stateBaselineAccuracyProfile = currentDatasetAccuracyProfiles.find(
   (profile) => profile.id === "historical-state-baselines",
 );

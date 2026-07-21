@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { getStateColor } from "@/lib/getStateColor";
+import { publicAssetPath } from "@/lib/publicAssetPath";
 import {
   formatLegislativeParty,
   formatMargin,
@@ -67,7 +68,7 @@ type StateGroup = {
   flaggedSeats: number;
 };
 
-const houseDistrictMapAssetPath = "/us-house-districts-119-20m.json";
+const houseDistrictMapAssetPath = publicAssetPath("us-house-districts-119-20m.json");
 const expectedVotingDistricts = 435;
 const nationalStateCode = "national";
 type HouseZoomMode = "national" | "state" | "district";

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const publicSiteUrl = "https://damonko1.github.io/demoPrediction/";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(publicSiteUrl),
   applicationName: "Election Forecast Playground",
   title: {
     default: "Election Forecast Playground",
@@ -18,16 +22,20 @@ export const metadata: Metadata = {
     "political scenario analysis",
   ],
   category: "education",
+  alternates: {
+    canonical: publicSiteUrl,
+  },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: `${publicBasePath}/favicon.svg`,
+    shortcut: `${publicBasePath}/favicon.svg`,
+    apple: `${publicBasePath}/apple-touch-icon.png`,
   },
   openGraph: {
     title: "Election Forecast Playground",
     description:
       "Build and share interactive President, House, and Senate scenarios with historical baselines, swing controls, and local race overrides.",
     type: "website",
+    url: publicSiteUrl,
     siteName: "Election Forecast Playground",
     images: [
       {

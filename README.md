@@ -1,6 +1,9 @@
 # Election Forecast Playground
 
 [![Quality gate](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml/badge.svg)](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml)
+[![Live site](https://img.shields.io/badge/live-GitHub%20Pages-0969da)](https://damonko1.github.io/demoPrediction/)
+
+[Open the live simulator](https://damonko1.github.io/demoPrediction/)
 
 An interactive, browser-based lab for exploring how election assumptions can change the presidential, House, and Senate map.
 
