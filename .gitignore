@@ -1,12 +1,38 @@
+# Dependencies
 node_modules/
+
+# Next.js and production output
 .next/
 out/
 dist/
-.tmp/
+.vercel/
 
+# Test, coverage, and browser automation artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright-cli/
+output/playwright/
+
+# Local caches and generated diagnostics
+.tmp/
+.turbo/
+*.tsbuildinfo
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment files (keep a documented example)
 .env*
 !.env.example
 
-*.tsbuildinfo
-.playwright-cli/
-output/playwright/
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

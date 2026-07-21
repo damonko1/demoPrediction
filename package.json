@@ -2,10 +2,14 @@
   "name": "election-forecast-playground",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "python3 -m http.server 3000 -d out",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:historical-data": "node scripts/build-historical-data.mjs",
@@ -26,6 +30,8 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "d3-geo": "^3.1.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.9",
     "shapefile": "^0.6.6",
     "typescript": "6.0.3",
     "vitest": "^4.1.10"

@@ -995,10 +995,6 @@ function getPartyCounts(seats) {
   );
 }
 
-function getSeatIds(seats) {
-  return seats.map((seat) => seat.id);
-}
-
 function getSeatsWithVoteTotalMismatches(seats) {
   return seats
     .filter((seat) => seat.candidateVoteTotalDifference !== 0)
