@@ -6110,6 +6110,11 @@
 }
 
 @media (max-width: 760px) {
+  .sliderFrame,
+  .swingSlider {
+    min-height: 44px;
+  }
+
   .shell button,
   .shell input:not([type="range"]):not([type="radio"]):not([type="checkbox"]),
   .shell select,
