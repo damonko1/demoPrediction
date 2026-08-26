@@ -14,14 +14,15 @@ Election Scenario Playground turns national swing and local race assumptions int
 
 ## Highlights
 
-- **Three connected workspaces:** Explore presidential, House, and Senate outcomes from one responsive interface.
+- **Three connected workspaces:** Explore House and Senate midterm scenarios, with historical presidential replay available for context.
 - **Historical replay:** Use calculation-ready state presidential baselines for every election from 2000 through 2024.
 - **Interactive election maps:** Inspect all 538 electoral votes, 435 voting House districts, and 100 Senate seats with margin-based color intensity.
 - **Real-time scenario controls:** Adjust national swing and demographic-style assumptions and see the map, counters, summaries, and pressure points update immediately.
 - **One-click stress tests:** Try youth-turnout, suburban-shift, rural-surge, low-turnout, and popular-vote/Electoral College split scenarios.
 - **Local overrides:** Apply state, district, or Senate-race adjustments to explore outcomes that a national model cannot capture.
 - **Decision context:** Review flipped states, tipping-point rankings, paths to 270, largest assumption effects, and a deterministic Monte Carlo uncertainty stress test.
-- **Save and share:** Copy a scenario URL, bookmark named scenarios locally, preview an embed card, or export the presidential map as a PNG.
+- **Save and share:** Copy a scenario URL, bookmark named scenarios locally, export a scenario card as SVG or PNG, or export the presidential map as PNG.
+- **Progressive disclosure:** The map and essential outcome lead; customization, sharing, comparison, methodology, and stress testing remain available on demand.
 - **Accessible controls:** Keyboard-friendly native inputs, visible focus states, descriptive labels, and light and dark themes.
 - **Transparent data notes:** Model explanations and dataset readiness labels distinguish sourced baselines from illustrative assumptions.
 
@@ -50,6 +51,7 @@ Open [http://localhost:3000](http://localhost:3000).
 npm run typecheck
 npm run lint
 npm test
+npm run validate:launch
 npm run build
 npm run start
 ```
@@ -58,13 +60,13 @@ The project uses Next.js static export. `npm run build` writes the deployable si
 
 ## User Guide
 
-1. **Choose a chamber.** Use the President, House, and Senate tabs to switch workspaces. Each chamber has its own map, seat counter, controls, and detail panel.
-2. **Pick a baseline.** In the presidential workspace, choose a historical election year from 2000–2024. The 2024 baseline is selected by default.
+1. **Choose a chamber.** Use House, Senate, or History to switch workspaces. House is the launch default; History contains presidential replay rather than a current forecast.
+2. **Pick a baseline.** House uses the 2024 result baseline, Senate uses the latest completed race baselines, and History supports presidential election years from 2000–2024.
 3. **Set the broad environment.** Move the national swing control toward Democrats or Republicans. Results and margins update as you drag.
 4. **Try a preset or tune the electorate.** Open the scenario presets for a quick stress test, or expand the demographic-style controls to adjust individual inputs. Vote-shift controls label their partisan direction; turnout controls show higher or lower participation and use the model's state-specific sensitivities.
 5. **Inspect the map.** Select a state, House district, or Senate seat to see its baseline, simulated margin, major drivers, and available local overrides. Darker fills indicate larger modeled margins, not greater certainty.
-6. **Read the analysis.** The counters show chamber control; summaries surface flips and seat changes; pressure points show close states, tipping points, and paths to 270. Monte Carlo output is an uncertainty exercise built around the current scenario—not a win probability forecast.
-7. **Save or share.** Copy the current link to preserve scenario inputs, save named bookmarks in the current browser, or export the presidential map. Anyone opening a shared URL receives the encoded scenario state.
+6. **Read the analysis when needed.** Open **Advanced analysis and methodology** for summaries, pressure points, sensitivity, and Monte Carlo stress testing. Monte Carlo output is an uncertainty exercise—not a win-probability forecast.
+7. **Save or share.** Open **Share, save, reset, and compare chambers** to copy the current link, save a named browser-local scenario, or export an SVG/PNG card. Anyone opening a shared URL receives the encoded scenario state.
 8. **Reset when needed.** Reset controls return the relevant assumptions and overrides to their neutral baseline.
 
 ## How the Model Works
@@ -111,6 +113,7 @@ The runtime has no API server or database. Scenario links use URL parameters, wh
 | `npm run validate:state-map` | Validate state/DC map coverage and related records |
 | `npm run validate:house-map` | Validate House district geometry coverage |
 | `npm run validate:legislative-data` | Validate legislative records and source metadata |
+| `npm run validate:launch` | Validate the pre-launch product contract and regression guardrails |
 
 ## Repository Guide
 
@@ -144,4 +147,5 @@ npm run build
 npm run validate:state-map
 npm run validate:house-map
 npm run validate:legislative-data
+npm run validate:launch
 ```

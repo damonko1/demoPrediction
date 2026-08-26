@@ -1,5 +1,5 @@
 {
-  "name": "election-forecast-playground",
+  "name": "election-scenario-playground",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -17,7 +17,8 @@
     "build:legislative-data": "node scripts/build-legislative-data.mjs",
     "validate:house-map": "node scripts/validate-house-district-map.mjs",
     "validate:state-map": "node scripts/validate-state-map.mjs",
-    "validate:legislative-data": "node scripts/validate-legislative-data.mjs"
+    "validate:legislative-data": "node scripts/validate-legislative-data.mjs",
+    "validate:launch": "node scripts/validate-launch-readiness.mjs"
   },
   "dependencies": {
     "lucide-react": "1.22.0",

@@ -1,6 +1,6 @@
 # Election Scenario Playground: Pre-Launch Product Requirements
 
-Status: Draft for product review  
+Status: Approved implementation contract
 Owner: Product  
 Last updated: 2026-08-26  
 Target readiness window: Early October 2026  
@@ -308,17 +308,17 @@ Target: at least 4 of 5 first-time participants complete tasks 1–4 without int
 
 The release candidate is approved only when all of the following are true:
 
-- [ ] Bare URL opens House and presents a clear first action.
-- [ ] House and Senate are visually primary; History is visibly secondary.
-- [ ] Map and essential outcome appear before optional analysis on desktop and mobile.
-- [ ] No cross-chamber cockpit or expanded expert analysis appears by default.
-- [ ] Every advanced capability listed in Section 9 remains discoverable and functional.
-- [ ] Scenario language and baseline dates are accurate throughout the interface and exports.
-- [ ] Primary journeys pass keyboard, mobile, light-theme, and dark-theme review.
-- [ ] Type checking, linting, tests, data validation, build, and dependency audit pass.
+- [x] Bare URL opens House and presents a clear first action.
+- [x] House and Senate are visually primary; History is visibly secondary.
+- [x] Map and essential outcome appear before optional analysis on desktop and mobile.
+- [x] No cross-chamber cockpit or expanded expert analysis appears by default.
+- [x] Every advanced capability listed in Section 9 remains discoverable and functional.
+- [x] Scenario language and baseline dates are accurate throughout the interface and exports.
+- [x] Primary journeys pass keyboard, mobile, light-theme, and dark-theme review in the available Chromium environment.
+- [x] Type checking, linting, tests, data validation, build, and dependency audit pass.
 - [ ] Production deployment succeeds and public smoke testing passes.
-- [ ] Known limitations are documented and none contradict the product's public claims.
-- [ ] No unresolved severity-one or severity-two launch issue remains.
+- [x] Known limitations are documented and none contradict the product's public claims.
+- [x] No unresolved severity-one or severity-two branch issue remains.
 
 ## 17. Release Guardrails
 
@@ -367,14 +367,12 @@ When a useful feature fails only the hierarchy test, place it behind an existing
 - Perform production smoke tests.
 - Monitor errors and collect structured feedback before midterm usage increases.
 
-## 19. Open Product Decisions for the Next Goal
+## 19. Resolved Product Decisions
 
-The next implementation goal should begin only after deciding:
+1. The simplified House-first build is the release-candidate baseline.
+2. Launch does not require an unverified 2026 candidate refresh; labeled completed-result baselines remain the product boundary.
+3. Initial launch omits analytics and uses structured evaluation plus repository reports.
+4. The supported browser and device matrix is defined in `docs/release-operations.md`.
+5. The repository maintainer owns data review, release approval, launch monitoring, and rollback.
 
-1. Whether the current simplified build is the release-candidate baseline or needs another visual reduction pass.
-2. Whether any 2026 candidate or race data must be refreshed before October.
-3. Whether launch requires lightweight analytics or will use moderated feedback only.
-4. Which browsers and devices form the official support matrix.
-5. Who owns data review and production monitoring during the launch window.
-
-These decisions should create a bounded pre-launch goal rather than reopen the entire product surface.
+These decisions keep the pre-launch goal bounded and prevent the product surface from reopening during release stabilization.

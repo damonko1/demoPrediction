@@ -674,8 +674,8 @@ export function Playground() {
               </h2>
             </div>
             <div className={styles.headerMeta}>
-              <span>State, seat, and chamber results update live</span>
-              <strong>Simulation only</strong>
+              <span>Adjust assumptions; results update live</span>
+              <strong>Scenario simulator — not a forecast</strong>
             </div>
           </header>
 

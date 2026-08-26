@@ -6090,6 +6090,23 @@
 }
 
 @media (max-width: 760px) {
+  .shell button,
+  .shell input:not([type="range"]):not([type="radio"]):not([type="checkbox"]),
+  .shell select,
+  .shell summary {
+    min-height: 44px;
+  }
+
+  .shell button,
+  .shell select {
+    min-width: 44px;
+  }
+
+  .shell summary {
+    display: flex;
+    align-items: center;
+  }
+
   .unifiedSummary {
     grid-template-areas:
       "simulation-header"
