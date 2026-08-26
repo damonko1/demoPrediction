@@ -4,6 +4,10 @@ Status: Release-candidate evidence
 Branch: `docs/prelaunch-product-prd`  
 Last updated: 2026-08-26
 
+Verified commit: `b314e39`
+
+Clean-checkout quality gate: [GitHub Actions run 32997013552](https://github.com/damonko1/demoPrediction/actions/runs/32997013552) — passed
+
 This matrix maps the pre-launch PRD to authoritative source, automated, build, and runtime evidence. Production deployment remains intentionally gated on review and merge into `main`.
 
 ## Acceptance Matrix
@@ -66,7 +70,7 @@ The CI quality gate runs:
 6. the pre-launch product-contract validator; and
 7. the production static build.
 
-The quality workflow also supports manual dispatch so the feature branch can be tested from a clean GitHub checkout before a pull request or merge.
+The quality workflow also supports manual dispatch so the feature branch can be tested from a clean GitHub checkout before a pull request or merge. Run `32997013552` passed every job for the verified implementation commit.
 
 ## Remaining Release Actions
 
