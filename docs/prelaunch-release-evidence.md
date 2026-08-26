@@ -4,11 +4,11 @@ Status: Production-verified release evidence
 Branch: `docs/prelaunch-product-prd`  
 Last updated: 2026-08-26
 
-Application release commit: `f6446c7`
+Application release commit: `cc374a5`
 
-Main quality gate: [GitHub Actions run 32998626925](https://github.com/damonko1/demoPrediction/actions/runs/32998626925) — passed
+Main quality gate: [GitHub Actions run 33004857987](https://github.com/damonko1/demoPrediction/actions/runs/33004857987) — passed
 
-Production deployment: [GitHub Actions run 32998626913](https://github.com/damonko1/demoPrediction/actions/runs/32998626913) — passed
+Production deployment: [GitHub Actions run 33004857935](https://github.com/damonko1/demoPrediction/actions/runs/33004857935) — passed
 
 This matrix maps the pre-launch PRD to authoritative source, automated, build, and runtime evidence. Production deployment remains intentionally gated on review and merge into `main`.
 
@@ -22,11 +22,11 @@ This matrix maps the pre-launch PRD to authoritative source, automated, build, a
 | No permanent cross-chamber cockpit or expert analysis | Pass | Cross-chamber tools and analysis are closed native disclosures. Runtime audit found zero open disclosures on House, Senate, and History defaults. |
 | Advanced capabilities discoverable and functional | Pass | Runtime accessibility snapshots exposed every named disclosure. SVG and PNG card downloads both completed successfully. Existing controls expose local overrides, sources, saved scenarios, comparison, sensitivity, Monte Carlo, and methodology. |
 | Scenario language and source dates accurate | Pass | Header explicitly says “Scenario simulator — not a forecast.” House identifies the 2024 result baseline, Senate identifies latest-completed race baselines, and History identifies the selected result year. Data validators pass. |
-| Keyboard, mobile, light, and dark review | Pass in Chromium | Tabs support arrow-key selection and focus. House-map ArrowRight moved focus and selection from PA-7 to PA-8. Light/dark toggle updated its accessible label. At 320px all non-SVG interactive targets reached 44px in both dimensions and the page had zero horizontal overflow. |
+| Keyboard, mobile, light, and dark review | Pass in Chromium and native Safari | Tabs support arrow-key selection and focus. House-map ArrowRight moved focus and selection from PA-7 to PA-8. Light/dark toggle updated its accessible label. At 320px all visible interactive targets reached 44px in both dimensions and the page had zero horizontal overflow. Native Safari 16.6 confirmed the production Senate journey, dark-theme toggle, URL routing, and mobile target sizing. |
 | Quality, data, build, and security gates | Pass | ESLint, TypeScript, 37 tests, state/Senate map validation, House map validation, legislative data validation, launch-contract validation, local static build, base-path build, and production dependency audit all passed. Audit reported zero vulnerabilities. |
-| Production deployment and public smoke test | Pass | Commit `f6446c7` passed the main quality gate and GitHub Pages deployment. The public House and Senate URLs returned HTTP 200. The expanded Senate tools layout had zero overlaps and zero horizontal overflow at 1844px and 320px, with zero console errors. |
+| Production deployment and public smoke test | Pass | Commit `cc374a5` passed the main quality gate and GitHub Pages deployment. The public House and Senate URLs returned HTTP 200. The expanded Senate tools layout had zero overlaps and zero horizontal overflow at 1844px and 320px, with zero console errors. Native Safari found no undersized visible targets at 320px after remediation. |
 | Known limitations consistent with public claims | Pass | `docs/data-accuracy.md`, `docs/launch-readiness-audit.md`, the PRD, and release runbook define completed-result baselines, heuristic limits, and non-goals. |
-| No unresolved severity-one or severity-two issue | Pass for audited branch | No blocking issue remains from source, automated, data, build, security, or Chromium runtime review. Cross-browser production checks remain a release-procedure gate. |
+| No unresolved severity-one or severity-two issue | Pass for production | No blocking issue remains from source, automated, data, build, security, Chromium runtime, or native Safari production review. |
 
 ## Functional Capability Matrix
 
@@ -53,6 +53,7 @@ This matrix maps the pre-launch PRD to authoritative source, automated, build, a
 | Measurement | Result |
 | --- | --- |
 | Chromium viewport | 320 × 800 CSS pixels |
+| Native Safari viewport | 320 × 900 CSS pixels on Safari 16.6 |
 | Horizontal overflow | 0px in House, Senate, and History |
 | Closed disclosures on default load | 0 open |
 | House swing visible-update latency | 30.6ms over two animation frames |
@@ -76,7 +77,7 @@ The quality workflow also supports manual dispatch so a feature branch can be te
 
 ## Remaining Evaluation Actions
 
-The implementation, merge, deployment, and public smoke test are complete. Two human/environment evaluation activities remain recommended before the early-October launch window:
+The implementation, merge, deployment, public smoke test, and native Safari confirmation are complete. Two broader evaluation activities remain recommended before the early-October launch window:
 
-1. Complete native Safari/WebKit confirmation on a supported environment; Playwright WebKit and Firefox are unavailable on the current macOS 12 ARM runtime.
-2. Run the moderated tasks with first-time users and record observed completion rates.
+1. Repeat the smoke matrix on current Safari/iOS hardware as part of the release-candidate procedure.
+2. Run the moderated tasks with first-time users and record observed completion rates; this is a product-learning activity, not a blocker for the technically launch-ready build.
