@@ -6029,8 +6029,28 @@
 
 .scenarioToolsBody {
   display: grid;
+  min-width: 0;
+  grid-template-areas:
+    "tools-actions"
+    "tools-results"
+    "tools-saved";
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   padding-top: 8px;
+}
+
+.scenarioToolsBody > .simulationDockActions {
+  grid-area: tools-actions;
+}
+
+.scenarioToolsBody > .unifiedSummaryGrid {
+  grid-area: tools-results;
+  min-width: 0;
+}
+
+.scenarioToolsBody > .scenarioBookmarkDisclosure {
+  grid-area: tools-saved;
+  min-width: 0;
 }
 
 .scenarioBookmarkDisclosure {

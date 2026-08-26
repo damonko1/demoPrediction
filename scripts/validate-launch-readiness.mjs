@@ -96,6 +96,9 @@ requireText(globalStyles, "prefers-reduced-motion: reduce", "Reduced-motion supp
 requireText(globalStyles, ":focus-visible", "Visible keyboard focus");
 requireText(playgroundStyles, '.shell summary {', "Mobile disclosure targets");
 requireText(playgroundStyles, "min-height: 44px", "Minimum touch targets");
+requireText(playgroundStyles, '"tools-actions"', "Scenario tools row layout");
+requireText(playgroundStyles, '"tools-results"', "Scenario results row layout");
+requireText(playgroundStyles, '"tools-saved"', "Saved scenarios row layout");
 requireText(metadata, 'applicationName: "Election Scenario Playground"', "Metadata identity");
 
 if (packageJson.name !== "election-scenario-playground") {
