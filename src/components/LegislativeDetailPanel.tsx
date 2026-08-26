@@ -336,23 +336,6 @@ export function LegislativeDetailPanel({
         </div>
       </div>
 
-      <PoliticianPortraitGroup label="Current member portrait">
-        <PoliticianPortrait
-          imageUrl={incumbentPortrait?.imageUrl}
-          name={seat.incumbent?.name ?? "Vacant seat"}
-          party={incumbentParty}
-          role={
-            seat.incumbent
-              ? `${getPartyDetail(result)} / current ${
-                  seat.chamber === "house" ? "representative" : "senator"
-                }`
-              : "No current incumbent in roster snapshot"
-          }
-          sourceLabel={incumbentPortrait?.sourceLabel}
-          sourceUrl={incumbentPortrait?.sourceUrl}
-        />
-      </PoliticianPortraitGroup>
-
       <div className={styles.detailGrid}>
         <div>
           <span>Baseline</span>
@@ -400,44 +383,65 @@ export function LegislativeDetailPanel({
         <strong>{result.marginToFlip.toFixed(1)} pts</strong>
       </div>
 
-      <StateOverrideControls
-        stateName={seat.stateName}
-        value={stateOverride}
-        onChange={onStateOverrideChange}
-        onReset={onStateOverrideReset}
-      />
+      <details className={styles.detailDisclosure}>
+        <summary>Customize this {seat.chamber === "house" ? "district" : "race"}</summary>
+        <div className={styles.detailDisclosureBody}>
+          <StateOverrideControls
+            stateName={seat.stateName}
+            value={stateOverride}
+            onChange={onStateOverrideChange}
+            onReset={onStateOverrideReset}
+          />
 
-      {seat.chamber === "house" || seat.upNextCycle ? (
-        <SeatOverrideControls
-          kind={seat.chamber === "house" ? "district" : "race"}
-          label={seat.districtLabel}
-          value={seatOverride}
-          onChange={onSeatOverrideChange}
-          onReset={onSeatOverrideReset}
-        />
-      ) : null}
+          {seat.chamber === "house" || seat.upNextCycle ? (
+            <SeatOverrideControls
+              kind={seat.chamber === "house" ? "district" : "race"}
+              label={seat.districtLabel}
+              value={seatOverride}
+              onChange={onSeatOverrideChange}
+              onReset={onSeatOverrideReset}
+            />
+          ) : null}
 
-      <div className={styles.assumptionDrivers}>
-        <div className={styles.assumptionDriversHeader}>
-          <span>Applied assumption</span>
-          <strong>{formatSignedPoints(result.totalAdjustment)}</strong>
+          <div className={styles.assumptionDrivers}>
+            <div className={styles.assumptionDriversHeader}>
+              <span>Applied assumption</span>
+              <strong>{formatSignedPoints(result.totalAdjustment)}</strong>
+            </div>
+            <ol className={styles.driverList}>
+              {assumptionDrivers.map((driver) => (
+                <li key={driver.label}>
+                  <span>
+                    <b>{driver.label}</b>
+                    <small>{getDriverNote(driver, result)}</small>
+                  </span>
+                  <strong>{formatSignedPoints(driver.delta)}</strong>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
-        <ol className={styles.driverList}>
-          {assumptionDrivers.map((driver) => (
-            <li key={driver.label}>
-              <span>
-                <b>{driver.label}</b>
-                <small>{getDriverNote(driver, result)}</small>
-              </span>
-              <strong>{formatSignedPoints(driver.delta)}</strong>
-            </li>
-          ))}
-        </ol>
-      </div>
+      </details>
 
       <details className={styles.detailDisclosure}>
         <summary>Member profile and seat context</summary>
         <div className={styles.detailDisclosureBody}>
+          <PoliticianPortraitGroup label="Current member portrait">
+            <PoliticianPortrait
+              imageUrl={incumbentPortrait?.imageUrl}
+              name={seat.incumbent?.name ?? "Vacant seat"}
+              party={incumbentParty}
+              role={
+                seat.incumbent
+                  ? `${getPartyDetail(result)} / current ${
+                      seat.chamber === "house" ? "representative" : "senator"
+                    }`
+                  : "No current incumbent in roster snapshot"
+              }
+              sourceLabel={incumbentPortrait?.sourceLabel}
+              sourceUrl={incumbentPortrait?.sourceUrl}
+            />
+          </PoliticianPortraitGroup>
           <div className={styles.detailGrid}>
             <div>
               <span>{getSeatCodeLabel(result)}</span>

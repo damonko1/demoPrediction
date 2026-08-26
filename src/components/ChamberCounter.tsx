@@ -128,8 +128,25 @@ export function ChamberCounter({ scenario }: ChamberCounterProps) {
         </div>
       </div>
 
-      <div className={`${styles.counterMetaGrid} ${styles.chamberCounterMetaGrid}`}>
-        <div>
+      <div className={styles.counterBar} aria-hidden="true">
+        <div className={styles.demBar} style={{ width: `${demWidth}%` }} />
+        <div className={styles.repBar} style={{ width: `${repWidth}%` }} />
+        <span
+          className={styles.thresholdMarker}
+          style={{ left: `${thresholdPosition}%` }}
+        />
+      </div>
+
+      <div className={styles.scaleTicks} aria-hidden="true">
+        <span>0D</span>
+        <span>{scenario.majorityThreshold} CONTROL</span>
+        <span>{scenario.totalSeats}R</span>
+      </div>
+
+      <details className={styles.counterDetails}>
+        <summary>More chamber details</summary>
+        <div className={`${styles.counterMetaGrid} ${styles.chamberCounterMetaGrid}`}>
+          <div>
           <span>Threshold</span>
           <strong>{scenario.majorityThreshold}</strong>
           <small>{controlNote}</small>
@@ -187,22 +204,8 @@ export function ChamberCounter({ scenario }: ChamberCounterProps) {
             <small>Current roster vacancies, separate from simulated control</small>
           </div>
         ) : null}
-      </div>
-
-      <div className={styles.counterBar} aria-hidden="true">
-        <div className={styles.demBar} style={{ width: `${demWidth}%` }} />
-        <div className={styles.repBar} style={{ width: `${repWidth}%` }} />
-        <span
-          className={styles.thresholdMarker}
-          style={{ left: `${thresholdPosition}%` }}
-        />
-      </div>
-
-      <div className={styles.scaleTicks} aria-hidden="true">
-        <span>0D</span>
-        <span>{scenario.majorityThreshold} CONTROL</span>
-        <span>{scenario.totalSeats}R</span>
-      </div>
+        </div>
+      </details>
     </section>
   );
 }

@@ -5982,3 +5982,140 @@
     border-width: 2px;
   }
 }
+
+/* Launch simplification: keep the simulator map-first and reveal depth on demand. */
+.unifiedSummary {
+  display: grid;
+  grid-template-areas:
+    "simulation-header simulation-settings"
+    "simulation-tools simulation-tools";
+  grid-template-columns: minmax(320px, 1fr) auto;
+  align-items: center;
+  padding: 9px 12px;
+}
+
+.unifiedSummaryHeader {
+  grid-area: simulation-header;
+  display: block;
+  padding: 0;
+  border-right: 0;
+}
+
+.simulationIdentity {
+  align-items: center;
+}
+
+.activeSettingsBar {
+  justify-content: flex-end;
+}
+
+.scenarioToolsDisclosure {
+  grid-area: simulation-tools;
+  margin-top: 3px;
+  border-top: 1px solid var(--line);
+}
+
+.scenarioToolsDisclosure > summary,
+.counterDetails > summary,
+.mapDataDisclosure > summary,
+.advancedAnalysisDisclosure > summary {
+  padding: 7px 2px 2px;
+  color: var(--muted-strong);
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.scenarioToolsBody {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.scenarioBookmarkDisclosure {
+  border: 0;
+  background: transparent;
+}
+
+.scenarioBookmarkDisclosure > section {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.counterDetails {
+  margin-top: 5px;
+  border-top: 1px solid var(--line);
+}
+
+.counterDetails .counterMetaGrid {
+  margin-top: 7px;
+}
+
+.mapDataDisclosure {
+  margin-bottom: 8px;
+}
+
+.mapDataDisclosure .houseMapStatus {
+  margin-top: 7px;
+  margin-bottom: 0;
+}
+
+.analysisRail,
+.focusWorkspace .analysisRail {
+  display: block;
+}
+
+.advancedAnalysisDisclosure {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.advancedAnalysisDisclosure > summary {
+  padding: 10px 12px;
+}
+
+.advancedAnalysisBody {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  padding: 0 10px 10px;
+}
+
+.advancedAnalysisBody > * {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .unifiedSummary {
+    grid-template-areas:
+      "simulation-header"
+      "simulation-settings"
+      "simulation-tools";
+    grid-template-columns: 1fr;
+  }
+
+  .simulationIdentity {
+    align-items: flex-start;
+  }
+
+  .activeSettingsBar {
+    justify-content: flex-start;
+    margin-top: 6px;
+  }
+
+  .advancedAnalysisBody {
+    grid-template-columns: 1fr;
+  }
+
+  .counterTopline {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .partyTotal strong {
+    font-size: 32px;
+  }
+}

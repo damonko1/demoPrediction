@@ -507,34 +507,37 @@ export function HouseDistrictMap({
         </button>
       </div>
 
-      <div
-        className={styles.houseMapStatus}
-        aria-label="House map data status"
-        aria-live="polite"
-      >
-        <div>
+      <details className={styles.mapDataDisclosure}>
+        <summary>Map coverage and data flags</summary>
+        <div
+          className={styles.houseMapStatus}
+          aria-label="House map data status"
+          aria-live="polite"
+        >
+          <div>
           <span>Rendered</span>
           <strong>
             {renderedDistrictCount || results.length}/{expectedVotingDistricts}
           </strong>
           <small>Voting districts</small>
         </div>
-        <div>
+          <div>
           <span>Delegates</span>
           <strong>Separate</strong>
           <small>{delegateSummary}</small>
         </div>
-        <div>
+          <div>
           <span>Flags</span>
           <strong>{flaggedDistrictCount}</strong>
           <small>Uncontested / low data</small>
         </div>
-        <div>
+          <div>
           <span>Source</span>
           <strong>US Census</strong>
           <small>{mapAsset?.source.vintage ?? "119th district boundaries"}</small>
+          </div>
         </div>
-      </div>
+      </details>
 
       <div className={styles.houseBoundaryViewport}>
         <p className={styles.srOnly} id="house-map-keyboard-help">

@@ -3,8 +3,6 @@
 import {
   Building2,
   Landmark,
-  Maximize2,
-  Minimize2,
   Moon,
   Sun,
   Vote,
@@ -75,9 +73,9 @@ const initialSelectedSenateSeat = "GA-S2";
 type ThemeMode = "light" | "dark";
 
 const tabs = [
-  { id: "president", label: "President", detail: "538 EV", Icon: Vote },
   { id: "house", label: "House", detail: "435 seats", Icon: Building2 },
   { id: "senate", label: "Senate", detail: "100 seats", Icon: Landmark },
+  { id: "president", label: "History", detail: "President", Icon: Vote },
 ] as const;
 
 export function Playground() {
@@ -106,7 +104,6 @@ export function Playground() {
     initialSelectedSenateSeat,
   );
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
-  const [isFocusMode, setIsFocusMode] = useState(false);
   const [urlReady, setUrlReady] = useState(false);
 
   const scenarioAssumptions = useMemo(
@@ -598,7 +595,7 @@ export function Playground() {
 
   return (
     <main
-      className={`${styles.shell} ${isFocusMode ? styles.focusShell : ""}`}
+      className={styles.shell}
       data-theme={themeMode}
     >
       <a className={styles.skipLink} href="#simulation-workspace">
@@ -641,51 +638,19 @@ export function Playground() {
           </nav>
 
           <div className={styles.sidebarFooter}>
-            <div
-              className={styles.themeSwitch}
-              aria-label="Display mode"
-              role="group"
-            >
-              <button
-                aria-label="Use light mode"
-                aria-pressed={themeMode === "light"}
-                className={themeMode === "light" ? styles.activeThemeButton : ""}
-                onClick={() => setThemeMode("light")}
-                title="Light mode"
-                type="button"
-              >
-                <Sun size={15} strokeWidth={2.2} />
-                <span>Light</span>
-              </button>
-              <button
-                aria-label="Use dark mode"
-                aria-pressed={themeMode === "dark"}
-                className={themeMode === "dark" ? styles.activeThemeButton : ""}
-                onClick={() => setThemeMode("dark")}
-                title="Dark mode"
-                type="button"
-              >
-                <Moon size={15} strokeWidth={2.2} />
-                <span>Dark</span>
-              </button>
-            </div>
-
             <button
-              aria-label={isFocusMode ? "Return to balanced view" : "Focus the map"}
-              aria-pressed={isFocusMode}
-              className={`${styles.focusToggle} ${
-                isFocusMode ? styles.activeFocusToggle : ""
-              }`}
-              onClick={() => setIsFocusMode((currentValue) => !currentValue)}
-              title={isFocusMode ? "Return to balanced view" : "Focus map"}
+              aria-label={`Use ${themeMode === "light" ? "dark" : "light"} mode`}
+              className={styles.focusToggle}
+              onClick={() => setThemeMode((current) => current === "light" ? "dark" : "light")}
+              title={`Use ${themeMode === "light" ? "dark" : "light"} mode`}
               type="button"
             >
-              {isFocusMode ? (
-                <Minimize2 size={16} strokeWidth={2.3} />
+              {themeMode === "light" ? (
+                <Moon size={16} strokeWidth={2.3} />
               ) : (
-                <Maximize2 size={16} strokeWidth={2.3} />
+                <Sun size={16} strokeWidth={2.3} />
               )}
-              <span>{isFocusMode ? "Balanced view" : "Focus map"}</span>
+              <span>{themeMode === "light" ? "Dark mode" : "Light mode"}</span>
             </button>
           </div>
         </aside>
@@ -737,9 +702,7 @@ export function Playground() {
               />
 
               <section
-                className={`${styles.workspace} ${
-                  isFocusMode ? styles.focusWorkspace : ""
-                }`}
+                className={styles.workspace}
                 aria-label="Election scenario workspace"
               >
                 <aside className={styles.leftRail} aria-label="Scenario controls">
@@ -779,16 +742,21 @@ export function Playground() {
                 </aside>
 
                 <aside className={styles.analysisRail} aria-label="Scenario summary and pressure points">
-                  <ScenarioSummary scenario={scenario} />
-                  <ScenarioComparison baselineYear={baselineYear} scenario={scenario} />
-                  <MonteCarloPanel scenario={scenario} />
-                  <SensitivityView scenario={scenario} />
-                  <ShareCardPreview
-                    baselineYear={baselineYear}
-                    scenario={scenario}
-                    shareUrl={currentShareUrl}
-                  />
-                  <ModelExplanation />
+                  <details className={styles.advancedAnalysisDisclosure}>
+                    <summary>Advanced analysis and methodology</summary>
+                    <div className={styles.advancedAnalysisBody}>
+                      <ScenarioSummary scenario={scenario} />
+                      <ScenarioComparison baselineYear={baselineYear} scenario={scenario} />
+                      <MonteCarloPanel scenario={scenario} />
+                      <SensitivityView scenario={scenario} />
+                      <ShareCardPreview
+                        baselineYear={baselineYear}
+                        scenario={scenario}
+                        shareUrl={currentShareUrl}
+                      />
+                      <ModelExplanation />
+                    </div>
+                  </details>
                 </aside>
               </section>
             </div>
@@ -802,7 +770,6 @@ export function Playground() {
                 selectedSeatId={selectedHouseSeatId}
                 assumptions={houseScenarioAssumptions}
                 presidentialAssumptions={scenarioAssumptions}
-                isFocusMode={isFocusMode}
                 onSelectSeat={setSelectedHouseSeatId}
                 onNationalSwingChange={updateHouseSwing}
                 onSliderChange={updateHouseSlider}
@@ -830,7 +797,6 @@ export function Playground() {
                 assumptions={senateScenarioAssumptions}
                 presidentialAssumptions={scenarioAssumptions}
                 presidentialScenario={scenario}
-                isFocusMode={isFocusMode}
                 onSelectSeat={setSelectedSenateSeatId}
                 onNationalSwingChange={updateSenateSwing}
                 onSliderChange={updateSenateSlider}

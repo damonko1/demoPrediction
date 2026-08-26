@@ -138,12 +138,17 @@ export function StateDetailPanel({
         <strong>{result.marginToFlip.toFixed(1)} pts</strong>
       </div>
 
-      <StateOverrideControls
-        stateName={result.state.name}
-        value={stateOverride}
-        onChange={onStateOverrideChange}
-        onReset={onStateOverrideReset}
-      />
+      <details className={styles.detailDisclosure}>
+        <summary>Customize this state</summary>
+        <div className={styles.detailDisclosureBody}>
+          <StateOverrideControls
+            stateName={result.state.name}
+            value={stateOverride}
+            onChange={onStateOverrideChange}
+            onReset={onStateOverrideReset}
+          />
+        </div>
+      </details>
 
       {hasSplitElectoralVotes ? (
         <div className={styles.splitEvDetail}>

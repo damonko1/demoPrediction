@@ -66,22 +66,6 @@ export function ElectoralCounter({ totals, baselineTotals }: ElectoralCounterPro
         </div>
       </div>
 
-      <div className={styles.counterMetaGrid}>
-        <div>
-          <span>Threshold</span>
-          <strong>{winningThreshold}</strong>
-        </div>
-        <div>
-          <span>Toss-up EV</span>
-          <strong>{remainingVotes}</strong>
-          <small>{tossUpLabel}</small>
-        </div>
-        <div>
-          <span>Scenario total</span>
-          <strong>{allocatedVotes}/{totalElectoralVotes}</strong>
-        </div>
-      </div>
-
       <div className={styles.counterBar} aria-hidden="true">
         <div className={styles.demBar} style={{ width: `${demWidth}%` }} />
         {remainingVotes > 0 ? (
@@ -102,6 +86,25 @@ export function ElectoralCounter({ totals, baselineTotals }: ElectoralCounterPro
         <span>270 WIN</span>
         <span>538R</span>
       </div>
+
+      <details className={styles.counterDetails}>
+        <summary>More electoral vote details</summary>
+        <div className={styles.counterMetaGrid}>
+          <div>
+            <span>Threshold</span>
+            <strong>{winningThreshold}</strong>
+          </div>
+          <div>
+            <span>Toss-up EV</span>
+            <strong>{remainingVotes}</strong>
+            <small>{tossUpLabel}</small>
+          </div>
+          <div>
+            <span>Scenario total</span>
+            <strong>{allocatedVotes}/{totalElectoralVotes}</strong>
+          </div>
+        </div>
+      </details>
     </section>
   );
 }

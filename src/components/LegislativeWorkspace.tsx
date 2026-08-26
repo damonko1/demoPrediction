@@ -26,7 +26,6 @@ type LegislativeWorkspaceProps = {
   assumptions: LegislativeAssumptions;
   presidentialAssumptions?: ScenarioAssumptions;
   presidentialScenario?: ScenarioResult;
-  isFocusMode?: boolean;
   onSelectSeat: (seatId: string) => void;
   onNationalSwingChange: (value: number) => void;
   onSliderChange?: (id: LegislativeSliderId, value: number) => void;
@@ -47,7 +46,6 @@ export function LegislativeWorkspace({
   assumptions,
   presidentialAssumptions,
   presidentialScenario,
-  isFocusMode = false,
   onSelectSeat,
   onNationalSwingChange,
   onSliderChange,
@@ -83,7 +81,7 @@ export function LegislativeWorkspace({
       <ChamberCounter scenario={scenario} />
 
       <section
-        className={`${styles.workspace} ${isFocusMode ? styles.focusWorkspace : ""}`}
+        className={styles.workspace}
         aria-label={`${chamber === "house" ? "House" : "Senate"} scenario workspace`}
       >
         <aside
@@ -148,11 +146,16 @@ export function LegislativeWorkspace({
           className={styles.analysisRail}
           aria-label={`${chamber === "house" ? "House" : "Senate"} summary and assumptions`}
         >
-          <LegislativeSummary
-            scenario={scenario}
-            presidentialScenario={presidentialScenario}
-          />
-          <LegislativeModelExplanation chamber={chamber} />
+          <details className={styles.advancedAnalysisDisclosure}>
+            <summary>Advanced analysis and methodology</summary>
+            <div className={styles.advancedAnalysisBody}>
+              <LegislativeSummary
+                scenario={scenario}
+                presidentialScenario={presidentialScenario}
+              />
+              <LegislativeModelExplanation chamber={chamber} />
+            </div>
+          </details>
         </aside>
       </section>
     </>

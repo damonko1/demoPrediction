@@ -45,26 +45,6 @@ function getActiveLabel(activeTab: SimulationTab) {
   return "President active";
 }
 
-function getPresidentialLeader(scenario: ScenarioResult) {
-  if (scenario.totals.democratic === scenario.totals.republican) {
-    return "Electoral tie";
-  }
-
-  return scenario.totals.democratic > scenario.totals.republican
-    ? "Democratic EV lead"
-    : "Republican EV lead";
-}
-
-function getChamberControl(scenario: LegislativeScenarioResult) {
-  if (scenario.controlTotals.democratic === scenario.controlTotals.republican) {
-    return `${scenario.chamber === "senate" ? "Senate" : "House"} tie`;
-  }
-
-  return scenario.controlTotals.democratic > scenario.controlTotals.republican
-    ? "Democratic control"
-    : "Republican control";
-}
-
 function formatCountDelta(value: number, label: string) {
   if (value === 0) {
     return `No ${label} change`;
@@ -227,68 +207,18 @@ export function UnifiedScenarioSummary({
   return (
     <section
       className={styles.unifiedSummary}
-      aria-label="Unified presidential, House, and Senate scenario summary"
+      aria-label="Active election scenario"
     >
       <div className={styles.unifiedSummaryHeader}>
         <div className={styles.simulationIdentity}>
           <div>
-            <p className={styles.sectionKicker}>Active simulation</p>
+            <p className={styles.sectionKicker}>{getActiveLabel(activeTab)}</p>
             <h2>{activeScenarioName}</h2>
           </div>
-          <span className={styles.summaryPill}>{getActiveLabel(activeTab)}</span>
-        </div>
-        <div className={styles.simulationDockActions}>
-          <button disabled={!shareUrl} onClick={copySnapshot} type="button">
-            {shareStatus === "copied" ? <Check size={14} /> : <Copy size={14} />}
-            {shareStatus === "copied" ? "Copied" : "Copy"}
-          </button>
-          <button onClick={exportSnapshotCard} type="button">
-            {shareStatus === "saved" ? <Check size={14} /> : <Download size={14} />}
-            {shareStatus === "saved" ? "Saved" : "Export"}
-          </button>
-          <button
-            className={styles.completeResetButton}
-            disabled={resetDisabled}
-            onClick={onResetAll}
-            type="button"
-          >
-            <RotateCcw size={14} />
-            Reset all
-          </button>
-        </div>
-      </div>
-
-      <div className={styles.unifiedSummaryGrid}>
-        <div data-active={activeTab === "president"}>
-          <span>President</span>
-          <strong>
-            D {presidentialScenario.totals.democratic} / R{" "}
-            {presidentialScenario.totals.republican}
-          </strong>
-          <small>
-            {getPresidentialLeader(presidentialScenario)} · {formatCountDelta(presidentialEvDelta, "D EV")}
-          </small>
-        </div>
-        <div data-active={activeTab === "house"}>
-          <span>House</span>
-          <strong>
-            D {houseScenario.controlTotals.democratic} / R{" "}
-            {houseScenario.controlTotals.republican}
-          </strong>
-          <small>{getChamberControl(houseScenario)} · {formatCountDelta(houseSeatDelta, "D seats")}</small>
-        </div>
-        <div data-active={activeTab === "senate"}>
-          <span>Senate</span>
-          <strong>
-            D {senateScenario.controlTotals.democratic} / R{" "}
-            {senateScenario.controlTotals.republican}
-          </strong>
-          <small>{getChamberControl(senateScenario)} · {formatCountDelta(senateSeatDelta, "D seats")}</small>
         </div>
       </div>
 
       <div className={styles.activeSettingsBar} aria-label="Active simulation settings">
-        <strong>Now simulating</strong>
         {activeTab === "president" ? <span>{baselineYear} result baseline</span> : null}
         {activeTab === "house" ? <span>2024 result baseline</span> : null}
         {activeTab === "senate" ? <span>Latest completed race baselines</span> : null}
@@ -305,9 +235,51 @@ export function UnifiedScenarioSummary({
         {!hasActiveCustomSettings ? <span>All assumptions at default</span> : null}
       </div>
 
-      <details className={styles.scenarioBookmarkDisclosure}>
-        <summary>Save or open a named scenario</summary>
-        <ScenarioBookmarks currentUrl={shareUrl} />
+      <details className={styles.scenarioToolsDisclosure}>
+        <summary>Share, save, reset, and compare chambers</summary>
+        <div className={styles.scenarioToolsBody}>
+          <div className={styles.simulationDockActions}>
+            <button disabled={!shareUrl} onClick={copySnapshot} type="button">
+              {shareStatus === "copied" ? <Check size={14} /> : <Copy size={14} />}
+              {shareStatus === "copied" ? "Copied" : "Copy summary"}
+            </button>
+            <button onClick={exportSnapshotCard} type="button">
+              {shareStatus === "saved" ? <Check size={14} /> : <Download size={14} />}
+              {shareStatus === "saved" ? "Saved" : "Export card"}
+            </button>
+            <button
+              className={styles.completeResetButton}
+              disabled={resetDisabled}
+              onClick={onResetAll}
+              type="button"
+            >
+              <RotateCcw size={14} />
+              Reset all
+            </button>
+          </div>
+
+          <div className={styles.unifiedSummaryGrid}>
+            <div data-active={activeTab === "president"}>
+              <span>President</span>
+              <strong>D {presidentialScenario.totals.democratic} / R {presidentialScenario.totals.republican}</strong>
+              <small>{formatCountDelta(presidentialEvDelta, "D EV")}</small>
+            </div>
+            <div data-active={activeTab === "house"}>
+              <span>House</span>
+              <strong>D {houseScenario.controlTotals.democratic} / R {houseScenario.controlTotals.republican}</strong>
+              <small>{formatCountDelta(houseSeatDelta, "D seats")}</small>
+            </div>
+            <div data-active={activeTab === "senate"}>
+              <span>Senate</span>
+              <strong>D {senateScenario.controlTotals.democratic} / R {senateScenario.controlTotals.republican}</strong>
+              <small>{formatCountDelta(senateSeatDelta, "D seats")}</small>
+            </div>
+          </div>
+
+          <div className={styles.scenarioBookmarkDisclosure}>
+            <ScenarioBookmarks currentUrl={shareUrl} />
+          </div>
+        </div>
       </details>
     </section>
   );
