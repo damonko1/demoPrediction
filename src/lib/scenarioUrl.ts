@@ -334,10 +334,18 @@ export function simulationTabFromSearchParams(
     return tab;
   }
 
-  // Lead a bare landing page with the current midterm cycle. Older shared
-  // presidential URLs did not include an explicit tab, so keep treating any
-  // URL with scenario state as presidential for backwards compatibility.
-  return params.size === 0 ? "house" : "president";
+  // Lead new and campaign-tagged landing URLs with the current midterm cycle.
+  // Older presidential links did not include an explicit tab, so retain that
+  // behavior only when an actual presidential scenario field is present.
+  const hasLegacyPresidentialState = [
+    swingParam,
+    baselineYearParam,
+    selectedStateParam,
+    stateOverridesParam,
+    ...Object.values(demographicParams),
+  ].some((paramName) => params.has(paramName));
+
+  return hasLegacyPresidentialState ? "president" : "house";
 }
 
 export function legislativeSwingFromSearchParams(

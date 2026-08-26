@@ -16,6 +16,9 @@ import {
 describe("landing workspace URL state", () => {
   it("opens the 2026 House workspace on a bare landing URL", () => {
     expect(simulationTabFromSearchParams(new URLSearchParams())).toBe("house");
+    expect(
+      simulationTabFromSearchParams(new URLSearchParams("utm_source=launch")),
+    ).toBe("house");
   });
 
   it("preserves legacy presidential links and honors explicit tabs", () => {
