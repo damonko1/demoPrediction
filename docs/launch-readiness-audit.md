@@ -55,9 +55,10 @@ These are not hidden defects. They define what version 1 is allowed to claim.
 - [x] Data and geometry validation gate
 - [x] Zero known production dependency vulnerabilities
 - [x] Public static deployment path
-- [ ] Deploy the current audited revision and smoke-test the public URL
+- [x] Deploy the current audited revision and smoke-test the public URL
+
+Public verification: GitHub Pages deployment run `32992233100` completed successfully. A desktop and 390px mobile smoke test confirmed the midterm-first landing flow (including a campaign-tagged URL), correct branding, zero console errors or warnings, and no horizontal overflow.
 
 ## Operational Recommendation
 
 Freeze new feature work before launch. Until election day, prioritize only current-cycle roster/data refreshes, factual copy corrections, accessibility regressions, broken links/assets, and defects in saving, sharing, or calculations. Re-run the full quality gate and public smoke test for every release.
-
