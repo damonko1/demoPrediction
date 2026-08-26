@@ -316,7 +316,7 @@ The release candidate is approved only when all of the following are true:
 - [x] Scenario language and baseline dates are accurate throughout the interface and exports.
 - [x] Primary journeys pass keyboard, mobile, light-theme, and dark-theme review in the available Chromium environment.
 - [x] Type checking, linting, tests, data validation, build, and dependency audit pass.
-- [ ] Production deployment succeeds and public smoke testing passes.
+- [x] Production deployment succeeds and public smoke testing passes.
 - [x] Known limitations are documented and none contradict the product's public claims.
 - [x] No unresolved severity-one or severity-two branch issue remains.
 

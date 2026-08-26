@@ -1,12 +1,14 @@
 # Pre-Launch Release Evidence
 
-Status: Release-candidate evidence  
+Status: Production-verified release evidence
 Branch: `docs/prelaunch-product-prd`  
 Last updated: 2026-08-26
 
-Verified commit: `b314e39`
+Application release commit: `f6446c7`
 
-Clean-checkout quality gate: [GitHub Actions run 32997013552](https://github.com/damonko1/demoPrediction/actions/runs/32997013552) — passed
+Main quality gate: [GitHub Actions run 32998626925](https://github.com/damonko1/demoPrediction/actions/runs/32998626925) — passed
+
+Production deployment: [GitHub Actions run 32998626913](https://github.com/damonko1/demoPrediction/actions/runs/32998626913) — passed
 
 This matrix maps the pre-launch PRD to authoritative source, automated, build, and runtime evidence. Production deployment remains intentionally gated on review and merge into `main`.
 
@@ -22,7 +24,7 @@ This matrix maps the pre-launch PRD to authoritative source, automated, build, a
 | Scenario language and source dates accurate | Pass | Header explicitly says “Scenario simulator — not a forecast.” House identifies the 2024 result baseline, Senate identifies latest-completed race baselines, and History identifies the selected result year. Data validators pass. |
 | Keyboard, mobile, light, and dark review | Pass in Chromium | Tabs support arrow-key selection and focus. House-map ArrowRight moved focus and selection from PA-7 to PA-8. Light/dark toggle updated its accessible label. At 320px all non-SVG interactive targets reached 44px in both dimensions and the page had zero horizontal overflow. |
 | Quality, data, build, and security gates | Pass | ESLint, TypeScript, 37 tests, state/Senate map validation, House map validation, legislative data validation, launch-contract validation, local static build, base-path build, and production dependency audit all passed. Audit reported zero vulnerabilities. |
-| Production deployment and public smoke test | Pending merge | The branch is intentionally isolated and has not replaced the public `main` deployment. The Pages workflow uses supported actions and the base-path artifact builds successfully. |
+| Production deployment and public smoke test | Pass | Commit `f6446c7` passed the main quality gate and GitHub Pages deployment. The public House and Senate URLs returned HTTP 200. The expanded Senate tools layout had zero overlaps and zero horizontal overflow at 1844px and 320px, with zero console errors. |
 | Known limitations consistent with public claims | Pass | `docs/data-accuracy.md`, `docs/launch-readiness-audit.md`, the PRD, and release runbook define completed-result baselines, heuristic limits, and non-goals. |
 | No unresolved severity-one or severity-two issue | Pass for audited branch | No blocking issue remains from source, automated, data, build, security, or Chromium runtime review. Cross-browser production checks remain a release-procedure gate. |
 
@@ -70,14 +72,11 @@ The CI quality gate runs:
 6. the pre-launch product-contract validator; and
 7. the production static build.
 
-The quality workflow also supports manual dispatch so the feature branch can be tested from a clean GitHub checkout before a pull request or merge. Run `32997013552` passed every job for the verified implementation commit.
+The quality workflow also supports manual dispatch so a feature branch can be tested from a clean GitHub checkout before a pull request or merge. The pull-request gate and the main-branch gate passed every job for this release.
 
-## Remaining Release Actions
+## Remaining Evaluation Actions
 
-These are deployment controls, not missing branch implementation:
+The implementation, merge, deployment, and public smoke test are complete. Two human/environment evaluation activities remain recommended before the early-October launch window:
 
-1. Review and merge the release-candidate branch.
-2. Complete native Safari/WebKit confirmation on a supported environment; Playwright WebKit and Firefox are unavailable on the current macOS 12 ARM runtime.
-3. Watch the clean-checkout Quality Gate and GitHub Pages deployment.
-4. Smoke-test the deployed commit at the public URL and record its workflow links here.
-5. Run the recommended moderated tasks with first-time users before the early-October launch window.
+1. Complete native Safari/WebKit confirmation on a supported environment; Playwright WebKit and Firefox are unavailable on the current macOS 12 ARM runtime.
+2. Run the moderated tasks with first-time users and record observed completion rates.
