@@ -29,6 +29,22 @@ describe("landing workspace URL state", () => {
       "senate",
     );
   });
+
+  it("returns malformed explicit tabs to the House launch default", () => {
+    expect(
+      simulationTabFromSearchParams(
+        new URLSearchParams("tab=unknown&state=PA&swing=2"),
+      ),
+    ).toBe("house");
+  });
+
+  it("does not mistake malformed legacy fields for a presidential scenario", () => {
+    expect(
+      simulationTabFromSearchParams(
+        new URLSearchParams("state=ZZ&swing=broken&year=1900"),
+      ),
+    ).toBe("house");
+  });
 });
 
 describe("local override URL state", () => {

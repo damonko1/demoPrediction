@@ -334,16 +334,28 @@ export function simulationTabFromSearchParams(
     return tab;
   }
 
+  // A present but unknown tab is not a legacy presidential URL. Treat it as
+  // an invalid modern link and return to the launch-default House workspace.
+  if (tab !== null) {
+    return "house";
+  }
+
   // Lead new and campaign-tagged landing URLs with the current midterm cycle.
   // Older presidential links did not include an explicit tab, so retain that
   // behavior only when an actual presidential scenario field is present.
-  const hasLegacyPresidentialState = [
-    swingParam,
-    baselineYearParam,
-    selectedStateParam,
-    stateOverridesParam,
-    ...Object.values(demographicParams),
-  ].some((paramName) => params.has(paramName));
+  const hasFiniteValue = (paramName: string) => {
+    const value = params.get(paramName);
+    return value !== null && value.trim() !== "" && Number.isFinite(Number(value));
+  };
+  const legacyYear = Number(params.get(baselineYearParam));
+  const legacyState = params.get(selectedStateParam);
+  const hasLegacyPresidentialState =
+    hasFiniteValue(swingParam) ||
+    (params.has(baselineYearParam) &&
+      historicalElectionYears.includes(legacyYear as HistoricalElectionYear)) ||
+    (legacyState !== null && validStateCodes.has(legacyState)) ||
+    Object.keys(stateOverridesFromSearchParams(params)).length > 0 ||
+    Object.values(demographicParams).some(hasFiniteValue);
 
   return hasLegacyPresidentialState ? "president" : "house";
 }

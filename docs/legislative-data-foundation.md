@@ -2,7 +2,7 @@
 
 Last updated: 2026-07-06
 
-This document defines the public data needed for the House and Senate portions of Election Forecast Playground. The goal is a calculation-ready legislative layer: complete current rosters, clean election returns, stable geographic IDs, explicit incumbency and open-seat flags, transparent third-party handling, and source metadata that can be audited later.
+This document defines the public data needed for the House and Senate portions of Election Scenario Playground. The goal is a calculation-ready legislative layer: complete current rosters, clean election returns, stable geographic IDs, explicit incumbency and open-seat flags, transparent third-party handling, and source metadata that can be audited later.
 
 The current app already has a first calculation baseline from MIT Election Data and Science Lab congressional results plus `unitedstates/congress-legislators` current roster data. The remaining work is mostly hardening: authoritative boundary ingestion, explicit tenure and incumbency fields, open-seat detection, presidential partisan baselines by district/state, and deeper historical comparison rules.
 
