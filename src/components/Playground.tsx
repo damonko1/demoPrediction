@@ -86,7 +86,7 @@ export function Playground() {
     house: null,
     senate: null,
   });
-  const [activeTab, setActiveTab] = useState<SimulationTab>("president");
+  const [activeTab, setActiveTab] = useState<SimulationTab>("house");
   const [nationalSwing, setNationalSwing] = useState(0);
   const [demographicAssumptions, setDemographicAssumptions] =
     useState<DemographicAssumptions>({ ...defaultDemographicAssumptions });
@@ -611,8 +611,8 @@ export function Playground() {
               <Vote size={20} strokeWidth={2.4} />
             </div>
             <div className={styles.brandText}>
-              <p className={styles.eyebrow}>Scenario Lab</p>
-              <h1>Election Forecast Playground</h1>
+              <p className={styles.eyebrow}>2026 Scenario Lab</p>
+              <h1>Election Scenario Playground</h1>
             </div>
           </div>
 
@@ -697,8 +697,16 @@ export function Playground() {
         >
           <header className={styles.header}>
             <div>
-              <p className={styles.eyebrow}>Interactive election scenarios</p>
-              <h2>{tabs.find((tab) => tab.id === activeTab)?.label} workspace</h2>
+              <p className={styles.eyebrow}>
+                {activeTab === "president"
+                  ? "Historical presidential scenarios"
+                  : "2026 midterm scenarios"}
+              </p>
+              <h2>
+                {activeTab === "president"
+                  ? "President replay workspace"
+                  : `${tabs.find((tab) => tab.id === activeTab)?.label} workspace`}
+              </h2>
             </div>
             <div className={styles.headerMeta}>
               <span>State, seat, and chamber results update live</span>

@@ -330,9 +330,14 @@ export function simulationTabFromSearchParams(
 ): SimulationTab {
   const tab = params.get(tabParam);
 
-  return tab === "house" || tab === "senate" || tab === "president"
-    ? tab
-    : "president";
+  if (tab === "house" || tab === "senate" || tab === "president") {
+    return tab;
+  }
+
+  // Lead a bare landing page with the current midterm cycle. Older shared
+  // presidential URLs did not include an explicit tab, so keep treating any
+  // URL with scenario state as presidential for backwards compatibility.
+  return params.size === 0 ? "house" : "president";
 }
 
 export function legislativeSwingFromSearchParams(
@@ -415,9 +420,7 @@ export function appScenarioToUrl({
   const normalizedHouseSwing = normalizeSwing(houseSwing);
   const normalizedSenateSwing = normalizeSwing(senateSwing);
 
-  if (activeTab === "house" || activeTab === "senate") {
-    params.set(tabParam, activeTab);
-  }
+  params.set(tabParam, activeTab);
 
   if (validStateCodes.has(selectedStateCode)) {
     params.set(selectedStateParam, selectedStateCode);

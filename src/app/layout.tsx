@@ -6,13 +6,13 @@ const publicSiteUrl = "https://damonko1.github.io/demoPrediction/";
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicSiteUrl),
-  applicationName: "Election Forecast Playground",
+  applicationName: "Election Scenario Playground",
   title: {
-    default: "Election Forecast Playground",
-    template: "%s | Election Forecast Playground",
+    default: "2026 Midterm Election Scenario Playground",
+    template: "%s | Election Scenario Playground",
   },
   description:
-    "Explore how national swing, demographic-style assumptions, and local race overrides reshape the presidential, House, and Senate map.",
+    "Explore how national swing and local race assumptions could reshape the 2026 House and Senate maps, with presidential history available for context.",
   keywords: [
     "election simulator",
     "Electoral College map",
@@ -31,26 +31,26 @@ export const metadata: Metadata = {
     apple: `${publicBasePath}/apple-touch-icon.png`,
   },
   openGraph: {
-    title: "Election Forecast Playground",
+    title: "2026 Midterm Election Scenario Playground",
     description:
-      "Build and share interactive President, House, and Senate scenarios with historical baselines, swing controls, and local race overrides.",
+      "Build and share interactive 2026 House and Senate scenarios using sourced historical baselines and transparent assumptions.",
     type: "website",
     url: publicSiteUrl,
-    siteName: "Election Forecast Playground",
+    siteName: "Election Scenario Playground",
     images: [
       {
         url: "https://raw.githubusercontent.com/damonko1/demoPrediction/main/public/og-card.png",
         width: 1200,
         height: 630,
-        alt: "Election Forecast Playground interactive election lab",
+        alt: "Election Scenario Playground interactive election lab",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Election Forecast Playground",
+    title: "2026 Midterm Election Scenario Playground",
     description:
-      "Build and share interactive President, House, and Senate scenarios with historical baselines and transparent assumptions.",
+      "Build and share interactive 2026 House and Senate scenarios with historical baselines and transparent assumptions.",
     images: [
       "https://raw.githubusercontent.com/damonko1/demoPrediction/main/public/og-card.png",
     ],

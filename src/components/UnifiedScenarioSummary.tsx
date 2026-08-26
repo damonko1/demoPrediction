@@ -154,12 +154,15 @@ export function UnifiedScenarioSummary({
   const activePresetName = activeTab === "president"
     ? presidentialPreset?.label
     : activeLegislativePreset?.label;
+  const defaultScenarioName = activeTab === "president"
+    ? `${baselineYear} presidential replay`
+    : `2026 ${activeTab === "house" ? "House" : "Senate"} scenario`;
   const activeScenarioName = activePresetName ??
-    (hasActiveCustomSettings ? "Custom mix" : "Baseline");
+    (hasActiveCustomSettings ? "Custom mix" : defaultScenarioName);
   const visibleSettings = activeSliderLabels.slice(0, 4);
   const hiddenSettingCount = Math.max(0, activeSliderLabels.length - visibleSettings.length);
   const snapshotText = [
-    "Election Forecast Playground · Simulation only",
+    "Election Scenario Playground · Simulation only",
     `President D ${presidentialScenario.totals.democratic} / R ${presidentialScenario.totals.republican}`,
     `House D ${houseScenario.controlTotals.democratic} / R ${houseScenario.controlTotals.republican}`,
     `Senate D ${senateScenario.controlTotals.democratic} / R ${senateScenario.controlTotals.republican}`,
@@ -196,7 +199,7 @@ export function UnifiedScenarioSummary({
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
       <rect width="1200" height="630" fill="#e9f7f9"/>
       <rect x="48" y="48" width="1104" height="534" rx="24" fill="#ffffff" stroke="#257e91" stroke-width="3"/>
-      <text x="92" y="125" fill="#123442" font-family="system-ui,sans-serif" font-size="28" font-weight="700">Election Forecast Playground</text>
+      <text x="92" y="125" fill="#123442" font-family="system-ui,sans-serif" font-size="28" font-weight="700">Election Scenario Playground</text>
       <text x="92" y="170" fill="#5d7781" font-family="system-ui,sans-serif" font-size="20">Full national scenario · Simulation only</text>
       <text x="92" y="270" fill="#123442" font-family="system-ui,sans-serif" font-size="34" font-weight="800">President</text>
       <text x="92" y="320" fill="#1976c9" font-family="system-ui,sans-serif" font-size="30">D ${presidentialScenario.totals.democratic}</text>
@@ -286,7 +289,9 @@ export function UnifiedScenarioSummary({
 
       <div className={styles.activeSettingsBar} aria-label="Active simulation settings">
         <strong>Now simulating</strong>
-        {activeTab === "president" ? <span>{baselineYear} baseline</span> : null}
+        {activeTab === "president" ? <span>{baselineYear} result baseline</span> : null}
+        {activeTab === "house" ? <span>2024 result baseline</span> : null}
+        {activeTab === "senate" ? <span>Latest completed race baselines</span> : null}
         <span>{formatSwing(activeSwing)}</span>
         {visibleSettings.map((label) => <span key={label}>{label}</span>)}
         {hiddenSettingCount ? <span>+{hiddenSettingCount} more settings</span> : null}

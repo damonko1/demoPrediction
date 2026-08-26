@@ -1,4 +1,4 @@
-# Election Forecast Playground
+# Election Scenario Playground
 
 [![Quality gate](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml/badge.svg)](https://github.com/damonko1/demoPrediction/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/live-GitHub%20Pages-0969da)](https://damonko1.github.io/demoPrediction/)
@@ -7,7 +7,7 @@
 
 An interactive, browser-based lab for exploring how election assumptions can change the presidential, House, and Senate map.
 
-Election Forecast Playground turns national swing, demographic-style inputs, and local race overrides into immediate visual results. Start from a sourced historical baseline, apply a preset or build a custom scenario, then inspect which states and seats move—and why. Scenarios are encoded in the URL, so an interesting map can be shared without creating an account.
+Election Scenario Playground turns national swing and local race assumptions into immediate visual results. The default experience focuses on the 2026 House midterms, with Senate and historical presidential workspaces alongside it. Start from a sourced historical baseline, apply a preset or build a custom scenario, then inspect which states and seats move—and why. Scenarios are encoded in the URL, so an interesting map can be shared without creating an account.
 
 > [!IMPORTANT]
 > This is an educational scenario simulator, not a polling average, election forecast, or statement about voter behavior. Presets and demographic weights are transparent stress-test assumptions. Read the [data accuracy policy](docs/data-accuracy.md) before interpreting or extending the model.

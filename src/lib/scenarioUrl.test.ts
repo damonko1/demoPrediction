@@ -10,7 +10,23 @@ import {
   normalizeSwing,
   scenarioFromSearchParams,
   selectedStateFromSearchParams,
+  simulationTabFromSearchParams,
 } from "@/lib/scenarioUrl";
+
+describe("landing workspace URL state", () => {
+  it("opens the 2026 House workspace on a bare landing URL", () => {
+    expect(simulationTabFromSearchParams(new URLSearchParams())).toBe("house");
+  });
+
+  it("preserves legacy presidential links and honors explicit tabs", () => {
+    expect(simulationTabFromSearchParams(new URLSearchParams("state=PA"))).toBe(
+      "president",
+    );
+    expect(simulationTabFromSearchParams(new URLSearchParams("tab=senate"))).toBe(
+      "senate",
+    );
+  });
+});
 
 describe("local override URL state", () => {
   it("round-trips state, district, and active Senate race overrides", () => {

@@ -17,7 +17,7 @@ function createEmbedCode(shareUrl: string) {
     return "";
   }
 
-  return `<iframe title="Election Forecast Playground scenario" src="${shareUrl}" width="100%" height="720" loading="lazy"></iframe>`;
+  return `<iframe title="Election Scenario Playground scenario" src="${shareUrl}" width="100%" height="720" loading="lazy"></iframe>`;
 }
 
 function fallbackCopy(text: string) {
@@ -104,7 +104,7 @@ export function ShareCardPreview({
       </div>
 
       <div className={styles.sharePreviewCard}>
-        <span>Election Forecast Playground</span>
+        <span>Election Scenario Playground</span>
         <strong>{baselineYear} scenario</strong>
         <dl>
           <div>

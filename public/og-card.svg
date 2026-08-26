@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
-  <title id="title">Election Forecast Playground</title>
+  <title id="title">Election Scenario Playground</title>
   <desc id="description">Social preview for an interactive President, House, and Senate scenario simulator.</desc>
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
@@ -40,7 +40,8 @@
 
   <text x="150" y="84" fill="#a8b8ce" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" letter-spacing="3.2">INTERACTIVE ELECTION LAB</text>
 
-  <text x="74" y="210" fill="#f7f9fd" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="76" font-weight="780" letter-spacing="-2.7">Election Forecast</text>
+  <text x="74" y="210" fill="#f7f9fd" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="76" font-weight="780" letter-spacing="-2.7">Election</text>
+  <text x="358" y="210" fill="#f7f9fd" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="76" font-weight="780" letter-spacing="-2.7">Scenario</text>
   <text x="74" y="292" fill="#f7f9fd" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="76" font-weight="780" letter-spacing="-2.7">Playground</text>
   <text x="78" y="352" fill="#b8c5d7" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-size="28" font-weight="500">Build a scenario. See what moves.</text>
 
