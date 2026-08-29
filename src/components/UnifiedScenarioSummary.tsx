@@ -12,6 +12,7 @@ import { getMatchingScenarioPreset } from "@/data/scenarioPresets";
 import {
   formatSwing,
 } from "@/lib/format";
+import { copyTextToClipboard } from "@/lib/copyText";
 import type {
   LegislativeScenarioResult,
   HistoricalElectionYear,
@@ -167,7 +168,7 @@ export function UnifiedScenarioSummary({
 
   async function copySnapshot() {
     try {
-      await navigator.clipboard.writeText(snapshotText);
+      await copyTextToClipboard(snapshotText);
       setShareStatus("copied");
     } catch {
       setShareStatus("failed");
@@ -187,7 +188,7 @@ export function UnifiedScenarioSummary({
       <text x="455" y="270" fill="#123442" font-family="system-ui,sans-serif" font-size="34" font-weight="800">Senate</text>
       <text x="455" y="320" fill="#1976c9" font-family="system-ui,sans-serif" font-size="30">D ${senateScenario.controlTotals.democratic}</text>
       <text x="635" y="320" fill="#d84452" font-family="system-ui,sans-serif" font-size="30">R ${senateScenario.controlTotals.republican}</text>
-      <text x="815" y="270" fill="#123442" font-family="system-ui,sans-serif" font-size="34" font-weight="800">History · President</text>
+      <text x="815" y="270" fill="#123442" font-family="system-ui,sans-serif" font-size="30" font-weight="800">History · President</text>
       <text x="815" y="320" fill="#1976c9" font-family="system-ui,sans-serif" font-size="30">D ${presidentialScenario.totals.democratic}</text>
       <text x="985" y="320" fill="#d84452" font-family="system-ui,sans-serif" font-size="30">R ${presidentialScenario.totals.republican}</text>
       <text x="92" y="440" fill="#123442" font-family="system-ui,sans-serif" font-size="25" font-weight="700">Custom assumptions</text>
@@ -288,9 +289,20 @@ export function UnifiedScenarioSummary({
         <summary>Share, save, reset, and compare chambers</summary>
         <div className={styles.scenarioToolsBody}>
           <div className={styles.simulationDockActions}>
-            <button disabled={!shareUrl} onClick={copySnapshot} type="button">
+            <button
+              aria-label={shareStatus === "failed" ? "Copy summary failed" : "Copy summary"}
+              disabled={!shareUrl}
+              onClick={copySnapshot}
+              type="button"
+            >
               {shareStatus === "copied" ? <Check size={14} /> : <Copy size={14} />}
-              {shareStatus === "copied" ? "Copied" : "Copy summary"}
+              <span aria-live="polite">
+                {shareStatus === "copied"
+                  ? "Copied"
+                  : shareStatus === "failed"
+                    ? "Copy failed"
+                    : "Copy summary"}
+              </span>
             </button>
             <button onClick={() => void exportSnapshotCard("svg")} type="button">
               {shareStatus === "saved" ? <Check size={14} /> : <Download size={14} />}

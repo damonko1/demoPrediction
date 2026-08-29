@@ -52,6 +52,7 @@ import {
   simulationTabFromSearchParams,
 } from "@/lib/scenarioUrl";
 import { hasSeatOverride, hasStateOverride } from "@/lib/localOverrides";
+import { copyTextToClipboard } from "@/lib/copyText";
 import { resetBaselinePresetId } from "@/data/scenarioPresets";
 import type {
   DemographicAssumptions,
@@ -347,32 +348,7 @@ export function Playground() {
     });
     const shareUrl = new URL(relativeUrl, window.location.origin).href;
 
-    const textArea = document.createElement("textarea");
-    textArea.value = shareUrl;
-    textArea.setAttribute("readonly", "");
-    textArea.style.position = "fixed";
-    textArea.style.opacity = "0";
-    function copyWithFallback() {
-      document.body.append(textArea);
-      textArea.select();
-      const copied = document.execCommand("copy");
-      textArea.remove();
-
-      if (!copied) {
-        throw new Error("Scenario link could not be copied");
-      }
-    }
-
-    if (!navigator.clipboard?.writeText) {
-      copyWithFallback();
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-    } catch {
-      copyWithFallback();
-    }
+    await copyTextToClipboard(shareUrl);
   }, [
     activeTab,
     baselineYear,

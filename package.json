@@ -18,7 +18,8 @@
     "validate:house-map": "node scripts/validate-house-district-map.mjs",
     "validate:state-map": "node scripts/validate-state-map.mjs",
     "validate:legislative-data": "node scripts/validate-legislative-data.mjs",
-    "validate:launch": "node scripts/validate-launch-readiness.mjs"
+    "validate:launch": "node scripts/validate-launch-readiness.mjs",
+    "validate:performance": "node scripts/validate-performance-budget.mjs"
   },
   "dependencies": {
     "lucide-react": "1.22.0",
