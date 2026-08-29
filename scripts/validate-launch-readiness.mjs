@@ -33,6 +33,7 @@ function requireOrder(source, values, label) {
 
 const playground = read("src/components/Playground.tsx");
 const unifiedSummary = read("src/components/UnifiedScenarioSummary.tsx");
+const copyText = read("src/lib/copyText.ts");
 const chamberCounter = read("src/components/ChamberCounter.tsx");
 const electoralCounter = read("src/components/ElectoralCounter.tsx");
 const houseMap = read("src/components/HouseDistrictMap.tsx");
@@ -92,13 +93,17 @@ for (const source of [
 
 requireText(unifiedSummary, 'exportSnapshotCard("svg")', "SVG scenario-card export");
 requireText(unifiedSummary, 'exportSnapshotCard("png")', "PNG scenario-card export");
+requireText(copyText, "fallbackCopy", "Clipboard-denial fallback");
+requireText(unifiedSummary, '"Copy failed"', "Clipboard failure feedback");
 requireText(globalStyles, "prefers-reduced-motion: reduce", "Reduced-motion support");
+rejectText(globalStyles, "fonts.googleapis.com", "Render-blocking third-party fonts");
 requireText(globalStyles, ":focus-visible", "Visible keyboard focus");
 requireText(playgroundStyles, '.shell summary {', "Mobile disclosure targets");
 requireText(playgroundStyles, "min-height: 44px", "Minimum touch targets");
 requireText(playgroundStyles, '"tools-actions"', "Scenario tools row layout");
 requireText(playgroundStyles, '"tools-results"', "Scenario results row layout");
 requireText(playgroundStyles, '"tools-saved"', "Saved scenarios row layout");
+requireText(playgroundStyles, "backdrop-filter: none", "Mobile compositing fallback");
 requireText(metadata, 'applicationName: "Election Scenario Playground"', "Metadata identity");
 
 if (packageJson.name !== "election-scenario-playground") {
@@ -112,6 +117,7 @@ for (const workflow of [ci, deploy]) {
 requireText(deploy, "actions/configure-pages@v6", "Supported Pages configuration action");
 requireText(deploy, "actions/upload-pages-artifact@v5", "Supported artifact action");
 requireText(deploy, "actions/deploy-pages@v5", "Supported deploy action");
+requireText(ci, "npm run validate:performance", "Performance budget gate");
 
 for (const documentationPath of [
   "docs/data-accuracy.md",

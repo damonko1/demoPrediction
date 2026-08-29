@@ -1,6 +1,7 @@
 import { Check, Copy, Share2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatSwing } from "@/lib/format";
+import { copyTextToClipboard } from "@/lib/copyText";
 import type { HistoricalElectionYear, ScenarioResult } from "@/types/election";
 import styles from "@/components/Playground.module.css";
 
@@ -18,37 +19,6 @@ function createEmbedCode(shareUrl: string) {
   }
 
   return `<iframe title="Election Scenario Playground scenario" src="${shareUrl}" width="100%" height="720" loading="lazy"></iframe>`;
-}
-
-function fallbackCopy(text: string) {
-  const textArea = document.createElement("textarea");
-
-  textArea.value = text;
-  textArea.setAttribute("readonly", "");
-  textArea.style.position = "fixed";
-  textArea.style.opacity = "0";
-  document.body.append(textArea);
-  textArea.select();
-
-  const copied = document.execCommand("copy");
-  textArea.remove();
-
-  if (!copied) {
-    throw new Error("Copy failed");
-  }
-}
-
-async function copyText(text: string) {
-  if (!navigator.clipboard?.writeText) {
-    fallbackCopy(text);
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    fallbackCopy(text);
-  }
 }
 
 export function ShareCardPreview({
@@ -75,7 +45,7 @@ export function ShareCardPreview({
     }
 
     try {
-      await copyText(embedCode);
+      await copyTextToClipboard(embedCode);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");

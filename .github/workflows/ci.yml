@@ -51,3 +51,6 @@ jobs:
 
       - name: Build static production export
         run: npm run build
+
+      - name: Enforce production performance budget
+        run: npm run validate:performance
