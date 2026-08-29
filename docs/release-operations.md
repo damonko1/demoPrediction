@@ -81,7 +81,7 @@ No unresolved severity-one or severity-two issue may ship.
 
 1. Confirm the release commit is on a feature branch and the worktree is clean.
 2. Run `npm ci` from a clean checkout.
-3. Run lint, type checking, all tests, all data validators, the launch validator, dependency audit, and both static builds.
+3. Run lint, type checking, all tests, all data validators, the launch validator, dependency audit, both static builds, and `npm run validate:performance` against the final export.
 4. Complete the browser acceptance matrix in `docs/prelaunch-release-evidence.md`.
 5. Review public language, baseline dates, data flags, and export output.
 6. Merge only the reviewed release candidate into `main`.

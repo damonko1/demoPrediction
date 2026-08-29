@@ -53,6 +53,7 @@ npm run lint
 npm test
 npm run validate:launch
 npm run build
+npm run validate:performance
 npm run start
 ```
 
@@ -114,6 +115,7 @@ The runtime has no API server or database. Scenario links use URL parameters, wh
 | `npm run validate:house-map` | Validate House district geometry coverage |
 | `npm run validate:legislative-data` | Validate legislative records and source metadata |
 | `npm run validate:launch` | Validate the pre-launch product contract and regression guardrails |
+| `npm run validate:performance` | Enforce static-export, compressed JavaScript/CSS, and data-asset budgets after a build |
 
 ## Repository Guide
 
@@ -148,4 +150,5 @@ npm run validate:state-map
 npm run validate:house-map
 npm run validate:legislative-data
 npm run validate:launch
+npm run validate:performance
 ```
