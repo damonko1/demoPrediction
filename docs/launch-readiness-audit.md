@@ -1,6 +1,6 @@
 # Launch Readiness Audit
 
-Last updated: 2026-08-26
+Last updated: 2026-08-29
 
 ## Decision
 
@@ -13,12 +13,13 @@ The first-run experience now opens the 2026 House workspace, explicitly labels i
 | Area | Evidence | Status |
 | --- | --- | --- |
 | Build and type safety | `npm run typecheck`, `npm run lint`, and static `npm run build` pass | Ready |
-| Automated behavior | 35 Vitest tests cover calculations, normalization, URLs, overrides, presets, and bookmarks | Ready |
+| Automated behavior | 37 Vitest tests cover calculations, normalization, URLs, overrides, presets, and bookmarks; the suite passed three consecutive runs | Ready |
 | Data integrity | State, House-map, and legislative-data validators pass; 538 EV, 435 voting districts, and 100 Senate seats reconcile | Ready with documented limitations |
 | Security | Next.js upgraded to 16.3.3; `npm audit --omit=dev` reports zero vulnerabilities | Ready |
 | Deployment | GitHub Pages returns HTTP 200; base-path production export references `/demoPrediction/` assets correctly | Ready after deploying current commit |
-| Desktop UX | Browser QA at 1440×1000: House opens by default, controls and map render, no console errors | Ready |
-| Mobile UX | Browser QA at 390×844: no horizontal overflow (`scrollWidth === innerWidth`), navigation and content reflow correctly | Ready |
+| Desktop UX | Browser QA through 1920px: House opens by default, controls and map render, disclosures do not overlap, and primary journeys have no console errors | Ready |
+| Mobile UX | Browser QA at 320, 360, and 390px: no horizontal overflow, clipped headings, or sidebar compositing loss; navigation and content reflow correctly | Ready |
+| Performance | Production Lighthouse scored 85–88 over three runs (100 accessibility/best-practices/SEO); rapid updates averaged 31.9ms; CI enforces compressed bundle budgets | Ready |
 | Accessibility | Native tabs/buttons/inputs, keyboard map instructions, skip link, visible labels, semantic regions, and text equivalents are present | Ready for launch; continue periodic manual testing |
 | Sharing and persistence | URL state is bounded and validated; old presidential links remain compatible; local bookmarks fail safely | Ready |
 | Failure handling | Map fetch failures and top-level React failures have visible fallbacks | Ready |
@@ -57,7 +58,7 @@ These are not hidden defects. They define what version 1 is allowed to claim.
 - [x] Public static deployment path
 - [x] Deploy the current audited revision and smoke-test the public URL
 
-Public verification: GitHub Pages deployment run `32992233100` completed successfully. A desktop and 390px mobile smoke test confirmed the midterm-first landing flow (including a campaign-tagged URL), correct branding, zero console errors or warnings, and no horizontal overflow.
+Public verification: GitHub Pages deployment run `33265173853` completed successfully for commit `77aff59`. Repeated desktop and 320px mobile smoke tests confirmed all three workspaces, correct branding, explicit clipboard-denial feedback, zero failed assets, and no horizontal overflow.
 
 ## Operational Recommendation
 

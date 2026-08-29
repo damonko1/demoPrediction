@@ -4,11 +4,11 @@ Status: Production-verified release evidence
 Branch: `docs/prelaunch-product-prd`  
 Last updated: 2026-08-26
 
-Application release commit: `cc374a5`
+Application release commit: `77aff59`
 
-Main quality gate: [GitHub Actions run 33004857987](https://github.com/damonko1/demoPrediction/actions/runs/33004857987) — passed
+Main quality gate: [GitHub Actions run 33265173837](https://github.com/damonko1/demoPrediction/actions/runs/33265173837) — passed
 
-Production deployment: [GitHub Actions run 33004857935](https://github.com/damonko1/demoPrediction/actions/runs/33004857935) — passed
+Production deployment: [GitHub Actions run 33265173853](https://github.com/damonko1/demoPrediction/actions/runs/33265173853) — passed
 
 This matrix maps the pre-launch PRD to authoritative source, automated, build, and runtime evidence. Production deployment remains intentionally gated on review and merge into `main`.
 
@@ -23,8 +23,8 @@ This matrix maps the pre-launch PRD to authoritative source, automated, build, a
 | Advanced capabilities discoverable and functional | Pass | Runtime accessibility snapshots exposed every named disclosure. SVG and PNG card downloads both completed successfully. Existing controls expose local overrides, sources, saved scenarios, comparison, sensitivity, Monte Carlo, and methodology. |
 | Scenario language and source dates accurate | Pass | Header explicitly says “Scenario simulator — not a forecast.” House identifies the 2024 result baseline, Senate identifies latest-completed race baselines, and History identifies the selected result year. Data validators pass. |
 | Keyboard, mobile, light, and dark review | Pass in Chromium and native Safari | Tabs support arrow-key selection and focus. House-map ArrowRight moved focus and selection from PA-7 to PA-8. Light/dark toggle updated its accessible label. At 320px all visible interactive targets reached 44px in both dimensions and the page had zero horizontal overflow. Native Safari 16.6 confirmed the production Senate journey, dark-theme toggle, URL routing, and mobile target sizing. |
-| Quality, data, build, and security gates | Pass | ESLint, TypeScript, 37 tests, state/Senate map validation, House map validation, legislative data validation, launch-contract validation, local static build, base-path build, and production dependency audit all passed. Audit reported zero vulnerabilities. |
-| Production deployment and public smoke test | Pass | Commit `cc374a5` passed the main quality gate and GitHub Pages deployment. The public House and Senate URLs returned HTTP 200. The expanded Senate tools layout had zero overlaps and zero horizontal overflow at 1844px and 320px, with zero console errors. Native Safari found no undersized visible targets at 320px after remediation. |
+| Quality, data, build, and security gates | Pass | ESLint, TypeScript, 37 tests repeated three times, state/Senate map validation, House map validation, legislative data validation, launch-contract validation, performance-budget validation, local static build, base-path build, and production dependency audit all passed. Audit reported zero vulnerabilities. |
+| Production deployment and public smoke test | Pass | Commit `77aff59` passed the main quality gate and GitHub Pages deployment. The public House, Senate, and History journeys returned HTTP 200 with no failed assets. The expanded Senate tools layout had zero overlaps and zero horizontal overflow at 1844px and 320px. Native Safari found no undersized visible targets at 320px after remediation. |
 | Known limitations consistent with public claims | Pass | `docs/data-accuracy.md`, `docs/launch-readiness-audit.md`, the PRD, and release runbook define completed-result baselines, heuristic limits, and non-goals. |
 | No unresolved severity-one or severity-two issue | Pass for production | No blocking issue remains from source, automated, data, build, security, Chromium runtime, or native Safari production review. |
 
@@ -60,6 +60,12 @@ This matrix maps the pre-launch PRD to authoritative source, automated, build, a
 | Browser console | 0 errors, 0 warnings in audited journeys |
 | Non-SVG mobile target minimum | 44 × 44 CSS pixels after remediation |
 | Export output | 1200 × 630 SVG and PNG downloads |
+| Production Lighthouse (three runs) | Performance 85–88; accessibility 100; best practices 100; SEO 100 |
+| Production first contentful paint | 1.1s, improved from 2.8s |
+| Production total blocking time | 230–320ms, improved from 770ms |
+| Production speed index | 2.4–2.8s, improved from 4.5s |
+| Rapid House input updates | 31.9ms average; 35.6ms maximum over ten updates |
+| Static performance envelope | 2,517,880 bytes total; 304,212 bytes gzipped JavaScript; 21,604 bytes gzipped CSS; 497,453-byte largest data asset |
 
 ## Automated Gate
 
@@ -71,7 +77,8 @@ The CI quality gate runs:
 4. all Vitest tests;
 5. all map and legislative-data validators;
 6. the pre-launch product-contract validator; and
-7. the production static build.
+7. the production static build; and
+8. the production size and compression budget.
 
 The quality workflow also supports manual dispatch so a feature branch can be tested from a clean GitHub checkout before a pull request or merge. The pull-request gate and the main-branch gate passed every job for this release.
 
@@ -81,3 +88,17 @@ The implementation, merge, deployment, public smoke test, and native Safari conf
 
 1. Repeat the smoke matrix on current Safari/iOS hardware as part of the release-candidate procedure.
 2. Run the moderated tasks with first-time users and record observed completion rates; this is a product-learning activity, not a blocker for the technically launch-ready build.
+
+## Final Production Audit — 2026-08-29
+
+The last full audit repeated every primary chamber journey, preset and slider updates, local state/district/race overrides, URL restoration and malformed-link fallback, local bookmark save/load/delete behavior, local and global reset paths, theme switching, keyboard tab and map navigation, disclosure content, map failure fallbacks, clipboard success and denial paths, and all three image exports.
+
+Three launch issues were found and resolved:
+
+1. Mobile Chromium could composite the translucent sidebar incorrectly and hide portions of the brand and inactive tabs when Senate was selected. Mobile now uses an opaque surface without backdrop filtering.
+2. Copy Summary relied only on the async Clipboard API and did not visibly report denial. All copy features now share a tested legacy fallback and expose a clear failure state.
+3. The History heading on the 1200 × 630 share card sat too close to the right border. Its typography now fits with safe spacing in both SVG and PNG output.
+
+The audit also removed render-blocking Google Font requests. Production Lighthouse improved from 57 to 85–88, while retaining perfect automated accessibility, best-practice, and SEO scores. CI now rejects releases that exceed the committed static-export, JavaScript, CSS, or data-asset budgets.
+
+The application is static and has no application server, runtime database, account service, or polling API. Normal traffic scales through the static host and CDN cache. If launch traffic is expected to exceed the host's published Pages limits, migrate the unchanged `out/` artifact to a dedicated CDN/static host; no application rewrite is required.
